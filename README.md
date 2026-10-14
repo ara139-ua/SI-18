@@ -207,3 +207,12 @@ Hay cinco tipos de usuario, cada uno con necesidades distintas:
 
 - El documento da pie a una novena historia: la **aprobación de franjas por la concejalía**. Aquí está incluida dentro de HU5, pero puede separarse.
 - Ambigüedad a decidir: el texto no dice cómo cuentan en la ocupación las franjas bloqueadas por clubes ni las instalaciones cerradas. Conviene fijarlo en los COS de HU8.
+
+---
+
+Reparto propuesto
+Persona	Historias	Tema:
+- Artur	HU1 (buscar pistas) + HU5 (franjas fijas de clubes)	Disponibilidad: qué franjas están libres, a qué precio y cuáles bloquea un club
+- B	    HU2 (reservar y pagar) + HU6 (validar QR)	Reserva y acceso: se crea la reserva, se genera el QR y se valida en la puerta
+- Saul	HU3 (cancelar reserva) + HU7 (cierre por mantenimiento)	Cancelaciones y devoluciones: el cierre por mantenimiento es una cancelación masiva con reembolso
+- D	    HU4 (cursos y lista de espera) + HU8 (informe mensual)	Cursos e informes: la parte más independiente del sistema
