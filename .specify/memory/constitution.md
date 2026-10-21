@@ -1,100 +1,160 @@
 <!--
 Sync Impact Report
-Version change: (unratified template) → 1.0.0
-Modified principles: none renamed (all placeholders replaced; initial adoption)
-Added sections: Core Principles I–VI, Stack and Security Constraints,
-  Development Workflow and Quality Gates, Governance
-Removed sections: none
-Follow-up TODOs: none
+- Versión: 1.0.0 → 1.1.0 (2026-10-21)
+- Idioma: el documento pasa de inglés a español (sin cambiar el sentido de I, II, IV, V y VI).
+- Principio modificado: III. Las reglas viven en el backend. Se quita la lista parcial de reglas
+  (7 días, 24 h, 15 min) y se remite a los valores de negocio de specs/000-core/spec.md para que
+  haya una única fuente de verdad.
+- Principios añadidos: VII. Base común en 000-core; VIII. Cero alcance fantasma;
+  IX. Idioma, moneda y zona horaria.
+- Secciones ampliadas: «Flujo de trabajo» (ciclo Spec Kit completo y obligatorio, conservación
+  de iteraciones) y nueva sección «Acuerdos de colaboración» (ramas, dueño por módulo,
+  trazabilidad, cambios en la base común por PR).
+- Gobernanza: «Principios I–VI» → «Principios I–IX».
+- Plantillas afectadas: ninguna requiere cambios (plan-template ya incluye «Constitution Check»).
+- Pendientes: crear specs/000-core (lo exige el principio VII).
+---
+Informe anterior (1.0.0, 2026-10-21): adopción inicial. Principios I–VI, restricciones de pila
+y seguridad, flujo de trabajo y gobernanza.
 -->
-# SI-18 Constitution
+# Constitución de SI-18 · Reserva de Instalaciones Deportivas Municipales
 
-## Core Principles
+## Principios
 
-### I. Accessibility WCAG 2.1 AA (NON-NEGOTIABLE)
-Every user-facing screen and component MUST conform to WCAG 2.1 level AA. Interactive elements
-MUST be keyboard operable with visible focus, have accessible names and labels, and meet AA
-colour-contrast ratios. Errors and status changes (e.g. a rejected booking, a validated QR)
-MUST NOT rely on colour alone and MUST be announced to assistive technologies. A feature is not
-done until its UI has been checked against these criteria.
-Rationale: the app serves all citizens of a municipality, so accessibility is a legal and
-social requirement, not an enhancement.
+### I. Accesibilidad WCAG 2.1 AA (NO NEGOCIABLE)
+Toda pantalla y componente visible para el usuario DEBE cumplir WCAG 2.1 nivel AA. Los elementos
+interactivos DEBEN poder usarse con teclado y con el foco visible, tener nombre y etiqueta
+accesibles y cumplir el contraste AA. Los errores y cambios de estado (por ejemplo, una reserva
+rechazada o un QR validado) NO DEBEN comunicarse solo con color y DEBEN anunciarse a las
+tecnologías de apoyo. Una funcionalidad no está terminada hasta que su interfaz se ha comprobado
+contra estos criterios.
+Motivo: la aplicación da servicio a toda la ciudadanía de un municipio; la accesibilidad es una
+obligación legal y social, no una mejora.
 
-### II. Business Logic Is Tested
-All business-rule logic MUST be covered by automated tests, including both sides of every
-boundary (e.g. exactly 7 days, exactly 24 h, exactly 15 minutes). Bug fixes MUST include a
-regression test. Tests for business logic MUST be deterministic: time MUST be injected through
-an abstraction (clock), never read from the system clock directly.
-Rationale: the rules decide money and access; they are cheap to test and costly to get wrong.
+### II. La lógica de negocio está probada
+Toda regla de negocio DEBE tener pruebas automáticas que cubran los dos lados de cada límite (por
+ejemplo, exactamente 7 días, exactamente 24 h, exactamente 15 minutos). Toda corrección de un
+fallo DEBE incluir una prueba de regresión. Las pruebas de negocio DEBEN ser deterministas: la hora
+se obtiene siempre a través de una abstracción de reloj inyectada, nunca leyendo el reloj del
+sistema directamente.
+Motivo: las reglas deciden dinero y acceso; probarlas es barato y equivocarse sale caro.
 
-### III. Business Rules Live in the Backend
-The ASP.NET Core API is the single source of truth for business rules. The following rules
-MUST be implemented and enforced only in the backend, in one place each:
-- A court can be booked at most 7 days in advance.
-- A cancellation is refunded only if it is made MORE than 24 h before the start time;
-  otherwise there is no refund.
-- A booking's QR code is valid from 15 minutes before the start until the end of the booking,
-  and is invalid once the booking is cancelled.
-The Blazor client MAY mirror these rules for user feedback, but it MUST NOT be trusted and MUST
-obtain the authoritative result from the API. Rule thresholds MUST be named constants or
-configuration, never duplicated literals.
-Rationale: a single enforcement point prevents client/server drift and bypass.
+### III. Las reglas de negocio viven en el backend
+La API de ASP.NET Core es la única fuente de verdad de las reglas de negocio. Cada regla DEBE
+implementarse y hacerse cumplir en el backend, en un único lugar. Los valores que las gobiernan
+(antelación máxima, plazo de devolución, ventana del QR, duración de la franja, tiempo de bloqueo
+durante el pago, etc.) se definen una sola vez en `specs/000-core/spec.md` y en el código DEBEN
+ser constantes con nombre o configuración, nunca literales repetidos.
+El cliente Blazor PUEDE replicar una regla para dar respuesta inmediata al usuario, pero NO DEBE
+considerarse fiable y DEBE obtener el resultado definitivo de la API. Toda restricción que dependa
+de la concurrencia (por ejemplo, que dos usuarios no confirmen la misma franja) DEBE garantizarse
+también en la base de datos, no solo en el código.
+Motivo: un único punto de aplicación evita que cliente y servidor diverjan y que la regla se
+salte con una petición directa.
 
-### IV. Consistent API Errors
-All API errors MUST use one response shape (RFC 9457 Problem Details) with a stable machine-readable
-error code, a human-readable message in Spanish suitable for display, and the correct HTTP
-status (400/422 validation or rule violation, 401/403 auth, 404 not found, 409 conflict).
-Unhandled exceptions MUST be converted by a global handler and MUST NOT leak stack traces or
-internal details. Rule rejections (e.g. booking beyond 7 days) MUST return an explanatory
-message.
-Rationale: clients can handle errors uniformly and users receive understandable feedback.
+### IV. Errores de la API coherentes
+Todos los errores de la API DEBEN usar un mismo formato (Problem Details, RFC 9457) con un código
+de error estable legible por máquina, un mensaje en español apto para mostrarse al usuario y el
+código HTTP correcto (400/422 validación o regla incumplida, 401/403 autenticación y permisos, 404
+no encontrado, 409 conflicto). Las excepciones no controladas DEBEN convertirse en un manejador
+global y NO DEBEN mostrar trazas ni detalles internos. Un rechazo por regla de negocio (por
+ejemplo, reservar a más de 7 días) DEBE devolver un mensaje que explique el motivo.
+Motivo: los clientes tratan los errores de forma uniforme y el usuario recibe explicaciones
+comprensibles.
 
-### V. No Secrets in the Repository (NON-NEGOTIABLE)
-Credentials, connection strings, API keys, payment-provider keys and signing keys MUST NEVER
-be committed. They MUST be supplied via environment variables, user-secrets or a secret store;
-the repo MAY contain only placeholder examples. A secret that is committed MUST be treated as
-compromised and rotated.
-Rationale: leaked secrets cannot be reliably retracted from git history.
+### V. Sin secretos en el repositorio (NO NEGOCIABLE)
+Credenciales, cadenas de conexión, claves de API, claves de la pasarela de pago y claves de firma
+NUNCA DEBEN subirse al repositorio. Se proporcionan mediante variables de entorno, user-secrets o
+un almacén de secretos; el repositorio solo PUEDE contener ejemplos con valores de relleno
+(`.env.example`). Un secreto subido por error DEBE considerarse comprometido y cambiarse.
+Motivo: un secreto filtrado no puede borrarse de forma fiable del historial de git.
 
-### VI. Fictitious Test Data
-Seed data, fixtures, tests and demos MUST use fictitious data only. Real personal data
-(names, emails, phone numbers, ID numbers, payment details) MUST NOT appear in the repository,
-logs or test databases.
-Rationale: protects citizens' privacy and keeps the project compliant with data-protection law.
+### VI. Datos de prueba ficticios
+Los datos de inicialización, fixtures, pruebas y demos DEBEN ser ficticios. No DEBEN aparecer
+datos personales reales (nombres, correos, teléfonos, DNI, datos de pago) en el repositorio, en
+los registros ni en las bases de datos de prueba.
+Motivo: protege la privacidad de la ciudadanía y cumple la normativa de protección de datos.
 
-## Stack and Security Constraints
+### VII. Base común en 000-core
+Las specs 001 a 008 se apoyan en el plan técnico (`specs/000-core/plan.md`) y en el modelo de
+datos (`specs/000-core/data-model.md`) de la spec `000-core`. No los repiten ni los redefinen: los
+referencian. Si una spec necesita una entidad, un estado o un valor de negocio nuevo o distinto,
+el cambio se propone primero en `000-core` y solo después se usa en la spec. Si una spec
+contradice a `000-core`, manda `000-core`.
+Motivo: cuatro personas trabajan en paralelo sobre las mismas entidades (reserva, pago,
+instalación, franja, curso); sin un modelo común la integración falla.
 
-- Frontend: Blazor WebAssembly with MudBlazor components (which MUST be used in an accessible
-  manner per Principle I).
-- Backend: ASP.NET Core Minimal API; business rules in a layer independent from HTTP endpoints
-  so they can be unit tested.
-- Database: PostgreSQL, with schema changes applied through versioned migrations.
-- Monetary amounts MUST use exact decimal types, and booking time slots are 1 hour.
-- Deviations from this stack MUST be justified in the plan and approved per Governance.
+### VIII. Cero alcance fantasma
+No se implementa ninguna funcionalidad que no esté escrita en una especificación. Si surge una
+idea nueva, se propone en la spec correspondiente; no se construye hasta que forme parte de ella.
+Entre dos soluciones que cumplen la spec, se elige la más simple: no se añaden capas, opciones ni
+flexibilidad «por si acaso».
+Motivo: mantiene trazable cada línea de código hasta una historia y evita que `converge` detecte
+código sin justificación.
 
-## Development Workflow and Quality Gates
+### IX. Idioma, moneda y zona horaria
+Todo el producto (pantallas, mensajes, especificaciones y documentación) está en español de
+España. Los importes se expresan en euros (€) con el formato habitual en España. Las reglas que
+dependen de la hora (7 días, 24 h, 15 minutos, franjas de 1 hora) se evalúan en la zona horaria
+`Europe/Madrid`; las fechas se guardan en UTC y se convierten solo al mostrarlas o al evaluar una
+regla, teniendo en cuenta el cambio de horario de verano.
+Motivo: el servicio es de un ayuntamiento español, y una regla de 24 h mal calculada en el cambio
+de hora decide si se devuelve o no el dinero.
 
-- Specifications, plans and tasks MUST be written through the Spec Kit flow before
-  implementation of a feature.
-- Every pull request MUST pass build and tests, and the reviewer MUST confirm compliance with
-  Principles I–VI.
-- A pull request that adds or changes a business rule MUST include tests (Principle II) and MUST
-  place the rule in the backend (Principle III).
-- A pull request that changes UI MUST state how WCAG AA was verified (Principle I).
-- Secret scanning MUST be performed before merging when tooling is available (Principle V).
+## Restricciones de pila y seguridad
 
-## Governance
+- Frontend: Blazor WebAssembly con componentes MudBlazor, usados de forma accesible (principio I).
+- Backend: ASP.NET Core Minimal API; las reglas de negocio en una capa independiente de los
+  endpoints HTTP para poder probarlas de forma unitaria.
+- Base de datos: PostgreSQL, con los cambios de esquema aplicados mediante migraciones versionadas.
+- Los importes DEBEN usar tipos decimales exactos (nunca coma flotante). Las franjas de reserva
+  son de 1 hora.
+- Cualquier desviación de esta pila DEBE justificarse en el plan y aprobarse según la Gobernanza.
 
-This constitution supersedes other practices in this repository. Amendments MUST be proposed
-through a pull request describing the change, rationale and impact on existing specs, plans and
-code, and MUST be approved by the project team before merge.
+## Flujo de trabajo y controles de calidad
 
-Versioning follows semantic versioning: MAJOR for backward-incompatible removal or redefinition
-of principles; MINOR for a new principle/section or materially expanded guidance; PATCH for
-clarifications and wording fixes.
+- Cada spec sigue el ciclo completo de Spec Kit: specify → clarify → plan → tasks → analyze →
+  implement → converge. No se implementa una funcionalidad sin su spec, su plan y sus tareas.
+- Se conservan todos los ficheros generados por el ciclo (`spec.md`, `plan.md`, `research.md`,
+  `data-model.md`, `contracts/`, `quickstart.md`, `tasks.md`, checklists e informes de analyze y
+  converge) y sus iteraciones: no se borran versiones anteriores de un informe ni tareas añadidas
+  por `converge`.
+- Todo pull request DEBE compilar y pasar las pruebas, y quien revisa DEBE confirmar que cumple los
+  principios I–IX.
+- Un pull request que añade o cambia una regla de negocio DEBE incluir pruebas (principio II) y
+  situar la regla en el backend (principio III).
+- Un pull request que cambia la interfaz DEBE indicar cómo se ha comprobado WCAG AA (principio I).
+- Antes de fusionar se DEBE revisar que no se suben secretos, con herramienta si está disponible
+  (principio V).
 
-Compliance MUST be reviewed in every pull request and at the planning stage (Constitution
-Check) of every feature. Violations MUST be fixed or explicitly justified and approved before
-merge. Runtime guidance for contributors is in [README.md](../../README.md).
+## Acuerdos de colaboración
 
-**Version**: 1.0.0 | **Ratified**: 2026-10-21 | **Last Amended**: 2026-10-21
+- El equipo son cuatro personas y cada una es responsable de dos historias; el reparto está en
+  `docs/agrupamiento.md` y no cambia sin acuerdo del grupo.
+- Cada spec se trabaja en su propia rama (`spec-001` a `spec-008`); la base común (`000-core`, la
+  constitución y la estructura del proyecto) se trabaja en `develop` y se lleva a `main` por pull
+  request.
+- Cada módulo de la API y del frontend tiene un único dueño, que es el único que escribe en sus
+  tablas; los demás usan su interfaz pública. Los cambios en el modelo de datos compartido o en
+  los valores de negocio van por pull request revisado por al menos otra persona del grupo.
+- Todo commit indica la spec o tarea a la que pertenece (por ejemplo, `spec-002 T014: ...`) para
+  que la autoría de cada historia sea trazable.
+- Cuando una historia dependa de otra persona (por ejemplo, la cancelación invalida el QR), la
+  dependencia se anota en las dos specs y se avisa al grupo.
+
+## Gobernanza
+
+Esta constitución prevalece sobre cualquier otra práctica del repositorio. Se modifica mediante un
+pull request que explique el cambio, el motivo y su impacto en las specs, planes y código
+existentes, y que el equipo apruebe antes de fusionarlo.
+
+Las versiones siguen versionado semántico: MAYOR si se elimina o redefine un principio de forma
+incompatible; MENOR si se añade un principio o sección o se amplía su alcance; PARCHE si solo se
+aclara la redacción.
+
+El cumplimiento se revisa en cada pull request y en la fase de planificación de cada spec
+(«Constitution Check» del plan). Los incumplimientos DEBEN corregirse o justificarse y aprobarse
+explícitamente antes de fusionar. La guía de uso para quien contribuye está en
+[README.md](../../README.md).
+
+**Versión**: 1.1.0 | **Ratificada**: 2026-10-21 | **Última modificación**: 2026-10-21
