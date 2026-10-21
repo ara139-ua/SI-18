@@ -211,7 +211,14 @@ Hay cinco tipos de usuario, cada uno con necesidades distintas:
 ---
 
 Reparto propuesto
-Persona	Historias	Tema:
+
+| Persona | HU1 | HU2 | HU3 | HU4 | HU5 | HU6 | HU7 | HU8
+|---|---|---|---|---|---|---|---|---|
+| Artur | X  | | | | X | | | |
+| Saul | | X | | | | X| | |
+| C |
+| D |
+
 - Artur	HU1 (buscar pistas) + HU5 (franjas fijas de clubes)	Disponibilidad: qué franjas están libres, a qué precio y cuáles bloquea un club
 - Saul	HU2 (reservar y pagar) + HU6 (validar QR)	Reserva y acceso: se crea la reserva, se genera el QR y se valida en la puerta
 - C	    HU3 (cancelar reserva) + HU7 (cierre por mantenimiento)	Cancelaciones y devoluciones: el cierre por mantenimiento es una cancelación masiva con reembolso
