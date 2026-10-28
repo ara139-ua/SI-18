@@ -300,7 +300,7 @@ poder ordenar y filtrar; es la representación del atributo «trimestre» de la 
   mismo curso con un `(llegada_en_utc, id)` menor.
 - **Estados**: `confirmada | lista_espera → baja`; `lista_espera → confirmada` (promoción del primero
   de la lista, con aviso). `baja` es final.
-- **Índice propuesto** (pendiente de confirmar en la spec-004): UNIQUE (`usuario_id`, `curso_id`)
+- **Índice propuesto para la spec-004** (no se crea en la migración `NucleoComun`, principio VIII): UNIQUE (`usuario_id`, `curso_id`)
   WHERE `estado <> 'baja'`.
 - La concurrencia se controla con `FOR UPDATE` sobre el curso (R19).
 

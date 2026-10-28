@@ -45,11 +45,11 @@ Content-Type: application/problem+json
 | -------------------------- | ---- | ---------------------------------------------------------------------------------- | -------------- |
 | `PETICION_INVALIDA`        | 400  | «Revisa los datos marcados.»                                                       | Comun          |
 | `NO_AUTENTICADO`           | 401  | «Tienes que iniciar sesión para continuar.»                                        | Comun          |
-| `CREDENCIALES_INVALIDAS`   | 401  | «Correo o contraseña incorrectos.» (no revela si el correo existe)                 | Comun, HU-3 esc. 5 |
+| `CREDENCIALES_INVALIDAS`   | 401  | «Correo o contraseña incorrectos.» (no revela si el correo existe)                 | Comun, HU-C3 esc. 5 |
 | `ROL_NO_PERMITIDO`         | 403  | «Tu perfil no permite realizar esta acción.»                                       | RF-009         |
 | `OTRO_CENTRO`              | 403  | «Esta instalación pertenece a otro centro; solo puedes actuar en el tuyo.»         | RF-009, D7     |
 | `NO_ENCONTRADO`            | 404  | «No se ha encontrado lo que buscas.»                                               | Comun          |
-| `TRANSICION_NO_PERMITIDA`  | 409  | «Esta reserva ya no se puede modificar en su estado actual.»                       | RF-015, HU-4 esc. 3 |
+| `TRANSICION_NO_PERMITIDA`  | 409  | «Esta reserva ya no se puede modificar en su estado actual.»                       | RF-015, HU-C4 esc. 3 |
 | `FRANJA_OCUPADA`           | 409  | «Otra persona acaba de reservar esta franja. Elige otra hora.»                     | RF-014         |
 | `RESERVA_CADUCADA`         | 409  | «Han pasado más de 10 minutos y la reserva ha caducado. Si la franja sigue libre, haz una reserva nueva.» | RF-016 |
 | `PAGO_RECHAZADO`           | 422  | «El pago no se ha completado y la reserva ha caducado. Si la franja sigue libre, haz una reserva nueva.» | RF-016 |

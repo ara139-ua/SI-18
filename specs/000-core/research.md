@@ -178,7 +178,7 @@ Cada apartado sigue el formato *Decisión / Motivo / Alternativas descartadas*. 
   - **Login fallido**: siempre el mismo 401 `CREDENCIALES_INVALIDAS` con el texto «Correo o
     contraseña incorrectos.», exista o no el correo. Si el correo no existe, se verifica un hash
     ficticio para igualar el tiempo de respuesta.
-- **Motivo**: RF-004 a RF-009 y la HU-3, escenario 5. Usar cookie con el mismo origen es lo más simple
+- **Motivo**: RF-004 a RF-009 y la HU-C3, escenario 5. Usar cookie con el mismo origen es lo más simple
   y seguro para una SPA servida por su propia API.
 - **Alternativas descartadas**: ASP.NET Core Identity completo (registro, tablas y UI que la spec
   excluye); JWT en `localStorage` (expuesto a XSS, y hay que gestionar la renovación); cliente y API en
@@ -268,7 +268,7 @@ Cada apartado sigue el formato *Decisión / Motivo / Alternativas descartadas*. 
   - Se usan los componentes de MudBlazor con etiqueta visible (`Label`) o `aria-label`, y
     `<html lang="es">`.
   - Los mensajes de resultado se muestran con `MudAlert`, con texto e icono (nunca solo color), dentro
-    de una región `role="status"` / `aria-live="polite"` común (`AvisoAccesible.razor`, módulo
+    de una región `role="status"` / `aria-live="polite"` común (`MensajeAccesible.razor`, módulo
     `Comun`).
   - Hay un salto «Ir al contenido» en el layout. El tema de MudBlazor se ajusta a contraste AA.
   - **Comprobación**: lista de verificación de teclado y foco más Lighthouse/axe DevTools en cada PR
