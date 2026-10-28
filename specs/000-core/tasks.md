@@ -47,7 +47,7 @@ defecto (`sugerido: …`) para no duplicar trabajo.
 
 **Propósito**: crear la solución y el entorno local. Bloquea todo lo demás salvo T011.
 
-- [ ] T001 [Saul] Crear la solución `fuentes/SI18.slnx` con seis proyectos:
+- [X] T001 [Saul] Crear la solución `fuentes/SI18.slnx` con seis proyectos:
   - `src/SI18.Dominio`: classlib, **sin** referencias a ASP.NET Core ni a EF Core.
   - `src/SI18.Contratos`: classlib, sin referencias.
   - `src/SI18.Api`: proyecto `web`; referencia a Dominio, Contratos y Cliente (la API sirve el
@@ -59,12 +59,12 @@ defecto (`sugerido: …`) para no duplicar trabajo.
   En `Dominio`, `Api`, `Cliente` y en los dos proyectos de pruebas, crear las carpetas de módulo
   `Comun/`, `Disponibilidad/`, `Reservas/`, `Cancelaciones/` y `CursosInformes/` (en `Api`, dentro de
   `Modulos/`) con un `.gitkeep`.
-- [ ] T002 [P] [Saul] Crear `fuentes/global.json` con `"sdk": { "version": "10.0.100", "rollForward": "latestFeature" }`.
-- [ ] T003 [P] [Saul] Crear `fuentes/Directory.Build.props`:
+- [X] T002 [P] [Saul] Crear `fuentes/global.json` con `"sdk": { "version": "10.0.100", "rollForward": "latestFeature" }`.
+- [X] T003 [P] [Saul] Crear `fuentes/Directory.Build.props`:
   - `TargetFramework net10.0`, `Nullable enable`, `ImplicitUsings enable` y `TreatWarningsAsErrors true`;
   - para los proyectos de `src/` (condición sobre `$(MSBuildProjectDirectory)`), referencia a
     `Microsoft.CodeAnalysis.BannedApiAnalyzers` y `<AdditionalFiles Include="$(MSBuildThisFileDirectory)BannedSymbols.txt" />`.
-- [ ] T004 [P] [Saul] Crear `fuentes/Directory.Packages.props` con `ManagePackageVersionsCentrally=true`
+- [X] T004 [P] [Saul] Crear `fuentes/Directory.Packages.props` con `ManagePackageVersionsCentrally=true`
   y **todos** los paquetes del plan, en la última versión estable compatible con net10.0:
   - `Microsoft.AspNetCore.Components.WebAssembly`, `Microsoft.AspNetCore.Components.WebAssembly.DevServer`,
     `Microsoft.AspNetCore.Components.WebAssembly.Server`;
@@ -78,23 +78,23 @@ defecto (`sugerido: …`) para no duplicar trabajo.
     `Testcontainers.PostgreSql`.
 
   Añadir a cada `.csproj` sus `PackageReference` sin versión.
-- [ ] T005 [P] [Saul] Crear `fuentes/BannedSymbols.txt` que prohíba `P:System.DateTime.Now`,
+- [X] T005 [P] [Saul] Crear `fuentes/BannedSymbols.txt` que prohíba `P:System.DateTime.Now`,
   `P:System.DateTime.UtcNow`, `P:System.DateTime.Today`, `P:System.DateTimeOffset.Now` y
   `P:System.DateTimeOffset.UtcNow`, con el mensaje «Usa TimeProvider inyectado (constitución, principio II)».
-- [ ] T006 [P] [Saul] Crear `fuentes/.config/dotnet-tools.json` con `dotnet-ef` 10.x.
-- [ ] T007 [P] [Saul] Crear `fuentes/docker-compose.yml` con un único servicio `postgres`:
+- [X] T006 [P] [Saul] Crear `fuentes/.config/dotnet-tools.json` con `dotnet-ef` 10.x.
+- [X] T007 [P] [Saul] Crear `fuentes/docker-compose.yml` con un único servicio `postgres`:
   - imagen `postgres:17-alpine`;
   - `POSTGRES_USER`, `POSTGRES_PASSWORD` y `POSTGRES_DB` leídos de `.env`;
   - puerto `${POSTGRES_PORT:-5432}:5432`;
   - volumen nombrado `si18-datos`;
   - `healthcheck` con `pg_isready -U $${POSTGRES_USER}`.
-- [ ] T008 [P] [Saul] Crear `fuentes/.env.example` y `fuentes/.gitignore`:
+- [X] T008 [P] [Saul] Crear `fuentes/.env.example` y `fuentes/.gitignore`:
   - `.env.example`, con valores de relleno y nunca reales (principio V): `POSTGRES_USER=si18`,
     `POSTGRES_PASSWORD=<cambia-esto>`, `POSTGRES_DB=si18`, `POSTGRES_PORT=5432`,
     `ConnectionStrings__Si18=Host=localhost;Port=5432;Database=si18;Username=si18;Password=<cambia-esto>`,
     `SI18_CLAVE_DEMO=<cambia-esto>`, `SI18_SEMBRAR_DATOS=true` y `SI18_TEST_CONNECTION=`;
   - `.gitignore`: `bin/`, `obj/`, `.vs/`, `*.user` y `.env`.
-- [ ] T009 [Saul] Crear `fuentes/src/SI18.Api/Program.cs` limitado a la composición:
+- [X] T009 [Saul] Crear `fuentes/src/SI18.Api/Program.cs` limitado a la composición:
   - llamadas a `builder.Services.AddInfraestructura(builder.Configuration)`, `AddErrores()` y `AddComun()`;
   - después, `app.UseErrores()`, `app.UseBlazorFrameworkFiles()`, `app.UseStaticFiles()`,
     `app.UseAuthentication()`, `app.UseAuthorization()`, `app.MapComun()` y
@@ -105,7 +105,7 @@ defecto (`sugerido: …`) para no duplicar trabajo.
   - `Infraestructura/RegistroInfraestructura.cs` (dueño: Saul);
   - `Infraestructura/RegistroErrores.cs` (dueño: Artur);
   - `Modulos/Comun/RegistroComun.cs` (dueño: Ambos).
-- [ ] T010 [Saul] Comprobar que `dotnet build SI18.slnx` compila sin advertencias y que
+- [X] T010 [Saul] Comprobar que `dotnet build SI18.slnx` compila sin advertencias y que
   `docker compose up -d` deja `postgres` en `healthy`. Abrir el PR de `feature/000-core-esqueleto` a
   `develop`; lo aprueba Artur.
 - [X] T011 [P] [Artur] Crear `docs/agrupamiento.md` (en la raíz del repositorio) con el reparto
@@ -682,8 +682,10 @@ responsable.
 
 - [ ] T071 [Ambos · sugerido: Artur] Crear las pruebas de errores, sin endpoints de prueba:
   - `fuentes/tests/SI18.Api.Tests/Comun/ErroresTests.cs`: una `FabricaApi` con `ConnectionStrings:Si18`
-    apuntando a un puerto cerrado; `GET /api/centros` → 500 `ERROR_INTERNO`, y el cuerpo no contiene
-    «Npgsql» ni ningún fragmento de la traza;
+    apuntando a un puerto cerrado **y `SI18_SEMBRAR_DATOS=false`** (si no, `InicializadorDatos`
+    intentaría migrar al arrancar y la API no llegaría a levantarse); `GET /api/centros` → 500
+    `ERROR_INTERNO`, y el cuerpo no contiene «Npgsql» ni ningún fragmento de la traza. Para ello,
+    `FabricaApi` (T022) acepta `sembrarDatos` y la cadena de conexión como parámetros del constructor;
   - `fuentes/tests/SI18.Api.Tests/Comun/ManejadorErroresTests.cs`: invocar
     `ManejadorErrores.TryHandleAsync` con `DefaultHttpContext` y `ErrorNegocio(FRANJA_OCUPADA)` → 409 y
     `application/problem+json` con `type`, `title`, `detail`, `codigo` y `traceId`.
