@@ -154,8 +154,8 @@ fuentes/
 │   └── SI18.Cliente/                # Blazor WebAssembly + MudBlazor
 │       ├── wwwroot/index.html       # lang="es"
 │       ├── Layout/                  # MainLayout con «Ir al contenido», menú por rol
-│       ├── Comun/                   # InicioSesion.razor, MisAvisos.razor, AvisoAccesible.razor,
-│       │                            # ClienteApi (lee ProblemDetails), FormatoEs (importes y fechas en Madrid)
+│       ├── Comun/                   # InicioSesion.razor, MisAvisos.razor, MensajeAccesible.razor,
+│       │                            # ClienteApi (lee ProblemDetails); FormatoEs está en SI18.Contratos/Comun
 │       ├── Disponibilidad/  Reservas/  Cancelaciones/  CursosInformes/
 └── tests/
     ├── SI18.Dominio.Tests/          # unitarias; una carpeta por módulo
@@ -201,7 +201,7 @@ Dependencias entre proyectos:
    caducidad la completa la spec-002 sobre la máquina de estados ya probada.
 9. **Avisos**: `IServicioAvisos` y `/api/avisos` (más la pantalla «Mis avisos»).
 10. **Cliente base**: layout accesible, inicio de sesión, menú por rol, `ClienteApi` con lectura de
-    Problem Details, `AvisoAccesible` y formato `es-ES`.
+    Problem Details, `MensajeAccesible` y formato `es-ES` (`FormatoEs`, en `SI18.Contratos`).
 11. **Entorno**: `docker-compose.yml`, `.env.example`, `.gitignore` y la base de pruebas de integración
     (`FabricaApi` con Testcontainers y `FakeTimeProvider`).
 

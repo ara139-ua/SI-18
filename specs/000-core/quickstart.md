@@ -60,11 +60,11 @@ Son manuales y van contra la API en marcha. Cada uno tiene también su prueba au
 
 | # | Paso | Resultado esperado | Spec |
 |---|------|--------------------|------|
-| V1 | `POST /api/sesion` con `ciudadana.empadronada@si18.test` + `SI18_CLAVE_DEMO` | 200; `rol = ciudadano`, `tipoTarifa = empadronado`; cookie `si18.sesion` HttpOnly | HU-3 esc. 1 |
-| V2 | Igual con `ciudadano.noempadronado@si18.test` | `tipoTarifa = no_empadronado` | HU-3 esc. 2 |
-| V3 | Igual con `representante.padel@si18.test` (no empadronado) | `tipoTarifa = club`, `clubNombre` informado | HU-3 esc. 3 |
-| V4 | Igual con `personal.norte@si18.test` | `rol = personal_centro`, `centroNombre = Polideportivo Norte` | HU-3, RF-008 |
-| V5 | `POST /api/sesion` con contraseña incorrecta, y otra vez con un correo inexistente | Las dos dan 401 `CREDENCIALES_INVALIDAS` con el mismo `detail` | HU-3 esc. 5 |
+| V1 | `POST /api/sesion` con `ciudadana.empadronada@si18.test` + `SI18_CLAVE_DEMO` | 200; `rol = ciudadano`, `tipoTarifa = empadronado`; cookie `si18.sesion` HttpOnly | HU-C3 esc. 1 |
+| V2 | Igual con `ciudadano.noempadronado@si18.test` | `tipoTarifa = no_empadronado` | HU-C3 esc. 2 |
+| V3 | Igual con `representante.padel@si18.test` (no empadronado) | `tipoTarifa = club`, `clubNombre` informado | HU-C3 esc. 3 |
+| V4 | Igual con `personal.norte@si18.test` | `rol = personal_centro`, `centroNombre = Polideportivo Norte` | HU-C3, RF-008 |
+| V5 | `POST /api/sesion` con contraseña incorrecta, y otra vez con un correo inexistente | Las dos dan 401 `CREDENCIALES_INVALIDAS` con el mismo `detail` | HU-C3 esc. 5 |
 | V6 | `GET /api/avisos` sin cookie | 401 Problem Details `NO_AUTENTICADO` en español, sin traza | RF-028, principio IV |
 | V7 | `GET /api/centros` | 4 centros, cada uno con `horaApertura 08:00` y `horaCierre 22:00` | Valores de negocio |
 | V8 | `GET /api/instalaciones?reservablePorFranjas=true` | Solo pistas de tenis y pádel (16) | RF-012 |

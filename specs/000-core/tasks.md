@@ -37,6 +37,9 @@ defecto (`sugerido: …`) para no duplicar trabajo.
 - Cada uno registra sus servicios en su propio fichero de extensión (`RegistroInfraestructura.cs`
   para Saul, `RegistroErrores.cs` para Artur, `RegistroComun.cs` para Ambos). `Program.cs` no se toca
   después de T009.
+- **Accesibilidad en cada PR** (principio I): todo PR que incluya ficheros de `SI18.Cliente` anota en
+  su descripción la comprobación de quickstart.md §6 (teclado, foco, anuncio de mensajes y
+  Lighthouse/axe). T073 es la revisión final conjunta, no la única.
 
 ---
 
@@ -208,7 +211,9 @@ ficheros distintos.
     definida `SI18_TEST_CONNECTION`;
   - inyecta `ConnectionStrings:Si18`, `SI18_CLAVE_DEMO=clave-de-prueba` y `SI18_SEMBRAR_DATOS=true`;
   - sustituye `TimeProvider` por un `FakeTimeProvider` expuesto como propiedad `Reloj`;
-  - ofrece `CrearClienteConSesion(correo)`.
+  - ofrece `CrearClienteConSesion(correo)`;
+  - fija `ClientOptions.BaseAddress = new Uri("https://localhost")`, para que el `HttpClient` de prueba
+    devuelva la cookie `Secure` `si18.sesion` (con el `http://localhost` por defecto no la enviaría).
 
   Crear también `ColeccionApi.cs` (`[CollectionDefinition]`). Las migraciones y la siembra las aplica
   el arranque (`InicializadorDatos`, T038).
@@ -222,10 +227,11 @@ ficheros distintos.
   - enlace «Ir al contenido» como primer elemento enfocable;
   - `<main id="contenido" tabindex="-1">`;
   - `MudThemeProvider` con `Tema`;
-  - encabezado con el nombre del servicio y un hueco para el menú por rol (se completa en T049).
+  - encabezado con el nombre del servicio y un hueco para el menú por rol (se completa en T056).
 
-  Depende de T023.
-- [ ] T025 [P] [Artur] Crear `fuentes/src/SI18.Cliente/Comun/AvisoAccesible.razor` (R16):
+  Depende de T023. Antes del PR: comprobar quickstart.md §6 sobre el layout y anotarlo en el PR.
+- [ ] T025 [P] [Artur] Crear `fuentes/src/SI18.Cliente/Comun/MensajeAccesible.razor` (R16; se llama
+  «Mensaje» para no confundirlo con las notificaciones de «Mis avisos»):
   - una región con `role="status"` y `aria-live="polite"` que siempre está en el DOM;
   - `MudAlert` con icono **y** texto (nunca solo color);
   - método público `Mostrar(string texto, Severity tipo)`.
@@ -246,8 +252,8 @@ ficheros distintos.
 **Objetivo**: todas las entidades de «Entidades clave» existen una sola vez en código y en
 PostgreSQL, con sus restricciones, y hay datos ficticios para trabajar.
 
-**Prueba independiente**: sobre una base de datos vacía se aplica la migración. Existen las 18 tablas
-(17 entidades más `instalacion_deportes`), con los índices y `CHECK` de data-model.md, la siembra
+**Prueba independiente**: sobre una base de datos vacía se aplica la migración. Existen las 17 tablas
+(16 entidades persistidas más `instalacion_deportes`; la Franja no se almacena), con los índices y `CHECK` de data-model.md, la siembra
 crea los datos indicados y ejecutarla dos veces no duplica nada.
 
 ### Entidades de dominio (Saul, en paralelo)
@@ -276,6 +282,10 @@ crea los datos indicados y ejecutarla dos veces no duplica nada.
 
   Métodos `Aprobar(ahora)` y `Rechazar(ahora)`: solo desde `Pendiente`; si no, lanzan
   `TRANSICION_NO_PERMITIDA`. La comprobación de conflictos al aprobar es de la spec-005.
+
+  Incluye `fuentes/tests/SI18.Dominio.Tests/Disponibilidad/SolicitudFranjasFijasTests.cs`: `Aprobar` y
+  `Rechazar` desde `Pendiente` funcionan y rellenan `ResueltaEnUtc`; desde `Aprobada` o `Rechazada`
+  → `TRANSICION_NO_PERMITIDA` (principio II).
 - [ ] T030 [P] [US1] [Saul] Crear `fuentes/src/SI18.Dominio/Reservas/Reserva.cs`, `Pago.cs` y
   `ValidacionAcceso.cs`, solo con los campos de data-model.md (los métodos de estado van en T060):
   - **Reserva**: `InicioUtc`, `FinUtc`, `TipoTarifa`, `Importe`, `Estado`, `CreadaEnUtc`,
@@ -290,6 +300,12 @@ crea los datos indicados y ejecutarla dos veces no duplica nada.
   - **CierreMantenimiento**: `InstalacionId`, `InicioUtc` y `FinUtc` «en punto (hora de Madrid)»,
     `Motivo` «varchar(500) obligatorio», `RegistradoPorId`, `RegistradoEnUtc`, y el método
     `Afecta(inicioUtc, finUtc)` para el solape semiabierto `[inicio, fin)`.
+
+  Incluye `fuentes/tests/SI18.Dominio.Tests/Cancelaciones/CierreMantenimientoTests.cs` con
+  `[Trait("Categoria","Limites")]` (principio II). Para un cierre de 10:00 a 12:00:
+  - la franja de 09:00 a 10:00 no se ve afectada;
+  - las de 10:00 a 11:00 y de 11:00 a 12:00 sí;
+  - la de 12:00 a 13:00 no.
 - [ ] T032 [P] [US1] [Saul] Crear `fuentes/src/SI18.Dominio/CursosInformes/Curso.cs` e
   `Inscripcion.cs`:
   - **Curso**: `Trimestre` «varchar(30)», `FechaInicio`, `FechaFin`, `DiasSemana`, `HoraInicio`,
@@ -335,9 +351,9 @@ crea los datos indicados y ejecutarla dos veces no duplica nada.
   - `Modulos/Cancelaciones/Configuraciones/`: `devoluciones.pago_id` UNIQUE; `cierres_mantenimiento`
     con `CHECK (fin_utc > inicio_utc)`;
   - `Modulos/CursosInformes/Configuraciones/`: `cursos` con `CHECK (plazas_maximas > 0)`,
-    `fecha_fin > fecha_inicio` y `hora_fin > hora_inicio`; `inscripciones` con
-    `UNIQUE (usuario_id, curso_id) WHERE estado <> 'baja'` y el comentario «pendiente de confirmar en
-    la spec-004».
+    `fecha_fin > fecha_inicio` y `hora_fin > hora_inicio`; `inscripciones` solo con sus claves
+    foráneas. El índice único por usuario y curso **no** se crea: lo propondrá la spec-004 (principio
+    VIII).
 - [ ] T036 [US1] [Saul] Rellenar `fuentes/src/SI18.Api/Infraestructura/RegistroInfraestructura.cs`:
   - `AddDbContext<Si18DbContext>` con `UseNpgsql(config.GetConnectionString("Si18"))` +
     `UseSnakeCaseNamingConvention()`;
@@ -355,7 +371,8 @@ crea los datos indicados y ejecutarla dos veces no duplica nada.
   - si `SI18_SEMBRAR_DATOS=true`, aplica `MigrateAsync()` y, si `centros` está vacía, inserta
     exactamente los datos de [data-model.md § Datos de inicialización](./data-model.md#datos-de-inicialización):
     - 4 centros y 7 deportes;
-    - 26 instalaciones (4 por centro + sala en cada uno + piscina en Norte y Sur);
+    - 26 instalaciones (por centro: 2 pistas de tenis, 2 de pádel, pabellón y sala; más una piscina
+      en Norte y otra en Sur);
     - 6 tarifas (6,00 / 10,00 / 4,00 para tenis y pádel);
     - 2 clubes y la temporada «2026-2027»;
     - 10 usuarios `@si18.test`;
@@ -369,8 +386,8 @@ crea los datos indicados y ejecutarla dos veces no duplica nada.
 ### Pruebas de US1 (integración · Fase 2 del reparto)
 
 - [ ] T039 [P] [US1] [Ambos · sugerido: Saul] Crear `fuentes/tests/SI18.Api.Tests/Comun/MigracionesTests.cs`
-  con `FabricaApi`: consultando `information_schema` y `pg_indexes`, comprobar que existen las 18 tablas
-  y el índice `ux_reservas_activa` con su filtro.
+  con `FabricaApi`: consultando `information_schema` y `pg_indexes`, comprobar que existen las 17 tablas
+  de data-model.md (sin contar `__EFMigrationsHistory`) y el índice `ux_reservas_activa` con su filtro.
 - [ ] T040 [P] [US1] [Ambos · sugerido: Saul] Crear `fuentes/tests/SI18.Api.Tests/Comun/InicializadorDatosTests.cs`:
   - los recuentos son los de T038;
   - ejecutar el inicializador dos veces no cambia los recuentos;
@@ -458,10 +475,16 @@ a los dos lados del límite.
     - null → `QR_DESCONOCIDO`.
 
   Depende de T045 y T046.
-- [ ] T048 [P] [US2] [Artur] Crear `fuentes/src/SI18.Cliente/Comun/FormatoEs.cs` (RF-027, principio IX):
+- [ ] T048 [P] [US2] [Artur] Crear `fuentes/src/SI18.Contratos/Comun/FormatoEs.cs` (RF-027, principio
+  IX). Va en Contratos para que el cliente lo use y se pueda probar:
   - `Importe(decimal)` → `ToString("C2", new CultureInfo("es-ES"))`, que da «6,00 €»;
   - `FechaHora(DateTime utc)` → hora de Madrid con `TimeZoneInfo.FindSystemTimeZoneById("Europe/Madrid")`,
     en formato `dd/MM/yyyy HH:mm`.
+
+  Incluye `fuentes/tests/SI18.Api.Tests/Comun/FormatoEsTests.cs`:
+  - `6m` → «6,00 €» (con espacio duro antes del €) y `10m` → «10,00 €»;
+  - 25/10/2026 a las 07:00 UTC → «25/10/2026 08:00»;
+  - 24/10/2026 a las 06:00 UTC → «24/10/2026 08:00».
 
   Verificar que el proyecto Cliente no desactiva `BlazorEnableTimeZoneSupport`.
 
@@ -525,7 +548,9 @@ llamado con otro rol, devuelve 403 `ROL_NO_PERMITIDO`.
   - `MudTextField` con `Label="Contraseña"`, `InputType.Password` y
     `autocomplete="current-password"`;
   - un botón «Iniciar sesión»;
-  - los errores se muestran con `AvisoAccesible`, y el foco vuelve al primer campo si hay error.
+  - los errores se muestran con `MensajeAccesible`, y el foco vuelve al primer campo si hay error.
+
+  Antes del PR: comprobar quickstart.md §6 sobre esta pantalla y anotarlo en el PR.
 - [ ] T056 [US3] [Artur] Crear `fuentes/src/SI18.Cliente/Comun/EstadoSesion.cs`, un
   `AuthenticationStateProvider` que consulta `GET /api/sesion/usuario`. Completar el menú por rol en
   `MainLayout.razor`: «Mis avisos» para cualquier usuario identificado y «Cerrar sesión», más los
@@ -534,8 +559,10 @@ llamado con otro rol, devuelve 403 `ROL_NO_PERMITIDO`.
   - V1–V4 de quickstart.md (rol, tarifa y centro de cada usuario precargado; cookie con `HttpOnly`);
   - V5: contraseña incorrecta y correo inexistente dan el mismo 401 y el mismo `detail`;
   - V6: `GET /api/avisos` sin cookie → 401 `NO_AUTENTICADO` en `application/problem+json`;
-  - HU-3 esc. 6: un endpoint de prueba que exige `EsTecnico`, registrado solo en `FabricaApi`,
-    llamado como ciudadano → 403 `ROL_NO_PERMITIDO`.
+  - HU-C3 esc. 6, en `fuentes/tests/SI18.Api.Tests/Comun/PoliticasTests.cs`: obtener
+    `IAuthorizationService` de `FabricaApi.Services` y comprobar que un `ClaimsPrincipal` con
+    `role=ciudadano` no cumple `EsTecnico`, `EsPersonal` ni `EsRepresentante`, y que uno con
+    `role=tecnico_concejalia` cumple `EsTecnico`. Los 403 reales de cada endpoint los prueba su spec.
 - [ ] T058 [P] [US3] [Ambos · sugerido: Saul] Crear `fuentes/tests/SI18.Api.Tests/Comun/CatalogoTests.cs`:
   - V7: 4 centros con `08:00`/`22:00`;
   - V8: `reservablePorFranjas=true` → 16 instalaciones, todas pistas de tenis o pádel.
@@ -577,7 +604,7 @@ responsable.
   `[Trait("Categoria","Limites")]`:
   - las cuatro transiciones válidas;
   - `pendiente_pago → cancelada` y cualquier cambio desde `caducada` o `cancelada` →
-    `TRANSICION_NO_PERMITIDA` (HU-4 esc. 3);
+    `TRANSICION_NO_PERMITIDA` (HU-C4 esc. 3);
   - `EstaVigente` a los 9:59 → sí y a los 10:00 → no;
   - `Confirmar` a los 10:00 → `RESERVA_CADUCADA`;
   - `Caducar` deja el pago en `Fallido`;
@@ -626,7 +653,7 @@ responsable.
   - botón «Marcar como leído» con `aria-label` que incluye el texto del aviso;
   - mensaje «No tienes avisos» si la lista está vacía.
 
-  Depende de T066.
+  Depende de T066. Antes del PR: comprobar quickstart.md §6 sobre esta pantalla y anotarlo en el PR.
 - [ ] T068 [US4] [Ambos · sugerido: Saul] Crear `fuentes/src/SI18.Api/Infraestructura/BarridoCaducidades.cs`
   (R8.4):
   - un `BackgroundService` con `PeriodicTimer(TimeSpan.FromSeconds(60), timeProvider)`;
@@ -653,10 +680,13 @@ responsable.
 
 ## Fase 7: Pulido y validación (Fase 2 del reparto · Ambos)
 
-- [ ] T071 [Ambos · sugerido: Artur] Crear `fuentes/tests/SI18.Api.Tests/Comun/ErroresTests.cs`:
-  - un endpoint de prueba que lanza `InvalidOperationException` → 500 `ERROR_INTERNO`, sin rastro de
-    la traza ni del mensaje interno en el cuerpo;
-  - un `ErrorNegocio(FRANJA_OCUPADA)` → 409 con `type`, `title`, `detail`, `codigo` y `traceId`.
+- [ ] T071 [Ambos · sugerido: Artur] Crear las pruebas de errores, sin endpoints de prueba:
+  - `fuentes/tests/SI18.Api.Tests/Comun/ErroresTests.cs`: una `FabricaApi` con `ConnectionStrings:Si18`
+    apuntando a un puerto cerrado; `GET /api/centros` → 500 `ERROR_INTERNO`, y el cuerpo no contiene
+    «Npgsql» ni ningún fragmento de la traza;
+  - `fuentes/tests/SI18.Api.Tests/Comun/ManejadorErroresTests.cs`: invocar
+    `ManejadorErrores.TryHandleAsync` con `DefaultHttpContext` y `ErrorNegocio(FRANJA_OCUPADA)` → 409 y
+    `application/problem+json` con `type`, `title`, `detail`, `codigo` y `traceId`.
 - [ ] T072 [Ambos · sugerido: Saul] Revisar `fuentes/src/SI18.Api/Program.cs`:
   - solo contiene la composición de T009;
   - añadir `AddOpenApi()` y `MapOpenApi()` (solo en Development) para servir `/openapi/v1.json`;
