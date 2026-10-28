@@ -108,7 +108,7 @@ defecto (`sugerido: …`) para no duplicar trabajo.
 - [ ] T010 [Saul] Comprobar que `dotnet build SI18.slnx` compila sin advertencias y que
   `docker compose up -d` deja `postgres` en `healthy`. Abrir el PR de `feature/000-core-esqueleto` a
   `develop`; lo aprueba Artur.
-- [ ] T011 [P] [Artur] Crear `docs/agrupamiento.md` (en la raíz del repositorio) con el reparto
+- [X] T011 [P] [Artur] Crear `docs/agrupamiento.md` (en la raíz del repositorio) con el reparto
   definitivo de las historias y los dueños de módulo de la tabla «Dueños de módulo» de plan.md
   (Comun: todo el grupo; Disponibilidad HU-01 y HU-05: Artur; Reservas HU-02 y HU-06: Saul;
   Cancelaciones HU-03 y HU-07: persona C; CursosInformes HU-04 y HU-08: persona D), con los nombres
