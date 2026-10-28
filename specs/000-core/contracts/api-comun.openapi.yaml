@@ -1,0 +1,194 @@
+openapi: 3.1.0
+info:
+  title: SI-18 · API común (000-core)
+  version: 0.1.0
+  description: >
+    Endpoints de la base común: identificación, catálogo precargado y «Mis avisos».
+    Los endpoints de cada historia los define su spec (001–008) bajo el prefijo reservado
+    en contracts/README.md. Todos los errores siguen contracts/errores.md (Problem Details).
+    Autenticación por cookie de sesión (HttpOnly, SameSite=Strict) emitida por POST /api/sesion.
+servers:
+  - url: https://localhost:7180
+security:
+  - cookieSesion: []
+paths:
+  /api/sesion:
+    post:
+      summary: Iniciar sesión con correo y contraseña (HU-3 de 000-core)
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PeticionInicioSesion' }
+      responses:
+        '200':
+          description: Sesión iniciada; se emite la cookie `si18.sesion`.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UsuarioActual' }
+        '400': { $ref: '#/components/responses/Problema' }
+        '401':
+          description: CREDENCIALES_INVALIDAS (mismo mensaje exista o no el correo).
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problema' }
+    delete:
+      summary: Cerrar sesión
+      responses:
+        '204': { description: Sesión cerrada; se borra la cookie. }
+  /api/sesion/usuario:
+    get:
+      summary: Quién soy (rol, tarifa, centro, club)
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UsuarioActual' }
+          description: Usuario identificado.
+        '401': { $ref: '#/components/responses/Problema' }
+  /api/centros:
+    get:
+      summary: Centros con su horario de apertura (derivado de ValoresNegocio)
+      security: []
+      responses:
+        '200':
+          description: Lista de centros.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Centro' }
+  /api/deportes:
+    get:
+      summary: Deportes
+      security: []
+      responses:
+        '200':
+          description: Lista de deportes.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Deporte' }
+  /api/instalaciones:
+    get:
+      summary: Instalaciones, filtrables por centro, deporte y si son reservables por franjas
+      security: []
+      parameters:
+        - { name: centroId, in: query, schema: { type: integer } }
+        - { name: deporteId, in: query, schema: { type: integer } }
+        - { name: reservablePorFranjas, in: query, schema: { type: boolean } }
+      responses:
+        '200':
+          description: Lista de instalaciones.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Instalacion' }
+  /api/avisos:
+    get:
+      summary: «Mis avisos» del usuario identificado, del más reciente al más antiguo
+      responses:
+        '200':
+          description: Avisos.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Aviso' }
+        '401': { $ref: '#/components/responses/Problema' }
+  /api/avisos/{id}/leido:
+    put:
+      summary: Marcar un aviso propio como leído (idempotente)
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer, format: int64 } }
+      responses:
+        '204': { description: Marcado como leído. }
+        '401': { $ref: '#/components/responses/Problema' }
+        '404': { $ref: '#/components/responses/Problema' }
+components:
+  securitySchemes:
+    cookieSesion:
+      type: apiKey
+      in: cookie
+      name: si18.sesion
+  responses:
+    Problema:
+      description: Error con Problem Details (contracts/errores.md).
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problema' }
+  schemas:
+    Problema:
+      type: object
+      required: [title, status, codigo]
+      properties:
+        type: { type: string, format: uri }
+        title: { type: string }
+        status: { type: integer }
+        detail: { type: string, description: Mensaje en español apto para el usuario. }
+        codigo: { type: string, examples: [FRANJA_OCUPADA] }
+        traceId: { type: string }
+        errors:
+          type: object
+          additionalProperties: { type: array, items: { type: string } }
+    PeticionInicioSesion:
+      type: object
+      required: [correo, contrasena]
+      properties:
+        correo: { type: string, format: email, maxLength: 254 }
+        contrasena: { type: string, minLength: 1, maxLength: 200 }
+    Rol:
+      type: string
+      enum: [ciudadano, representante_club, personal_centro, tecnico_concejalia]
+    TipoTarifa:
+      type: string
+      enum: [empadronado, no_empadronado, club]
+    UsuarioActual:
+      type: object
+      required: [id, nombre, correo, rol]
+      properties:
+        id: { type: integer }
+        nombre: { type: string }
+        correo: { type: string }
+        rol: { $ref: '#/components/schemas/Rol' }
+        tipoTarifa:
+          description: Solo para ciudadano y representante_club (RF-007).
+          oneOf: [{ $ref: '#/components/schemas/TipoTarifa' }, { type: 'null' }]
+        centroId: { type: [integer, 'null'], description: Solo personal_centro. }
+        centroNombre: { type: [string, 'null'] }
+        clubId: { type: [integer, 'null'], description: Solo representante_club. }
+        clubNombre: { type: [string, 'null'] }
+    Centro:
+      type: object
+      properties:
+        id: { type: integer }
+        nombre: { type: string }
+        direccion: { type: string }
+        horaApertura: { type: string, examples: ['08:00'] }
+        horaCierre: { type: string, examples: ['22:00'] }
+    Deporte:
+      type: object
+      properties:
+        id: { type: integer }
+        nombre: { type: string }
+    Instalacion:
+      type: object
+      properties:
+        id: { type: integer }
+        centroId: { type: integer }
+        nombre: { type: string }
+        tipo:
+          type: string
+          enum: [pista_tenis, pista_padel, pabellon, sala, piscina]
+        reservablePorFranjas: { type: boolean }
+        deporteIds: { type: array, items: { type: integer } }
+    Aviso:
+      type: object
+      properties:
+        id: { type: integer, format: int64 }
+        texto: { type: string }
+        fechaUtc: { type: string, format: date-time }
+        leido: { type: boolean }
