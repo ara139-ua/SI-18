@@ -22,7 +22,7 @@ public static class HorarioMadrid
 }
 public sealed class ErrorNegocio(string codigo, string mensaje) : Exception;
 public static class CodigosError { /* ver contracts/errores.md */ }
-public static class CalculadoraTarifa { TipoTarifa Para(Rol rol, bool empadronado); }
+public static class CalculadoraTarifa { TipoTarifa? Para(Rol rol, bool empadronado); }   // null para personal y técnico
 public static class PermisosCentro { void ExigirMismoCentro(int? centroPersonal, int centroInstalacion); }
 
 // SI18.Api/Modulos/Comun

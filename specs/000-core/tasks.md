@@ -501,15 +501,15 @@ rechaza las acciones fuera del rol o del centro, explicando el motivo.
 **Prueba independiente**: quickstart V1–V6 contra la API. También un endpoint exclusivo de un rol,
 llamado con otro rol, devuelve 403 `ROL_NO_PERMITIDO`.
 
-- [ ] T049 [P] [US3] [Saul] Crear `fuentes/src/SI18.Dominio/Comun/CalculadoraTarifa.cs` (RF-007):
+- [X] T049 [P] [US3] [Saul] Crear `fuentes/src/SI18.Dominio/Comun/CalculadoraTarifa.cs` (RF-007):
   `TipoTarifa? Para(Rol rol, bool empadronado)` =
   `{ Club, si rol = RepresentanteClub ; Empadronado, si rol = Ciudadano ∧ empadronado ; NoEmpadronado, si rol = Ciudadano ∧ ¬empadronado ; null, en otro caso }`.
   El `null` corresponde a personal y técnico, igual que `UsuarioActual.tipoTarifa` en el OpenAPI.
   Ajustar también la firma en `contracts/modulos.md` (cambio de PARCHE en 000-core).
-- [ ] T050 [P] [US3] [Saul] Crear `fuentes/src/SI18.Dominio/Comun/PermisosCentro.cs`:
+- [X] T050 [P] [US3] [Saul] Crear `fuentes/src/SI18.Dominio/Comun/PermisosCentro.cs`:
   `void ExigirMismoCentro(int? centroPersonal, int centroInstalacion)` lanza
   `CodigosError.Error(OTRO_CENTRO)` si son distintos o si `centroPersonal` es null.
-- [ ] T051 [P] [US3] [Saul] Crear `fuentes/tests/SI18.Dominio.Tests/Comun/CalculadoraTarifaTests.cs`
+- [X] T051 [P] [US3] [Saul] Crear `fuentes/tests/SI18.Dominio.Tests/Comun/CalculadoraTarifaTests.cs`
   (los cuatro casos, incluido el representante empadronado → `Club`) y `PermisosCentroTests.cs`
   (mismo centro → pasa; otro centro → `OTRO_CENTRO`; null → `OTRO_CENTRO`).
 - [ ] T052 [US3] [Ambos · sugerido: Artur] Crear la sesión en la API:
