@@ -314,7 +314,7 @@ crea los datos indicados y ejecutarla dos veces no duplica nada.
 
 ### Persistencia (Saul; solo Saul genera migraciones)
 
-- [ ] T033 [US1] [Saul] Crear `fuentes/src/SI18.Api/Infraestructura/Si18DbContext.cs`:
+- [X] T033 [US1] [Saul] Crear `fuentes/src/SI18.Api/Infraestructura/Si18DbContext.cs`:
   - un `DbSet` por entidad;
   - `ApplyConfigurationsFromAssembly`;
   - convención de enumerados como texto `snake_case`, con un conversor genérico
@@ -323,7 +323,7 @@ crea los datos indicados y ejecutarla dos veces no duplica nada.
   - `decimal` → `numeric(8,2)` por convención.
 
   Depende de T027–T032.
-- [ ] T034 [P] [US1] [Saul] Crear las configuraciones EF de Comun en
+- [X] T034 [P] [US1] [Saul] Crear las configuraciones EF de Comun en
   `fuentes/src/SI18.Api/Modulos/Comun/Configuraciones/`, una por entidad:
   - `centros` e `instalaciones` con `nombre` único (en instalaciones, por centro);
   - `instalacion_deportes` con PK compuesta;
@@ -333,7 +333,7 @@ crea los datos indicados y ejecutarla dos veces no duplica nada.
     `CHECK ((rol = 'personal_centro') = (centro_id IS NOT NULL))`;
   - `temporadas` con `CHECK (fecha_fin > fecha_inicio)`;
   - `notificaciones` con el índice (`usuario_id`, `fecha_utc` DESC).
-- [ ] T035 [P] [US1] [Saul] Crear las configuraciones EF de los módulos (desde ese momento, cada
+- [X] T035 [P] [US1] [Saul] Crear las configuraciones EF de los módulos (desde ese momento, cada
   fichero pertenece al dueño de su módulo):
   - `Modulos/Disponibilidad/Configuraciones/SolicitudFranjasFijasConfig.cs`: `dias_semana smallint[]`;
     `CHECK` «obligatorio si y solo si estado ≠ 'pendiente'» para `resuelta_en_utc`;
@@ -354,7 +354,7 @@ crea los datos indicados y ejecutarla dos veces no duplica nada.
     `fecha_fin > fecha_inicio` y `hora_fin > hora_inicio`; `inscripciones` solo con sus claves
     foráneas. El índice único por usuario y curso **no** se crea: lo propondrá la spec-004 (principio
     VIII).
-- [ ] T036 [US1] [Saul] Rellenar `fuentes/src/SI18.Api/Infraestructura/RegistroInfraestructura.cs`:
+- [X] T036 [US1] [Saul] Rellenar `fuentes/src/SI18.Api/Infraestructura/RegistroInfraestructura.cs`:
   - `AddDbContext<Si18DbContext>` con `UseNpgsql(config.GetConnectionString("Si18"))` +
     `UseSnakeCaseNamingConvention()`;
   - `services.AddSingleton(TimeProvider.System)`;
@@ -362,11 +362,11 @@ crea los datos indicados y ejecutarla dos veces no duplica nada.
 
   Si falta la cadena de conexión, el arranque falla con el mensaje «Falta ConnectionStrings:Si18
   (ver quickstart.md §2)».
-- [ ] T037 [US1] [Saul] Generar la migración inicial con `dotnet ef migrations add NucleoComun --project src/SI18.Api --output-dir Infraestructura/Migraciones`
+- [X] T037 [US1] [Saul] Generar la migración inicial con `dotnet ef migrations add NucleoComun --project src/SI18.Api --output-dir Infraestructura/Migraciones`
   (es la `0001_NucleoComun` del plan). Revisar el código generado: deben estar el filtro del índice
   parcial, todos los `CHECK` de T034–T035 y los tipos `timestamptz`, `date`, `time`, `numeric(8,2)` y
   `smallint[]`. Depende de T033–T035.
-- [ ] T038 [US1] [Saul] Crear `fuentes/src/SI18.Api/Infraestructura/InicializadorDatos.cs`
+- [X] T038 [US1] [Saul] Crear `fuentes/src/SI18.Api/Infraestructura/InicializadorDatos.cs`
   (`IHostedService`, R13):
   - si `SI18_SEMBRAR_DATOS=true`, aplica `MigrateAsync()` y, si `centros` está vacía, inserta
     exactamente los datos de [data-model.md § Datos de inicialización](./data-model.md#datos-de-inicialización):
