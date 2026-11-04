@@ -128,7 +128,7 @@ ficheros distintos.
 
 ### Línea de Saul
 
-- [ ] T012 [P] [Saul] Crear los enumerados en `fuentes/src/SI18.Dominio/Comun/Enumeraciones.cs`, con
+- [X] T012 [P] [Saul] Crear los enumerados en `fuentes/src/SI18.Dominio/Comun/Enumeraciones.cs`, con
   los valores exactos de data-model.md:
   - `Rol {Ciudadano, RepresentanteClub, PersonalCentro, TecnicoConcejalia}`;
   - `TipoTarifa {Empadronado, NoEmpadronado, Club}`;
@@ -139,7 +139,7 @@ ficheros distintos.
   - `MotivoDevolucion {CancelacionUsuario, CierreMantenimiento}`;
   - `EstadoSolicitud {Pendiente, Aprobada, Rechazada}`;
   - `EstadoInscripcion {Confirmada, ListaEspera, Baja}`.
-- [ ] T013 [P] [Saul] Crear `fuentes/src/SI18.Dominio/Comun/ValoresNegocio.cs` (R6), una clase
+- [X] T013 [P] [Saul] Crear `fuentes/src/SI18.Dominio/Comun/ValoresNegocio.cs` (R6), una clase
   estática con constantes con nombre:
   - `DuracionFranja = TimeSpan.FromHours(1)`;
   - `HoraApertura = new TimeOnly(8,0)` y `HoraCierre = new TimeOnly(22,0)`;
@@ -152,9 +152,9 @@ ficheros distintos.
 
   Un comentario por constante con la fila de la tabla «Valores de negocio» de la spec. **No** incluye
   precios: están en la tabla `tarifas`.
-- [ ] T014 [P] [Saul] Crear `fuentes/src/SI18.Dominio/Comun/ErrorNegocio.cs`:
+- [X] T014 [P] [Saul] Crear `fuentes/src/SI18.Dominio/Comun/ErrorNegocio.cs`:
   `sealed class ErrorNegocio(string codigo, string mensaje) : Exception`, con la propiedad `Codigo`.
-- [ ] T015 [Saul] Crear `fuentes/src/SI18.Dominio/Comun/HorarioMadrid.cs` (R5), una clase estática
+- [X] T015 [Saul] Crear `fuentes/src/SI18.Dominio/Comun/HorarioMadrid.cs` (R5), una clase estática
   con:
   - `DateOnly Hoy(DateTime ahoraUtc)`;
   - `DateTime AUtc(DateOnly fecha, TimeOnly hora)`, que devuelve `DateTimeKind.Utc`;
@@ -162,14 +162,14 @@ ficheros distintos.
 
   Usa `TimeZoneInfo.FindSystemTimeZoneById(ValoresNegocio.ZonaHoraria)`. Si recibe un `DateTime` que
   no es UTC, lanza `ArgumentException`. Depende de T013.
-- [ ] T016 [Saul] Crear las pruebas `fuentes/tests/SI18.Dominio.Tests/Comun/HorarioMadridTests.cs`,
+- [X] T016 [Saul] Crear las pruebas `fuentes/tests/SI18.Dominio.Tests/Comun/HorarioMadridTests.cs`,
   con `[Trait("Categoria","Limites")]`:
   - 23:30 UTC del 31/12/2026 es el 01/01/2027 en Madrid;
   - `AUtc(25/10/2026, 08:00)` = 07:00 UTC y `AUtc(24/10/2026, 08:00)` = 06:00 UTC;
   - `AUtc(28/03/2027, 08:00)` = 06:00 UTC y `AUtc(27/03/2027, 08:00)` = 07:00 UTC;
   - ida y vuelta con `ALocal`;
   - un `DateTime` no UTC lanza una excepción.
-- [ ] T017 [P] [Saul] Crear `fuentes/tests/SI18.Dominio.Tests/Comun/ArquitecturaTests.cs`: comprobar
+- [X] T017 [P] [Saul] Crear `fuentes/tests/SI18.Dominio.Tests/Comun/ArquitecturaTests.cs`: comprobar
   que el ensamblado `SI18.Dominio` no referencia ningún ensamblado `Microsoft.AspNetCore.*` ni
   `Microsoft.EntityFrameworkCore*` (plan, «Decisión de estructura»).
 
