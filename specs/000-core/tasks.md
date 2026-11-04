@@ -587,7 +587,7 @@ responsable.
 - una reserva pendiente pasa a caducada (y su pago a fallido) al llegar a los 10 min;
 - los avisos solo los ve su destinatario.
 
-- [ ] T060 [P] [US4] [Saul] Añadir la máquina de estados (RF-015, RF-016, data-model.md § Reserva) a
+- [X] T060 [P] [US4] [Saul] Añadir la máquina de estados (RF-015, RF-016, data-model.md § Reserva) a
   `fuentes/src/SI18.Dominio/Reservas/Reserva.cs` y `Pago.cs`:
   - `EstaVigente(ahora)` =
     `{ ahora < CreadaEnUtc + TiempoBloqueoPago, si PendientePago ; true, si Confirmada ; false, en otro caso }`;
@@ -598,9 +598,9 @@ responsable.
     `ahora < InicioUtc` (si no, `RESERVA_YA_EMPEZADA`); con `CierreMantenimiento`, sin límite de hora;
   - cualquier otra transición → `TRANSICION_NO_PERMITIDA`;
   - `Pago.Completar(ahora)` y `Pago.Fallar(ahora)`: solo desde `Pendiente`.
-- [ ] T061 [P] [US4] [Saul] Crear `fuentes/src/SI18.Dominio/Reservas/GeneradorCodigoAcceso.cs` (R14):
+- [X] T061 [P] [US4] [Saul] Crear `fuentes/src/SI18.Dominio/Reservas/GeneradorCodigoAcceso.cs` (R14):
   16 bytes de `RandomNumberGenerator`, codificados en Base64url sin relleno (22 caracteres).
-- [ ] T062 [US4] [Saul] Crear `fuentes/tests/SI18.Dominio.Tests/Reservas/ReservaTests.cs` con
+- [X] T062 [US4] [Saul] Crear `fuentes/tests/SI18.Dominio.Tests/Reservas/ReservaTests.cs` con
   `[Trait("Categoria","Limites")]`:
   - las cuatro transiciones válidas;
   - `pendiente_pago → cancelada` y cualquier cambio desde `caducada` o `cancelada` →

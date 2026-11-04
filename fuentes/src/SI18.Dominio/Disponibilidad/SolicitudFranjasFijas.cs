@@ -9,10 +9,6 @@ namespace SI18.Dominio.Disponibilidad;
 /// </summary>
 public class SolicitudFranjasFijas
 {
-    // TODO(T018): sustituir por CodigosError.Error(CodigosError.TransicionNoPermitida) cuando entre CodigosError.
-    private const string CodigoTransicionNoPermitida = "TRANSICION_NO_PERMITIDA";
-    private const string DetalleTransicionNoPermitida = "Esta reserva ya no se puede modificar en su estado actual.";
-
     private SolicitudFranjasFijas() { }
 
     public SolicitudFranjasFijas(
@@ -70,7 +66,7 @@ public class SolicitudFranjasFijas
     {
         if (Estado != EstadoSolicitud.Pendiente)
         {
-            throw new ErrorNegocio(CodigoTransicionNoPermitida, DetalleTransicionNoPermitida);
+            throw ErroresProvisionales.Error(ErroresProvisionales.TransicionNoPermitida);
         }
 
         Estado = nuevoEstado;

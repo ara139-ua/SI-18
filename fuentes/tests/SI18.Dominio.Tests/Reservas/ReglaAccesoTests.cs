@@ -10,14 +10,27 @@ public class ReglaAccesoTests
     private static readonly DateTime Fin = Inicio + ValoresNegocio.DuracionFranja;
     private static readonly TimeSpan UnSegundo = TimeSpan.FromSeconds(1);
 
-    /// <summary>
-    /// Reserva en el estado pedido. TODO(T060): usar Confirmar/Cancelar cuando exista la máquina de
-    /// estados; hasta entonces se fija el estado por reflexión, solo en pruebas.
-    /// </summary>
+    /// <summary>Reserva en el estado pedido, llevada hasta él con la máquina de estados.</summary>
     private static Reserva ReservaEn(EstadoReserva estado)
     {
-        var reserva = new Reserva(1, 1, Inicio, TipoTarifa.Empadronado, 6.00m, Inicio - TimeSpan.FromDays(1));
-        typeof(Reserva).GetProperty(nameof(Reserva.Estado))!.SetValue(reserva, estado);
+        var creada = Inicio - TimeSpan.FromDays(1);
+        var reserva = new Reserva(1, 1, Inicio, TipoTarifa.Empadronado, 6.00m, creada);
+        var poco = creada + TimeSpan.FromMinutes(1);
+
+        switch (estado)
+        {
+            case EstadoReserva.Confirmada:
+                reserva.Confirmar(GeneradorCodigoAcceso.Nuevo(), poco);
+                break;
+            case EstadoReserva.Cancelada:
+                reserva.Confirmar(GeneradorCodigoAcceso.Nuevo(), poco);
+                reserva.Cancelar(MotivoCancelacion.Usuario, poco);
+                break;
+            case EstadoReserva.Caducada:
+                reserva.Caducar(poco);
+                break;
+        }
+
         return reserva;
     }
 
