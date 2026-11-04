@@ -258,7 +258,7 @@ crea los datos indicados y ejecutarla dos veces no duplica nada.
 
 ### Entidades de dominio (Saul, en paralelo)
 
-- [ ] T027 [P] [US1] [Saul] Crear las entidades de catálogo en `fuentes/src/SI18.Dominio/Comun/`
+- [X] T027 [P] [US1] [Saul] Crear las entidades de catálogo en `fuentes/src/SI18.Dominio/Comun/`
   (`Centro.cs`, `Deporte.cs`, `Instalacion.cs`, `Tarifa.cs`, `Club.cs`, `Temporada.cs`), con los
   campos de data-model.md:
   - **Centro**: `nombre` «varchar(100) obligatorio, único», `direccion` «varchar(200)». No tiene
@@ -268,13 +268,13 @@ crea los datos indicados y ejecutarla dos veces no duplica nada.
     propiedad.
   - **Tarifa**: `PrecioHora` en `decimal`.
   - **Temporada**: `FechaInicio` y `FechaFin` (`DateOnly`).
-- [ ] T028 [P] [US1] [Saul] Crear `fuentes/src/SI18.Dominio/Comun/Usuario.cs` y
+- [X] T028 [P] [US1] [Saul] Crear `fuentes/src/SI18.Dominio/Comun/Usuario.cs` y
   `fuentes/src/SI18.Dominio/Comun/Notificacion.cs`:
   - **Usuario**: `Correo` «se guarda en minúsculas», `HashContrasena` (nunca se expone), `Rol`,
     `Empadronado`, `ClubId?`, `CentroId?`;
   - **Notificacion**: `UsuarioId`, `Texto` «varchar(500)», `FechaUtc`, `Leida` «por defecto false» y
     método `MarcarLeida()`.
-- [ ] T029 [P] [US1] [Saul] Crear `fuentes/src/SI18.Dominio/Disponibilidad/SolicitudFranjasFijas.cs`
+- [X] T029 [P] [US1] [Saul] Crear `fuentes/src/SI18.Dominio/Disponibilidad/SolicitudFranjasFijas.cs`
   con los campos de data-model.md:
   - `DiasSemana` (`short[]`), con la regla «1 = lunes … 7 = domingo (ISO); no vacío; sin repetidos»;
   - `HoraInicio` y `HoraFin` «en punto», `≥ 08:00` y `≤ 22:00`, con `> hora_inicio`;
@@ -286,14 +286,14 @@ crea los datos indicados y ejecutarla dos veces no duplica nada.
   Incluye `fuentes/tests/SI18.Dominio.Tests/Disponibilidad/SolicitudFranjasFijasTests.cs`: `Aprobar` y
   `Rechazar` desde `Pendiente` funcionan y rellenan `ResueltaEnUtc`; desde `Aprobada` o `Rechazada`
   → `TRANSICION_NO_PERMITIDA` (principio II).
-- [ ] T030 [P] [US1] [Saul] Crear `fuentes/src/SI18.Dominio/Reservas/Reserva.cs`, `Pago.cs` y
+- [X] T030 [P] [US1] [Saul] Crear `fuentes/src/SI18.Dominio/Reservas/Reserva.cs`, `Pago.cs` y
   `ValidacionAcceso.cs`, solo con los campos de data-model.md (los métodos de estado van en T060):
   - **Reserva**: `InicioUtc`, `FinUtc`, `TipoTarifa`, `Importe`, `Estado`, `CreadaEnUtc`,
     `CodigoAcceso?`, `CanceladaEnUtc?`, `MotivoCancelacion?` y la navegación `Pago`;
   - **Pago**: `Importe`, `Estado`, `CreadoEnUtc`, `ResueltoEnUtc?`;
   - **ValidacionAcceso**: `ReservaId?`, `CodigoLeido` «recortado a 64», `Aceptada`, `MotivoRechazo?`,
     `FechaUtc`, `PersonalId`.
-- [ ] T031 [P] [US1] [Saul] Crear `fuentes/src/SI18.Dominio/Cancelaciones/Devolucion.cs` y
+- [X] T031 [P] [US1] [Saul] Crear `fuentes/src/SI18.Dominio/Cancelaciones/Devolucion.cs` y
   `CierreMantenimiento.cs`:
   - **Devolucion**: `PagoId`, `Importe` «= pagos.importe (siempre íntegra)», `Motivo`, `FechaUtc`; sin
     estado;
@@ -306,7 +306,7 @@ crea los datos indicados y ejecutarla dos veces no duplica nada.
   - la franja de 09:00 a 10:00 no se ve afectada;
   - las de 10:00 a 11:00 y de 11:00 a 12:00 sí;
   - la de 12:00 a 13:00 no.
-- [ ] T032 [P] [US1] [Saul] Crear `fuentes/src/SI18.Dominio/CursosInformes/Curso.cs` e
+- [X] T032 [P] [US1] [Saul] Crear `fuentes/src/SI18.Dominio/CursosInformes/Curso.cs` e
   `Inscripcion.cs`:
   - **Curso**: `Trimestre` «varchar(30)», `FechaInicio`, `FechaFin`, `DiasSemana`, `HoraInicio`,
     `HoraFin` y `PlazasMaximas` «> 0». **Sin precio** (D10).
