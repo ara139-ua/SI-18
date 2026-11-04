@@ -30,6 +30,12 @@ dotnet user-secrets --project src/SI18.Api set "ConnectionStrings:Si18" "Host=lo
 dotnet user-secrets --project src/SI18.Api set "SI18_CLAVE_DEMO" "<contraseña de demo de .env>"
 ```
 
+> **Puerto ocupado**: si ya tienes un PostgreSQL instalado en Windows escuchando en el 5432 (por
+> ejemplo, el servicio `postgresql-x64-*`), Docker publica el puerto sin avisar y las conexiones a
+> `localhost:5432` llegan a ese servidor, no al contenedor. Compruébalo con
+> `Get-NetTCPConnection -LocalPort 5432 -State Listen`. Si está ocupado, pon `POSTGRES_PORT=5433` en
+> `.env` y usa `Port=5433` en la cadena de conexión (también en `user-secrets`).
+
 Las variables de `.env.example` son:
 
 - `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` y `POSTGRES_PORT`: para docker-compose.

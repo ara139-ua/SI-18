@@ -47,7 +47,7 @@ defecto (`sugerido: …`) para no duplicar trabajo.
 
 **Propósito**: crear la solución y el entorno local. Bloquea todo lo demás salvo T011.
 
-- [ ] T001 [Saul] Crear la solución `fuentes/SI18.slnx` con seis proyectos:
+- [X] T001 [Saul] Crear la solución `fuentes/SI18.slnx` con seis proyectos:
   - `src/SI18.Dominio`: classlib, **sin** referencias a ASP.NET Core ni a EF Core.
   - `src/SI18.Contratos`: classlib, sin referencias.
   - `src/SI18.Api`: proyecto `web`; referencia a Dominio, Contratos y Cliente (la API sirve el
@@ -59,12 +59,12 @@ defecto (`sugerido: …`) para no duplicar trabajo.
   En `Dominio`, `Api`, `Cliente` y en los dos proyectos de pruebas, crear las carpetas de módulo
   `Comun/`, `Disponibilidad/`, `Reservas/`, `Cancelaciones/` y `CursosInformes/` (en `Api`, dentro de
   `Modulos/`) con un `.gitkeep`.
-- [ ] T002 [P] [Saul] Crear `fuentes/global.json` con `"sdk": { "version": "10.0.100", "rollForward": "latestFeature" }`.
-- [ ] T003 [P] [Saul] Crear `fuentes/Directory.Build.props`:
+- [X] T002 [P] [Saul] Crear `fuentes/global.json` con `"sdk": { "version": "10.0.100", "rollForward": "latestFeature" }`.
+- [X] T003 [P] [Saul] Crear `fuentes/Directory.Build.props`:
   - `TargetFramework net10.0`, `Nullable enable`, `ImplicitUsings enable` y `TreatWarningsAsErrors true`;
   - para los proyectos de `src/` (condición sobre `$(MSBuildProjectDirectory)`), referencia a
     `Microsoft.CodeAnalysis.BannedApiAnalyzers` y `<AdditionalFiles Include="$(MSBuildThisFileDirectory)BannedSymbols.txt" />`.
-- [ ] T004 [P] [Saul] Crear `fuentes/Directory.Packages.props` con `ManagePackageVersionsCentrally=true`
+- [X] T004 [P] [Saul] Crear `fuentes/Directory.Packages.props` con `ManagePackageVersionsCentrally=true`
   y **todos** los paquetes del plan, en la última versión estable compatible con net10.0:
   - `Microsoft.AspNetCore.Components.WebAssembly`, `Microsoft.AspNetCore.Components.WebAssembly.DevServer`,
     `Microsoft.AspNetCore.Components.WebAssembly.Server`;
@@ -78,23 +78,23 @@ defecto (`sugerido: …`) para no duplicar trabajo.
     `Testcontainers.PostgreSql`.
 
   Añadir a cada `.csproj` sus `PackageReference` sin versión.
-- [ ] T005 [P] [Saul] Crear `fuentes/BannedSymbols.txt` que prohíba `P:System.DateTime.Now`,
+- [X] T005 [P] [Saul] Crear `fuentes/BannedSymbols.txt` que prohíba `P:System.DateTime.Now`,
   `P:System.DateTime.UtcNow`, `P:System.DateTime.Today`, `P:System.DateTimeOffset.Now` y
   `P:System.DateTimeOffset.UtcNow`, con el mensaje «Usa TimeProvider inyectado (constitución, principio II)».
-- [ ] T006 [P] [Saul] Crear `fuentes/.config/dotnet-tools.json` con `dotnet-ef` 10.x.
-- [ ] T007 [P] [Saul] Crear `fuentes/docker-compose.yml` con un único servicio `postgres`:
+- [X] T006 [P] [Saul] Crear `fuentes/.config/dotnet-tools.json` con `dotnet-ef` 10.x.
+- [X] T007 [P] [Saul] Crear `fuentes/docker-compose.yml` con un único servicio `postgres`:
   - imagen `postgres:17-alpine`;
   - `POSTGRES_USER`, `POSTGRES_PASSWORD` y `POSTGRES_DB` leídos de `.env`;
   - puerto `${POSTGRES_PORT:-5432}:5432`;
   - volumen nombrado `si18-datos`;
   - `healthcheck` con `pg_isready -U $${POSTGRES_USER}`.
-- [ ] T008 [P] [Saul] Crear `fuentes/.env.example` y `fuentes/.gitignore`:
+- [X] T008 [P] [Saul] Crear `fuentes/.env.example` y `fuentes/.gitignore`:
   - `.env.example`, con valores de relleno y nunca reales (principio V): `POSTGRES_USER=si18`,
     `POSTGRES_PASSWORD=<cambia-esto>`, `POSTGRES_DB=si18`, `POSTGRES_PORT=5432`,
     `ConnectionStrings__Si18=Host=localhost;Port=5432;Database=si18;Username=si18;Password=<cambia-esto>`,
     `SI18_CLAVE_DEMO=<cambia-esto>`, `SI18_SEMBRAR_DATOS=true` y `SI18_TEST_CONNECTION=`;
   - `.gitignore`: `bin/`, `obj/`, `.vs/`, `*.user` y `.env`.
-- [ ] T009 [Saul] Crear `fuentes/src/SI18.Api/Program.cs` limitado a la composición:
+- [X] T009 [Saul] Crear `fuentes/src/SI18.Api/Program.cs` limitado a la composición:
   - llamadas a `builder.Services.AddInfraestructura(builder.Configuration)`, `AddErrores()` y `AddComun()`;
   - después, `app.UseErrores()`, `app.UseBlazorFrameworkFiles()`, `app.UseStaticFiles()`,
     `app.UseAuthentication()`, `app.UseAuthorization()`, `app.MapComun()` y
@@ -105,7 +105,7 @@ defecto (`sugerido: …`) para no duplicar trabajo.
   - `Infraestructura/RegistroInfraestructura.cs` (dueño: Saul);
   - `Infraestructura/RegistroErrores.cs` (dueño: Artur);
   - `Modulos/Comun/RegistroComun.cs` (dueño: Ambos).
-- [ ] T010 [Saul] Comprobar que `dotnet build SI18.slnx` compila sin advertencias y que
+- [X] T010 [Saul] Comprobar que `dotnet build SI18.slnx` compila sin advertencias y que
   `docker compose up -d` deja `postgres` en `healthy`. Abrir el PR de `feature/000-core-esqueleto` a
   `develop`; lo aprueba Artur.
 - [X] T011 [P] [Artur] Crear `docs/agrupamiento.md` (en la raíz del repositorio) con el reparto
@@ -128,7 +128,7 @@ ficheros distintos.
 
 ### Línea de Saul
 
-- [ ] T012 [P] [Saul] Crear los enumerados en `fuentes/src/SI18.Dominio/Comun/Enumeraciones.cs`, con
+- [X] T012 [P] [Saul] Crear los enumerados en `fuentes/src/SI18.Dominio/Comun/Enumeraciones.cs`, con
   los valores exactos de data-model.md:
   - `Rol {Ciudadano, RepresentanteClub, PersonalCentro, TecnicoConcejalia}`;
   - `TipoTarifa {Empadronado, NoEmpadronado, Club}`;
@@ -139,7 +139,7 @@ ficheros distintos.
   - `MotivoDevolucion {CancelacionUsuario, CierreMantenimiento}`;
   - `EstadoSolicitud {Pendiente, Aprobada, Rechazada}`;
   - `EstadoInscripcion {Confirmada, ListaEspera, Baja}`.
-- [ ] T013 [P] [Saul] Crear `fuentes/src/SI18.Dominio/Comun/ValoresNegocio.cs` (R6), una clase
+- [X] T013 [P] [Saul] Crear `fuentes/src/SI18.Dominio/Comun/ValoresNegocio.cs` (R6), una clase
   estática con constantes con nombre:
   - `DuracionFranja = TimeSpan.FromHours(1)`;
   - `HoraApertura = new TimeOnly(8,0)` y `HoraCierre = new TimeOnly(22,0)`;
@@ -152,9 +152,9 @@ ficheros distintos.
 
   Un comentario por constante con la fila de la tabla «Valores de negocio» de la spec. **No** incluye
   precios: están en la tabla `tarifas`.
-- [ ] T014 [P] [Saul] Crear `fuentes/src/SI18.Dominio/Comun/ErrorNegocio.cs`:
+- [X] T014 [P] [Saul] Crear `fuentes/src/SI18.Dominio/Comun/ErrorNegocio.cs`:
   `sealed class ErrorNegocio(string codigo, string mensaje) : Exception`, con la propiedad `Codigo`.
-- [ ] T015 [Saul] Crear `fuentes/src/SI18.Dominio/Comun/HorarioMadrid.cs` (R5), una clase estática
+- [X] T015 [Saul] Crear `fuentes/src/SI18.Dominio/Comun/HorarioMadrid.cs` (R5), una clase estática
   con:
   - `DateOnly Hoy(DateTime ahoraUtc)`;
   - `DateTime AUtc(DateOnly fecha, TimeOnly hora)`, que devuelve `DateTimeKind.Utc`;
@@ -162,14 +162,14 @@ ficheros distintos.
 
   Usa `TimeZoneInfo.FindSystemTimeZoneById(ValoresNegocio.ZonaHoraria)`. Si recibe un `DateTime` que
   no es UTC, lanza `ArgumentException`. Depende de T013.
-- [ ] T016 [Saul] Crear las pruebas `fuentes/tests/SI18.Dominio.Tests/Comun/HorarioMadridTests.cs`,
+- [X] T016 [Saul] Crear las pruebas `fuentes/tests/SI18.Dominio.Tests/Comun/HorarioMadridTests.cs`,
   con `[Trait("Categoria","Limites")]`:
   - 23:30 UTC del 31/12/2026 es el 01/01/2027 en Madrid;
   - `AUtc(25/10/2026, 08:00)` = 07:00 UTC y `AUtc(24/10/2026, 08:00)` = 06:00 UTC;
   - `AUtc(28/03/2027, 08:00)` = 06:00 UTC y `AUtc(27/03/2027, 08:00)` = 07:00 UTC;
   - ida y vuelta con `ALocal`;
   - un `DateTime` no UTC lanza una excepción.
-- [ ] T017 [P] [Saul] Crear `fuentes/tests/SI18.Dominio.Tests/Comun/ArquitecturaTests.cs`: comprobar
+- [X] T017 [P] [Saul] Crear `fuentes/tests/SI18.Dominio.Tests/Comun/ArquitecturaTests.cs`: comprobar
   que el ensamblado `SI18.Dominio` no referencia ningún ensamblado `Microsoft.AspNetCore.*` ni
   `Microsoft.EntityFrameworkCore*` (plan, «Decisión de estructura»).
 
@@ -258,7 +258,7 @@ crea los datos indicados y ejecutarla dos veces no duplica nada.
 
 ### Entidades de dominio (Saul, en paralelo)
 
-- [ ] T027 [P] [US1] [Saul] Crear las entidades de catálogo en `fuentes/src/SI18.Dominio/Comun/`
+- [X] T027 [P] [US1] [Saul] Crear las entidades de catálogo en `fuentes/src/SI18.Dominio/Comun/`
   (`Centro.cs`, `Deporte.cs`, `Instalacion.cs`, `Tarifa.cs`, `Club.cs`, `Temporada.cs`), con los
   campos de data-model.md:
   - **Centro**: `nombre` «varchar(100) obligatorio, único», `direccion` «varchar(200)». No tiene
@@ -268,13 +268,13 @@ crea los datos indicados y ejecutarla dos veces no duplica nada.
     propiedad.
   - **Tarifa**: `PrecioHora` en `decimal`.
   - **Temporada**: `FechaInicio` y `FechaFin` (`DateOnly`).
-- [ ] T028 [P] [US1] [Saul] Crear `fuentes/src/SI18.Dominio/Comun/Usuario.cs` y
+- [X] T028 [P] [US1] [Saul] Crear `fuentes/src/SI18.Dominio/Comun/Usuario.cs` y
   `fuentes/src/SI18.Dominio/Comun/Notificacion.cs`:
   - **Usuario**: `Correo` «se guarda en minúsculas», `HashContrasena` (nunca se expone), `Rol`,
     `Empadronado`, `ClubId?`, `CentroId?`;
   - **Notificacion**: `UsuarioId`, `Texto` «varchar(500)», `FechaUtc`, `Leida` «por defecto false» y
     método `MarcarLeida()`.
-- [ ] T029 [P] [US1] [Saul] Crear `fuentes/src/SI18.Dominio/Disponibilidad/SolicitudFranjasFijas.cs`
+- [X] T029 [P] [US1] [Saul] Crear `fuentes/src/SI18.Dominio/Disponibilidad/SolicitudFranjasFijas.cs`
   con los campos de data-model.md:
   - `DiasSemana` (`short[]`), con la regla «1 = lunes … 7 = domingo (ISO); no vacío; sin repetidos»;
   - `HoraInicio` y `HoraFin` «en punto», `≥ 08:00` y `≤ 22:00`, con `> hora_inicio`;
@@ -286,14 +286,14 @@ crea los datos indicados y ejecutarla dos veces no duplica nada.
   Incluye `fuentes/tests/SI18.Dominio.Tests/Disponibilidad/SolicitudFranjasFijasTests.cs`: `Aprobar` y
   `Rechazar` desde `Pendiente` funcionan y rellenan `ResueltaEnUtc`; desde `Aprobada` o `Rechazada`
   → `TRANSICION_NO_PERMITIDA` (principio II).
-- [ ] T030 [P] [US1] [Saul] Crear `fuentes/src/SI18.Dominio/Reservas/Reserva.cs`, `Pago.cs` y
+- [X] T030 [P] [US1] [Saul] Crear `fuentes/src/SI18.Dominio/Reservas/Reserva.cs`, `Pago.cs` y
   `ValidacionAcceso.cs`, solo con los campos de data-model.md (los métodos de estado van en T060):
   - **Reserva**: `InicioUtc`, `FinUtc`, `TipoTarifa`, `Importe`, `Estado`, `CreadaEnUtc`,
     `CodigoAcceso?`, `CanceladaEnUtc?`, `MotivoCancelacion?` y la navegación `Pago`;
   - **Pago**: `Importe`, `Estado`, `CreadoEnUtc`, `ResueltoEnUtc?`;
   - **ValidacionAcceso**: `ReservaId?`, `CodigoLeido` «recortado a 64», `Aceptada`, `MotivoRechazo?`,
     `FechaUtc`, `PersonalId`.
-- [ ] T031 [P] [US1] [Saul] Crear `fuentes/src/SI18.Dominio/Cancelaciones/Devolucion.cs` y
+- [X] T031 [P] [US1] [Saul] Crear `fuentes/src/SI18.Dominio/Cancelaciones/Devolucion.cs` y
   `CierreMantenimiento.cs`:
   - **Devolucion**: `PagoId`, `Importe` «= pagos.importe (siempre íntegra)», `Motivo`, `FechaUtc`; sin
     estado;
@@ -306,7 +306,7 @@ crea los datos indicados y ejecutarla dos veces no duplica nada.
   - la franja de 09:00 a 10:00 no se ve afectada;
   - las de 10:00 a 11:00 y de 11:00 a 12:00 sí;
   - la de 12:00 a 13:00 no.
-- [ ] T032 [P] [US1] [Saul] Crear `fuentes/src/SI18.Dominio/CursosInformes/Curso.cs` e
+- [X] T032 [P] [US1] [Saul] Crear `fuentes/src/SI18.Dominio/CursosInformes/Curso.cs` e
   `Inscripcion.cs`:
   - **Curso**: `Trimestre` «varchar(30)», `FechaInicio`, `FechaFin`, `DiasSemana`, `HoraInicio`,
     `HoraFin` y `PlazasMaximas` «> 0». **Sin precio** (D10).
@@ -450,10 +450,10 @@ a los dos lados del límite.
     - el orden de los motivos se respeta.
 
   Depende de T042, T043 y T031 (`CierreMantenimiento`, de Saul).
-- [ ] T045 [P] [US2] [Saul] Crear `fuentes/src/SI18.Dominio/Cancelaciones/PoliticaDevolucion.cs`:
+- [X] T045 [P] [US2] [Saul] Crear `fuentes/src/SI18.Dominio/Cancelaciones/PoliticaDevolucion.cs`:
   `bool HayDevolucion(MotivoDevolucion motivo, DateTime inicioUtc, DateTime ahoraUtc)` =
   `{ true, si motivo = CierreMantenimiento ; inicioUtc − ahoraUtc > ValoresNegocio.PlazoDevolucion, si motivo = CancelacionUsuario }`.
-- [ ] T046 [P] [US2] [Saul] Crear `fuentes/src/SI18.Dominio/Reservas/ReglaAcceso.cs`:
+- [X] T046 [P] [US2] [Saul] Crear `fuentes/src/SI18.Dominio/Reservas/ReglaAcceso.cs`:
   `string? MotivoRechazo(Reserva? r, DateTime ahoraUtc)`:
   - `QR_DESCONOCIDO` si `r` es null;
   - `QR_RESERVA_NO_CONFIRMADA` si `Estado ≠ Confirmada`;
@@ -461,7 +461,7 @@ a los dos lados del límite.
   - null si es válido.
 
   `QR_OTRO_CENTRO` lo comprueba la spec-006.
-- [ ] T047 [US2] [Saul] Crear las pruebas de límites de T045 y T046 en `fuentes/tests/SI18.Dominio.Tests/`,
+- [X] T047 [US2] [Saul] Crear las pruebas de límites de T045 y T046 en `fuentes/tests/SI18.Dominio.Tests/`,
   con `[Trait("Categoria","Limites")]`:
   - `Cancelaciones/PoliticaDevolucionTests.cs`:
     - 24 h + 1 s → sí; 24 h exactas → no;
@@ -501,15 +501,15 @@ rechaza las acciones fuera del rol o del centro, explicando el motivo.
 **Prueba independiente**: quickstart V1–V6 contra la API. También un endpoint exclusivo de un rol,
 llamado con otro rol, devuelve 403 `ROL_NO_PERMITIDO`.
 
-- [ ] T049 [P] [US3] [Saul] Crear `fuentes/src/SI18.Dominio/Comun/CalculadoraTarifa.cs` (RF-007):
+- [X] T049 [P] [US3] [Saul] Crear `fuentes/src/SI18.Dominio/Comun/CalculadoraTarifa.cs` (RF-007):
   `TipoTarifa? Para(Rol rol, bool empadronado)` =
   `{ Club, si rol = RepresentanteClub ; Empadronado, si rol = Ciudadano ∧ empadronado ; NoEmpadronado, si rol = Ciudadano ∧ ¬empadronado ; null, en otro caso }`.
   El `null` corresponde a personal y técnico, igual que `UsuarioActual.tipoTarifa` en el OpenAPI.
   Ajustar también la firma en `contracts/modulos.md` (cambio de PARCHE en 000-core).
-- [ ] T050 [P] [US3] [Saul] Crear `fuentes/src/SI18.Dominio/Comun/PermisosCentro.cs`:
+- [X] T050 [P] [US3] [Saul] Crear `fuentes/src/SI18.Dominio/Comun/PermisosCentro.cs`:
   `void ExigirMismoCentro(int? centroPersonal, int centroInstalacion)` lanza
   `CodigosError.Error(OTRO_CENTRO)` si son distintos o si `centroPersonal` es null.
-- [ ] T051 [P] [US3] [Saul] Crear `fuentes/tests/SI18.Dominio.Tests/Comun/CalculadoraTarifaTests.cs`
+- [X] T051 [P] [US3] [Saul] Crear `fuentes/tests/SI18.Dominio.Tests/Comun/CalculadoraTarifaTests.cs`
   (los cuatro casos, incluido el representante empadronado → `Club`) y `PermisosCentroTests.cs`
   (mismo centro → pasa; otro centro → `OTRO_CENTRO`; null → `OTRO_CENTRO`).
 - [ ] T052 [US3] [Ambos · sugerido: Artur] Crear la sesión en la API:
@@ -587,7 +587,7 @@ responsable.
 - una reserva pendiente pasa a caducada (y su pago a fallido) al llegar a los 10 min;
 - los avisos solo los ve su destinatario.
 
-- [ ] T060 [P] [US4] [Saul] Añadir la máquina de estados (RF-015, RF-016, data-model.md § Reserva) a
+- [X] T060 [P] [US4] [Saul] Añadir la máquina de estados (RF-015, RF-016, data-model.md § Reserva) a
   `fuentes/src/SI18.Dominio/Reservas/Reserva.cs` y `Pago.cs`:
   - `EstaVigente(ahora)` =
     `{ ahora < CreadaEnUtc + TiempoBloqueoPago, si PendientePago ; true, si Confirmada ; false, en otro caso }`;
@@ -598,9 +598,9 @@ responsable.
     `ahora < InicioUtc` (si no, `RESERVA_YA_EMPEZADA`); con `CierreMantenimiento`, sin límite de hora;
   - cualquier otra transición → `TRANSICION_NO_PERMITIDA`;
   - `Pago.Completar(ahora)` y `Pago.Fallar(ahora)`: solo desde `Pendiente`.
-- [ ] T061 [P] [US4] [Saul] Crear `fuentes/src/SI18.Dominio/Reservas/GeneradorCodigoAcceso.cs` (R14):
+- [X] T061 [P] [US4] [Saul] Crear `fuentes/src/SI18.Dominio/Reservas/GeneradorCodigoAcceso.cs` (R14):
   16 bytes de `RandomNumberGenerator`, codificados en Base64url sin relleno (22 caracteres).
-- [ ] T062 [US4] [Saul] Crear `fuentes/tests/SI18.Dominio.Tests/Reservas/ReservaTests.cs` con
+- [X] T062 [US4] [Saul] Crear `fuentes/tests/SI18.Dominio.Tests/Reservas/ReservaTests.cs` con
   `[Trait("Categoria","Limites")]`:
   - las cuatro transiciones válidas;
   - `pendiente_pago → cancelada` y cualquier cambio desde `caducada` o `cancelada` →
@@ -682,8 +682,10 @@ responsable.
 
 - [ ] T071 [Ambos · sugerido: Artur] Crear las pruebas de errores, sin endpoints de prueba:
   - `fuentes/tests/SI18.Api.Tests/Comun/ErroresTests.cs`: una `FabricaApi` con `ConnectionStrings:Si18`
-    apuntando a un puerto cerrado; `GET /api/centros` → 500 `ERROR_INTERNO`, y el cuerpo no contiene
-    «Npgsql» ni ningún fragmento de la traza;
+    apuntando a un puerto cerrado **y `SI18_SEMBRAR_DATOS=false`** (si no, `InicializadorDatos`
+    intentaría migrar al arrancar y la API no llegaría a levantarse); `GET /api/centros` → 500
+    `ERROR_INTERNO`, y el cuerpo no contiene «Npgsql» ni ningún fragmento de la traza. Para ello,
+    `FabricaApi` (T022) acepta `sembrarDatos` y la cadena de conexión como parámetros del constructor;
   - `fuentes/tests/SI18.Api.Tests/Comun/ManejadorErroresTests.cs`: invocar
     `ManejadorErrores.TryHandleAsync` con `DefaultHttpContext` y `ErrorNegocio(FRANJA_OCUPADA)` → 409 y
     `application/problem+json` con `type`, `title`, `detail`, `codigo` y `traceId`.

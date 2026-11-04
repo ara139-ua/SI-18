@@ -1,0 +1,5 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Reglas de negocio. Sin dependencias de ASP.NET Core ni de EF Core (plan.md; ArquitecturaTests). -->
+
+</Project>

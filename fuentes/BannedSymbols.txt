@@ -1,0 +1,5 @@
+P:System.DateTime.Now;Usa TimeProvider inyectado (constitución, principio II)
+P:System.DateTime.UtcNow;Usa TimeProvider inyectado (constitución, principio II)
+P:System.DateTime.Today;Usa TimeProvider inyectado (constitución, principio II)
+P:System.DateTimeOffset.Now;Usa TimeProvider inyectado (constitución, principio II)
+P:System.DateTimeOffset.UtcNow;Usa TimeProvider inyectado (constitución, principio II)
