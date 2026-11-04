@@ -450,10 +450,10 @@ a los dos lados del límite.
     - el orden de los motivos se respeta.
 
   Depende de T042, T043 y T031 (`CierreMantenimiento`, de Saul).
-- [ ] T045 [P] [US2] [Saul] Crear `fuentes/src/SI18.Dominio/Cancelaciones/PoliticaDevolucion.cs`:
+- [X] T045 [P] [US2] [Saul] Crear `fuentes/src/SI18.Dominio/Cancelaciones/PoliticaDevolucion.cs`:
   `bool HayDevolucion(MotivoDevolucion motivo, DateTime inicioUtc, DateTime ahoraUtc)` =
   `{ true, si motivo = CierreMantenimiento ; inicioUtc − ahoraUtc > ValoresNegocio.PlazoDevolucion, si motivo = CancelacionUsuario }`.
-- [ ] T046 [P] [US2] [Saul] Crear `fuentes/src/SI18.Dominio/Reservas/ReglaAcceso.cs`:
+- [X] T046 [P] [US2] [Saul] Crear `fuentes/src/SI18.Dominio/Reservas/ReglaAcceso.cs`:
   `string? MotivoRechazo(Reserva? r, DateTime ahoraUtc)`:
   - `QR_DESCONOCIDO` si `r` es null;
   - `QR_RESERVA_NO_CONFIRMADA` si `Estado ≠ Confirmada`;
@@ -461,7 +461,7 @@ a los dos lados del límite.
   - null si es válido.
 
   `QR_OTRO_CENTRO` lo comprueba la spec-006.
-- [ ] T047 [US2] [Saul] Crear las pruebas de límites de T045 y T046 en `fuentes/tests/SI18.Dominio.Tests/`,
+- [X] T047 [US2] [Saul] Crear las pruebas de límites de T045 y T046 en `fuentes/tests/SI18.Dominio.Tests/`,
   con `[Trait("Categoria","Limites")]`:
   - `Cancelaciones/PoliticaDevolucionTests.cs`:
     - 24 h + 1 s → sí; 24 h exactas → no;
