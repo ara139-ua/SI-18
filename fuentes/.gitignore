@@ -1,0 +1,20 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+packages/
+TestResults/
+
+# IDE
+.vs/
+.vscode/
+.idea/
+
+# Secretos locales (constitución, principio V)
+.env
+
+# Sistema
+.DS_Store
+Thumbs.db
+*.tmp

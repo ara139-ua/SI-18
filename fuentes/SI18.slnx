@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SI18.Api/SI18.Api.csproj" />
+    <Project Path="src/SI18.Cliente/SI18.Cliente.csproj" />
+    <Project Path="src/SI18.Contratos/SI18.Contratos.csproj" />
+    <Project Path="src/SI18.Dominio/SI18.Dominio.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SI18.Api.Tests/SI18.Api.Tests.csproj" />
+    <Project Path="tests/SI18.Dominio.Tests/SI18.Dominio.Tests.csproj" />
+  </Folder>
+</Solution>
