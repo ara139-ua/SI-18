@@ -111,6 +111,16 @@ code {
     outline-offset: 2px;
 }
 
+/* <main> y el <h1> reciben el foco desde código («Ir al contenido» y FocusOnNavigate) para que el lector de
+   pantalla lea la página nueva; no son controles, así que no llevan recuadro. */
+h1:focus,
 main:focus {
     outline: none;
+}
+
+/* Menú principal (T056): botones en línea con el nombre del usuario. */
+.menu-principal {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
