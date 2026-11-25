@@ -62,7 +62,7 @@ public class SolicitudFranjasFijasTests
 
         var error = Assert.Throws<ErrorNegocio>(() => segunda(solicitud));
 
-        Assert.Equal("TRANSICION_NO_PERMITIDA", error.Codigo);
+        Assert.Equal("SOLICITUD_YA_RESUELTA", error.Codigo);
         Assert.Equal(estadoAntes, solicitud.Estado);
     }
 
