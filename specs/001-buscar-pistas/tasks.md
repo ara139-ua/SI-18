@@ -263,7 +263,7 @@ deporte y cuando la fecha está fuera de plazo.
 
 **Prueba independiente**: quickstart.md B5, B6 y el paso 4 de §4.
 
-- [ ] T018 [P] [US3] Crear `tests/SI18.Api.Tests/Disponibilidad/BuscarSinResultadosTests.cs`
+- [X] T018 [P] [US3] Crear `tests/SI18.Api.Tests/Disponibilidad/BuscarSinResultadosTests.cs`
   (`[Collection(ColeccionApi.Nombre)]`, `[Trait("Categoria","Limites")]`, Polideportivo Norte):
   - **«Baloncesto»** → 200 con `TotalPistas = 0` y `Pistas` vacía;
   - **hoy + 7** (28/12/2026) → 200 con franjas; **hoy + 8** (29/12/2026) → 422 `FUERA_DE_ANTELACION`
