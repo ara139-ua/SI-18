@@ -8,10 +8,9 @@ namespace SI18.Dominio.Reservas;
 /// </summary>
 public static class ReglaAcceso
 {
-    // TODO(T018): sustituir por las constantes de CodigosError cuando entre.
-    public const string QrDesconocido = ErroresProvisionales.QrDesconocido;
-    public const string QrReservaNoConfirmada = ErroresProvisionales.QrReservaNoConfirmada;
-    public const string QrFueraDeVentana = ErroresProvisionales.QrFueraDeVentana;
+    public const string QrDesconocido = CodigosError.QrDesconocido;
+    public const string QrReservaNoConfirmada = CodigosError.QrReservaNoConfirmada;
+    public const string QrFueraDeVentana = CodigosError.QrFueraDeVentana;
 
     /// <returns>
     /// El código de rechazo, o <c>null</c> si el código es válido: la reserva existe, está confirmada y

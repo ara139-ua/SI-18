@@ -175,7 +175,7 @@ ficheros distintos.
 
 ### Línea de Artur
 
-- [ ] T018 [P] [Artur] Crear `fuentes/src/SI18.Dominio/Comun/CodigosError.cs` con:
+- [X] T018 [P] [Artur] Crear `fuentes/src/SI18.Dominio/Comun/CodigosError.cs` con:
   - una constante `string` por cada código de [contracts/errores.md](./contracts/errores.md), los
     22 de la tabla «Catálogo de códigos de 000-core»;
   - `Titulo(codigo)` y `Detalle(codigo)`, con los textos en español copiados literalmente de la
@@ -183,7 +183,7 @@ ficheros distintos.
   - `ErrorNegocio Error(string codigo)`, que crea la excepción con su texto.
 
   Ninguna otra parte del código escribe esos textos. Depende de T014.
-- [ ] T019 [Artur] Crear `fuentes/src/SI18.Api/Infraestructura/ManejadorErrores.cs`:
+- [X] T019 [Artur] Crear `fuentes/src/SI18.Api/Infraestructura/ManejadorErrores.cs`:
   - un `IExceptionHandler` con la tabla código → estado HTTP de contracts/errores.md;
   - escribe `application/problem+json` con `type` = `https://si18.test/errores/{codigo-en-kebab-case}`,
     `title`, `status`, `detail` y las extensiones `codigo` y `traceId`;
@@ -193,10 +193,10 @@ ficheros distintos.
   Registrarlo en `fuentes/src/SI18.Api/Infraestructura/RegistroErrores.cs` (`AddErrores` →
   `AddProblemDetails` + `AddExceptionHandler<ManejadorErrores>`; `UseErrores` → `UseExceptionHandler`
   + `UseStatusCodePages`). Depende de T018.
-- [ ] T020 [P] [Artur] Crear `fuentes/tests/SI18.Api.Tests/Comun/CatalogoErroresTests.cs` (sin base de
+- [X] T020 [P] [Artur] Crear `fuentes/tests/SI18.Api.Tests/Comun/CatalogoErroresTests.cs` (sin base de
   datos): cada constante de `CodigosError` tiene un estado HTTP en la tabla de `ManejadorErrores` y un
   `Detalle` no vacío.
-- [ ] T021 [P] [Artur] Crear los DTO comunes en `fuentes/src/SI18.Contratos/Comun/`, uno por fichero y
+- [X] T021 [P] [Artur] Crear los DTO comunes en `fuentes/src/SI18.Contratos/Comun/`, uno por fichero y
   según `components/schemas` de [contracts/api-comun.openapi.yaml](./contracts/api-comun.openapi.yaml):
   - `PeticionInicioSesion` (`correo` con «maxLength: 254», `contrasena` con «minLength: 1, maxLength: 200»);
   - `UsuarioActualDto`, `CentroDto`, `DeporteDto`, `InstalacionDto`, `AvisoDto` y `ProblemaDto`;
@@ -204,7 +204,7 @@ ficheros distintos.
 
   Crear también `OpcionesJson.cs` con un `JsonSerializerOptions` compartido: camelCase y
   `JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower)`.
-- [ ] T022 [P] [Artur] Crear la base de pruebas de integración en
+- [X] T022 [P] [Artur] Crear la base de pruebas de integración en
   `fuentes/tests/SI18.Api.Tests/Infraestructura/FabricaApi.cs`:
   - `WebApplicationFactory<Program>` + `IAsyncLifetime`;
   - arranca `PostgreSqlBuilder().WithImage("postgres:17-alpine")` de Testcontainers, salvo que esté
@@ -217,25 +217,25 @@ ficheros distintos.
 
   Crear también `ColeccionApi.cs` (`[CollectionDefinition]`). Las migraciones y la siembra las aplica
   el arranque (`InicializadorDatos`, T038).
-- [ ] T023 [P] [Artur] Montar la base del cliente:
+- [X] T023 [P] [Artur] Montar la base del cliente:
   - `fuentes/src/SI18.Cliente/wwwroot/index.html` con `<html lang="es">` y el título «SI-18 · Reservas
     deportivas»;
   - `fuentes/src/SI18.Cliente/Program.cs`, que registra MudBlazor, `HttpClient` con `BaseAddress` igual
     al origen y `ClienteApi`;
   - `fuentes/src/SI18.Cliente/Layout/Tema.cs`, un `MudTheme` con contraste AA.
-- [ ] T024 [Artur] Crear `fuentes/src/SI18.Cliente/Layout/MainLayout.razor`:
+- [X] T024 [Artur] Crear `fuentes/src/SI18.Cliente/Layout/MainLayout.razor`:
   - enlace «Ir al contenido» como primer elemento enfocable;
   - `<main id="contenido" tabindex="-1">`;
   - `MudThemeProvider` con `Tema`;
   - encabezado con el nombre del servicio y un hueco para el menú por rol (se completa en T056).
 
   Depende de T023. Antes del PR: comprobar quickstart.md §6 sobre el layout y anotarlo en el PR.
-- [ ] T025 [P] [Artur] Crear `fuentes/src/SI18.Cliente/Comun/MensajeAccesible.razor` (R16; se llama
+- [X] T025 [P] [Artur] Crear `fuentes/src/SI18.Cliente/Comun/MensajeAccesible.razor` (R16; se llama
   «Mensaje» para no confundirlo con las notificaciones de «Mis avisos»):
   - una región con `role="status"` y `aria-live="polite"` que siempre está en el DOM;
   - `MudAlert` con icono **y** texto (nunca solo color);
   - método público `Mostrar(string texto, Severity tipo)`.
-- [ ] T026 [Artur] Crear `fuentes/src/SI18.Cliente/Comun/ClienteApi.cs`:
+- [X] T026 [Artur] Crear `fuentes/src/SI18.Cliente/Comun/ClienteApi.cs`:
   - envuelve `HttpClient` usando `OpcionesJson`;
   - ante una respuesta no satisfactoria, lee `application/problem+json` en `ProblemaDto` y lanza
     `ErrorApi(Codigo, Detalle)`;
@@ -412,15 +412,15 @@ a los dos lados del límite.
 **Prueba independiente**: `dotnet test --filter "Categoria=Limites"` en verde, con casos de
 7 días, 10 min, 24 h y 15 min, incluido el cambio de hora (CE-006).
 
-- [ ] T042 [P] [US2] [Artur] Crear `fuentes/src/SI18.Dominio/Disponibilidad/Franja.cs`
+- [X] T042 [P] [US2] [Artur] Crear `fuentes/src/SI18.Dominio/Disponibilidad/Franja.cs`
   (`sealed record Franja(int InstalacionId, DateOnly Fecha, TimeOnly HoraInicio, DateTime InicioUtc, DateTime FinUtc)`)
   y `CalculadoraFranjas.cs`: `FranjasDelDia(int instalacionId, DateOnly fecha)` devuelve las
   14 franjas de `ValoresNegocio.HoraApertura` a `HoraCierre − DuracionFranja`, convertidas con
   `HorarioMadrid.AUtc`.
-- [ ] T043 [P] [US2] [Artur] Crear `fuentes/src/SI18.Dominio/Disponibilidad/CalculadoraPrecio.cs`:
+- [X] T043 [P] [US2] [Artur] Crear `fuentes/src/SI18.Dominio/Disponibilidad/CalculadoraPrecio.cs`:
   `decimal Precio(TipoInstalacion tipo, TipoTarifa tarifa, IReadOnlyList<Tarifa> tarifas)` =
   `precio_hora × 1 h`. Si no hay tarifa para ese tipo, lanza `INSTALACION_NO_RESERVABLE`.
-- [ ] T044 [US2] [Artur] Crear `fuentes/src/SI18.Dominio/Disponibilidad/ReglaDisponibilidad.cs`, una
+- [X] T044 [US2] [Artur] Crear `fuentes/src/SI18.Dominio/Disponibilidad/ReglaDisponibilidad.cs`, una
   función pura:
 
   ```
@@ -475,7 +475,7 @@ a los dos lados del límite.
     - null → `QR_DESCONOCIDO`.
 
   Depende de T045 y T046.
-- [ ] T048 [P] [US2] [Artur] Crear `fuentes/src/SI18.Contratos/Comun/FormatoEs.cs` (RF-027, principio
+- [X] T048 [P] [US2] [Artur] Crear `fuentes/src/SI18.Contratos/Comun/FormatoEs.cs` (RF-027, principio
   IX). Va en Contratos para que el cliente lo use y se pueda probar:
   - `Importe(decimal)` → `ToString("C2", new CultureInfo("es-ES"))`, que da «6,00 €»;
   - `FechaHora(DateTime utc)` → hora de Madrid con `TimeZoneInfo.FindSystemTimeZoneById("Europe/Madrid")`,

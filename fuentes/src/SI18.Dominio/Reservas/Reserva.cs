@@ -92,7 +92,7 @@ public class Reserva
         ExigirEstado(EstadoReserva.PendientePago);
         if (!EstaVigente(ahoraUtc))
         {
-            throw ErroresProvisionales.Error(ErroresProvisionales.ReservaCaducada);
+            throw CodigosError.Error(CodigosError.ReservaCaducada);
         }
 
         PagoCargado().Completar(ahoraUtc);
@@ -127,7 +127,7 @@ public class Reserva
         ExigirEstado(EstadoReserva.Confirmada);
         if (motivo == Comun.MotivoCancelacion.Usuario && ahoraUtc >= InicioUtc)
         {
-            throw ErroresProvisionales.Error(ErroresProvisionales.ReservaYaEmpezada);
+            throw CodigosError.Error(CodigosError.ReservaYaEmpezada);
         }
 
         Estado = EstadoReserva.Cancelada;
@@ -139,7 +139,7 @@ public class Reserva
     {
         if (Estado != esperado)
         {
-            throw ErroresProvisionales.Error(ErroresProvisionales.TransicionNoPermitida);
+            throw CodigosError.Error(CodigosError.TransicionNoPermitida);
         }
     }
 

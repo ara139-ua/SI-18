@@ -44,7 +44,7 @@ public class Pago
     {
         if (Estado != EstadoPago.Pendiente)
         {
-            throw ErroresProvisionales.Error(ErroresProvisionales.TransicionNoPermitida);
+            throw CodigosError.Error(CodigosError.TransicionNoPermitida);
         }
 
         Estado = nuevoEstado;

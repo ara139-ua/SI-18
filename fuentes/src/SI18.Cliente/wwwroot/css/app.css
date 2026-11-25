@@ -87,3 +87,30 @@ code {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
 }
+/* Enlace «Ir al contenido» (research.md R16): fuera de la vista hasta que recibe el foco con el teclado. */
+.salto-contenido {
+    position: absolute;
+    left: 0.5rem;
+    top: -100px;
+    z-index: 2000;
+    padding: 0.5rem 1rem;
+    background: #FFFFFF;
+    color: #0B4F8A;
+    font-weight: 600;
+    border: 2px solid #0B4F8A;
+    border-radius: 4px;
+}
+
+.salto-contenido:focus {
+    top: 0.5rem;
+}
+
+/* Foco siempre visible (quickstart.md §6). */
+:focus-visible {
+    outline: 3px solid #0B4F8A;
+    outline-offset: 2px;
+}
+
+main:focus {
+    outline: none;
+}

@@ -1,0 +1,33 @@
+@* Región de mensajes de resultado (research.md R16). Está siempre en el DOM para que los lectores de
+   pantalla anuncien los cambios; el mensaje lleva icono y texto, nunca solo color.
+   Uso: <MensajeAccesible @ref="_mensaje" /> y después _mensaje.Mostrar("Reserva confirmada.", Severity.Success). *@
+
+<div role="status" aria-live="polite" aria-atomic="true" class="mensaje-accesible">
+    @if (_texto is not null)
+    {
+        <MudAlert Severity="_tipo" Variant="Variant.Text" Class="my-2"
+                  ShowCloseIcon="true" CloseIconClicked="Limpiar">
+            @_texto
+        </MudAlert>
+    }
+</div>
+
+@code {
+    private string? _texto;
+    private Severity _tipo = Severity.Info;
+
+    /// <summary>Muestra <paramref name="texto"/> y lo anuncia a los lectores de pantalla.</summary>
+    public void Mostrar(string texto, Severity tipo)
+    {
+        _texto = texto;
+        _tipo = tipo;
+        StateHasChanged();
+    }
+
+    /// <summary>Quita el mensaje; la región sigue en el DOM.</summary>
+    public void Limpiar()
+    {
+        _texto = null;
+        StateHasChanged();
+    }
+}

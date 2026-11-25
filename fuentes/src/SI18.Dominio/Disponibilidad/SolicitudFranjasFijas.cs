@@ -66,7 +66,7 @@ public class SolicitudFranjasFijas
     {
         if (Estado != EstadoSolicitud.Pendiente)
         {
-            throw ErroresProvisionales.Error(ErroresProvisionales.TransicionNoPermitida);
+            throw CodigosError.Error(CodigosError.TransicionNoPermitida);
         }
 
         Estado = nuevoEstado;
