@@ -1,3 +1,36 @@
 ﻿@inherits LayoutComponentBase
 
-@Body
+@* Layout común (research.md R16). El menú por rol se completa en tasks.md T056. *@
+
+<MudThemeProvider Theme="_tema" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<a class="salto-contenido" href="#contenido" @onclick="IrAlContenido" @onclick:preventDefault>Ir al contenido</a>
+
+<MudLayout>
+    <MudAppBar Elevation="1">
+        <MudText Typo="Typo.h6" Class="ml-2">SI-18 · Reservas deportivas</MudText>
+        <MudSpacer />
+        <nav aria-label="Menú principal">
+            @* Hueco para el menú por rol (T056). *@
+        </nav>
+    </MudAppBar>
+
+    <MudMainContent>
+        <main id="contenido" tabindex="-1" @ref="_contenido">
+            <MudContainer MaxWidth="MaxWidth.Large" Class="py-6">
+                @Body
+            </MudContainer>
+        </main>
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    private readonly MudTheme _tema = Tema.Crear();
+    private ElementReference _contenido;
+
+    // Con <base href="/">, un enlace a «#contenido» navegaría a la raíz: se mueve el foco desde código.
+    private async Task IrAlContenido() => await _contenido.FocusAsync();
+}

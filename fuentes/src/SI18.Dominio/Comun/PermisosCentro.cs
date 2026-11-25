@@ -12,7 +12,7 @@ public static class PermisosCentro
     {
         if (centroPersonal != centroInstalacion)
         {
-            throw ErroresProvisionales.Error(ErroresProvisionales.OtroCentro);
+            throw CodigosError.Error(CodigosError.OtroCentro);
         }
     }
 }
