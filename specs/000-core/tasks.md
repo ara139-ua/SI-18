@@ -566,7 +566,7 @@ llamado con otro rol, devuelve 403 `ROL_NO_PERMITIDO`.
 - [ ] T058 [P] [US3] [Ambos · sugerido: Saul] Crear `fuentes/tests/SI18.Api.Tests/Comun/CatalogoTests.cs`:
   - V7: 4 centros con `08:00`/`22:00`;
   - V8: `reservablePorFranjas=true` → 16 instalaciones, todas pistas de tenis o pádel.
-- [ ] T059 [P] [US3] [Artur] Crear `fuentes/tests/SI18.Api.Tests/Comun/EnumeracionesEspejoTests.cs`:
+- [X] T059 [P] [US3] [Artur] Crear `fuentes/tests/SI18.Api.Tests/Comun/EnumeracionesEspejoTests.cs`:
   los enumerados de `SI18.Contratos.Comun` tienen los mismos nombres que los de `SI18.Dominio.Comun`
   (evita que se separen).
 
@@ -613,7 +613,7 @@ responsable.
 
   Crear también `GeneradorCodigoAccesoTests.cs`: longitud 22, solo caracteres Base64url y
   1000 códigos distintos. Depende de T060 y T061.
-- [ ] T063 [P] [US4] [Artur] Crear `fuentes/src/SI18.Dominio/Reservas/IPasarelaPago.cs` (firma de
+- [X] T063 [P] [US4] [Artur] Crear `fuentes/src/SI18.Dominio/Reservas/IPasarelaPago.cs` (firma de
   contracts/modulos.md) y `fuentes/src/SI18.Api/Infraestructura/PasarelaSimulada.cs` (R9):
   - `Cobrar` acepta cualquier número de 16 dígitos salvo los que terminan en `0002`, que rechaza;
   - si el número no tiene 16 dígitos, lanza `PETICION_INVALIDA`;
@@ -622,13 +622,13 @@ responsable.
 
   Registrarla en un fichero propio de Artur, `Infraestructura/RegistroPasarela.cs` (`AddPasarela()`),
   que se llama desde `AddErrores()` para no tocar `Program.cs` ni `RegistroInfraestructura.cs`.
-- [ ] T064 [P] [US4] [Artur] Crear `fuentes/tests/SI18.Api.Tests/Comun/PasarelaSimuladaTests.cs` (sin
+- [X] T064 [P] [US4] [Artur] Crear `fuentes/tests/SI18.Api.Tests/Comun/PasarelaSimuladaTests.cs` (sin
   base de datos):
   - `4111111111111111` → aceptado;
   - `4000000000000002` → rechazado;
   - 15 dígitos → `PETICION_INVALIDA`;
   - `Devolver` no lanza.
-- [ ] T065 [P] [US4] [Artur] Declarar, **sin implementación**, las interfaces entre módulos con las
+- [X] T065 [P] [US4] [Artur] Declarar, **sin implementación**, las interfaces entre módulos con las
   firmas exactas de [contracts/modulos.md](./contracts/modulos.md):
   - `fuentes/src/SI18.Api/Modulos/Comun/IServicioAvisos.cs`;
   - `Modulos/Disponibilidad/IConsultaDisponibilidad.cs` e `IConsultaFranjasFijas.cs`;
