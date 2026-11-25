@@ -406,9 +406,9 @@ provisional de spec-001 retirada.
   - a C: `IConsultaFranjasFijas.RepresentantesAfectados` ya está disponible para spec-007.
 
   Anotarlo en la descripción del PR.
-- [ ] T028 Abrir el PR de `feature/005-franjas-fijas` a `develop`, con la lista de los principios I–IX
+- [X] T028 Abrir el PR de `feature/005-franjas-fijas` a `develop`, con la lista de los principios I–IX
   revisados y la comprobación de accesibilidad de T025. Lo aprueba otra persona del grupo.
-- [ ] T029 Después de fusionar, ejecutar `/speckit-converge` para la spec 005.
+- [X] T029 Después de fusionar, ejecutar `/speckit-converge` para la spec 005.
 
 ---
 
@@ -468,3 +468,9 @@ se abre un PR solo con la API, como en spec-001.
   `develop` (PR #32).
 - `RepresentantesAfectados` es para HU-07: esta spec solo lo publica y lo prueba, no crea los avisos de
   suspensión (los crea HU-07).
+
+---
+
+## Phase 10: Convergence
+
+- [X] T030 En `ServicioSolicitudesFranjasFijas.Conflictos`, empezar el rango de reservas en el inicio de la temporada (`max(ahora, FechaInicio en Madrid)`) y no solo en «ahora», para que una solicitud de una temporada futura no cuente reservas anteriores a ella; añadir a `ConflictosFranjasFijasTests.cs` una prueba con `DatosDisponibilidad.ConServicioSolicitudes` y un reloj propio en agosto de 2026 (antes de la temporada 2026-2027; sin insertar temporadas, que `InicializadorDatosTests` exige una) en la que una reserva de agosto no sale como conflicto per RF-008 (partial)

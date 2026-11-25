@@ -134,6 +134,25 @@ public class ConflictosFranjasFijasTests(FabricaApi fabrica)
     }
 
     [Fact]
+    public async Task Antes_de_empezar_la_temporada_solo_cuentan_las_reservas_de_dentro_de_ella()
+    {
+        // T030 (converge; RF-008): con el reloj en agosto, la temporada 2026-2027 aún no ha empezado (1/9/2026). Una
+        // reserva de un martes de agosto no es de la temporada; la del martes 1 de septiembre, su primer día, sí.
+        var agosto = new DateOnly(2026, 8, 25);
+        var primerDia = new DateOnly(2026, 9, 1);
+        var pista = await _datos.Pista(Oeste, "Pista de pádel 1");
+        var ahora = Utc(new DateOnly(2026, 8, 4), 10);
+        await _datos.Reserva(pista, Utc(agosto, 19), EstadoPrueba.Confirmada, creadaEnUtc: ahora - TimeSpan.FromMinutes(1));
+        await _datos.Reserva(pista, Utc(primerDia, 19), EstadoPrueba.Confirmada, creadaEnUtc: ahora - TimeSpan.FromMinutes(1));
+        var solicitud = await _datos.FranjaFija(pista, [2], 19, 21, EstadoSolicitudDominio.Pendiente);
+
+        var conflictos = await _datos.ConServicioSolicitudes(ahora, s => s.ConflictosDe(solicitud, Ct));
+
+        Assert.DoesNotContain(conflictos.Reservas, r => r.Fecha == agosto);
+        Assert.Contains(conflictos.Reservas, r => r.Fecha == primerDia && r.HoraInicio == "19:00");
+    }
+
+    [Fact]
     public async Task Un_representante_no_puede_ver_los_conflictos()
     {
         var solicitud = await _api.Crear(await _datos.Pista(Oeste, "Pista de tenis 2"), [1], 8, 9);
