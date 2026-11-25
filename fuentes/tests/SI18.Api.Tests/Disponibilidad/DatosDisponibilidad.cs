@@ -51,10 +51,12 @@ public sealed class DatosDisponibilidad(FabricaApi fabrica)
     public async Task<int> Usuario(string correo) =>
         await Consultar(db => db.Usuarios.Where(u => u.Correo == correo).Select(u => u.Id).SingleAsync(Ct));
 
-    /// <summary>Inserta una reserva de la ciudadana empadronada en el estado pedido.</summary>
-    public async Task Reserva(int pistaId, DateTime inicioUtc, EstadoPrueba estado, DateTime? creadaEnUtc = null)
+    /// <summary>Inserta una reserva en el estado pedido, de la ciudadana empadronada salvo que se indique otro titular.</summary>
+    public async Task Reserva(
+        int pistaId, DateTime inicioUtc, EstadoPrueba estado, DateTime? creadaEnUtc = null,
+        string titular = "ciudadana.empadronada@si18.test")
     {
-        var usuarioId = await Usuario("ciudadana.empadronada@si18.test");
+        var usuarioId = await Usuario(titular);
         var creada = creadaEnUtc ?? Ahora - TimeSpan.FromMinutes(1);
         var reserva = new Reserva(usuarioId, pistaId, inicioUtc, TipoTarifa.Empadronado, 6.00m, creada);
         var poco = creada + TimeSpan.FromSeconds(30);

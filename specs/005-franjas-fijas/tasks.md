@@ -133,7 +133,7 @@ bloquear nada, y ve la lista de su club.
 
 **Prueba independiente**: quickstart.md S1–S5.
 
-- [ ] T007 [US1] Añadir a `ServicioSolicitudesFranjasFijas` y a `EndpointsSolicitudesFranjasFijas`:
+- [X] T007 [US1] Añadir a `ServicioSolicitudesFranjasFijas` y a `EndpointsSolicitudesFranjasFijas`:
   - `Crear(PeticionSolicitudFranjasFijas p, int clubId)`, con la validación de research.md F2 **antes**
     de construir la entidad y `errors` por campo en español:
     - `diasSemana` vacío, fuera de 1–7 o repetido → «Elige al menos un día, sin repetir.»;
@@ -154,7 +154,7 @@ bloquear nada, y ve la lista de su club.
   - `GET /api/solicitudes-franjas-fijas/temporadas` (`EsRepresentante`): temporadas con `FechaFin ≥ hoy`.
 
   Depende de T005.
-- [ ] T008 [US1] Crear `tests/SI18.Api.Tests/Disponibilidad/SolicitarFranjasFijasTests.cs`
+- [X] T008 [US1] Crear `tests/SI18.Api.Tests/Disponibilidad/SolicitarFranjasFijasTests.cs`
   (`[Collection(ColeccionApi.Nombre)]`, Polideportivo Sur):
   - **esc. 1**: `representante.norte` pide el pabellón de Sur martes y jueves 19–21 → 201, `Pendiente`,
     `ClubNombre = "Club Deportivo Ficticio Norte"`, y aparece en su `GET`;
@@ -201,7 +201,7 @@ reciben un aviso.
 
 **Prueba independiente**: quickstart.md S6–S9.
 
-- [ ] T011 [US2] Añadir `Aprobar(int id)` a `ServicioSolicitudesFranjasFijas` y
+- [X] T011 [US2] Añadir `Aprobar(int id)` a `ServicioSolicitudesFranjasFijas` y
   `POST /api/solicitudes-franjas-fijas/{id}/aprobacion` (`EsTecnico`), en el orden de research.md F4:
   1. no existe → `NO_ENCONTRADO`;
   2. ya resuelta → `SOLICITUD_YA_RESUELTA` (lo lanza el dominio al llamar a `Aprobar`; comprobarlo
@@ -214,7 +214,7 @@ reciben un aviso.
      **un único** `SaveChanges` → 200 con el DTO.
 
   Depende de T005.
-- [ ] T012 [US2] Crear `tests/SI18.Api.Tests/Disponibilidad/RevisarFranjasFijasTests.cs`
+- [X] T012 [US2] Crear `tests/SI18.Api.Tests/Disponibilidad/RevisarFranjasFijasTests.cs`
   (`[Collection(ColeccionApi.Nombre)]`, Polideportivo Este). Reparto dentro de la clase, para que una
   aprobación no estropee otra prueba: **aprobar** usa «Pista de pádel 1» los **martes**; **rechazar**
   (T019) usa «Pista de pádel 2» los **miércoles**; **ya resuelta** (T019) usa «Pista de tenis 1» los
@@ -259,12 +259,12 @@ existan.
 
 **Prueba independiente**: quickstart.md S10 y S11.
 
-- [ ] T015 [US3] Añadir `GET /api/solicitudes-franjas-fijas/{id}/conflictos` (`EsTecnico`) a
+- [X] T015 [US3] Añadir `GET /api/solicitudes-franjas-fijas/{id}/conflictos` (`EsTecnico`) a
   `EndpointsSolicitudesFranjasFijas.cs`, con un método público `ConflictosDe(int id)` en el servicio que
   usa el `Conflictos()` privado de T005 y devuelve `ConflictosSolicitudDto` con
   `PuedeAprobarse = Reservas.Count == 0 && Solapadas.Count == 0`. Si no existe → `NO_ENCONTRADO`.
   Depende de T005.
-- [ ] T016 [US3] Crear `tests/SI18.Api.Tests/Disponibilidad/ConflictosFranjasFijasTests.cs`
+- [X] T016 [US3] Crear `tests/SI18.Api.Tests/Disponibilidad/ConflictosFranjasFijasTests.cs`
   (`[Collection(ColeccionApi.Nombre)]`, `[Trait("Categoria","Limites")]`, Polideportivo Oeste,
   «Pista de tenis 1» y «Pista de tenis 2»):
   - **esc. 1–2**: una reserva **confirmada** el martes 22/12/2026 a las 19:00 → la lista la tiene
@@ -299,11 +299,11 @@ existan.
 
 **Prueba independiente**: quickstart.md S12 y S13.
 
-- [ ] T018 [US4] Añadir `Rechazar(int id)` al servicio y `POST /api/solicitudes-franjas-fijas/{id}/rechazo`
+- [X] T018 [US4] Añadir `Rechazar(int id)` al servicio y `POST /api/solicitudes-franjas-fijas/{id}/rechazo`
   (`EsTecnico`): no existe → `NO_ENCONTRADO`; `solicitud.Rechazar(ahora)` (ya resuelta →
   `SOLICITUD_YA_RESUELTA`), aviso a cada representante con «… ha sido rechazada.» (sin motivo,
   aclaración 1) y un único `SaveChanges` → 200. Se puede rechazar aunque tenga conflictos. Depende de T011.
-- [ ] T019 [US4] Añadir a `tests/SI18.Api.Tests/Disponibilidad/RevisarFranjasFijasTests.cs`, con el reparto
+- [X] T019 [US4] Añadir a `tests/SI18.Api.Tests/Disponibilidad/RevisarFranjasFijasTests.cs`, con el reparto
   de T012 (rechazar en «Pista de pádel 2» de Este los **miércoles**; ya resuelta en «Pista de tenis 1» de
   Este los **viernes**), para que la aprobación de los martes en «Pista de pádel 1» no bloquee nada aquí:
   - **esc. 1–3**: rechazar una pendiente de «Pista de pádel 2», miércoles 19–21 (también una con
