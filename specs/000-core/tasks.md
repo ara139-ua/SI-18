@@ -535,7 +535,7 @@ llamado con otro rol, devuelve 403 `ROL_NO_PERMITIDO`.
   - `GET /api/sesion/usuario` → 200 o 401.
 
   Mapear en `MapComun`. Depende de T052, T049, T019 y T038.
-- [ ] T054 [P] [US3] [Ambos · sugerido: Saul] Crear `fuentes/src/SI18.Api/Modulos/Comun/EndpointsCatalogo.cs`
+- [X] T054 [P] [US3] [Ambos · sugerido: Saul] Crear `fuentes/src/SI18.Api/Modulos/Comun/EndpointsCatalogo.cs`
   (anónimos):
   - `GET /api/centros`, con `horaApertura` y `horaCierre` tomados de `ValoresNegocio` y formateados
     `HH:mm`;
@@ -564,7 +564,7 @@ llamado con otro rol, devuelve 403 `ROL_NO_PERMITIDO`.
     `IAuthorizationService` de `FabricaApi.Services` y comprobar que un `ClaimsPrincipal` con
     `role=ciudadano` no cumple `EsTecnico`, `EsPersonal` ni `EsRepresentante`, y que uno con
     `role=tecnico_concejalia` cumple `EsTecnico`. Los 403 reales de cada endpoint los prueba su spec.
-- [ ] T058 [P] [US3] [Ambos · sugerido: Saul] Crear `fuentes/tests/SI18.Api.Tests/Comun/CatalogoTests.cs`:
+- [X] T058 [P] [US3] [Ambos · sugerido: Saul] Crear `fuentes/tests/SI18.Api.Tests/Comun/CatalogoTests.cs`:
   - V7: 4 centros con `08:00`/`22:00`;
   - V8: `reservablePorFranjas=true` → 16 instalaciones, todas pistas de tenis o pádel.
 - [X] T059 [P] [US3] [Artur] Crear `fuentes/tests/SI18.Api.Tests/Comun/EnumeracionesEspejoTests.cs`:
