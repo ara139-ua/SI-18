@@ -25,6 +25,7 @@ public static class EndpointsReservas
         grupo.MapPost("/", Crear);
         grupo.MapPost("/{id:long}/pago", Pagar);
         grupo.MapGet("/{id:long}", Ver);
+        grupo.MapGet("/", Mias);
 
         return app;
     }
@@ -99,6 +100,9 @@ public static class EndpointsReservas
 
     private static async Task<IResult> Ver(long id, ServicioReservar servicio, CancellationToken ct) =>
         Results.Ok(await servicio.Ver(id, ct));
+
+    private static async Task<IResult> Mias(ServicioReservar servicio, CancellationToken ct) =>
+        Results.Ok(await servicio.Mias(ct));
 
     private static IResult Validacion(HttpContext http, Dictionary<string, string[]> errores)
     {

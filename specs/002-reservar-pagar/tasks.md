@@ -472,7 +472,7 @@ efectivo y el QR solo en las confirmadas.
 
 **Prueba independiente**: quickstart.md R15, R16 y los pasos 5–7 de §4.
 
-- [ ] T038 [US5] Añadir a `ServicioReservar` `Task<IReadOnlyList<ReservaDto>> Mias(CancellationToken ct)`
+- [X] T038 [US5] Añadir a `ServicioReservar` `Task<IReadOnlyList<ReservaDto>> Mias(CancellationToken ct)`
   y `GET /api/reservas` en `EndpointsReservas.cs` (research.md E6; data-model.md, «Orden de "Mis
   reservas"»):
   - todas las reservas de `IUsuarioActual.Id`, `AsNoTracking`, unidas a `instalaciones` y `centros`;
@@ -481,7 +481,7 @@ efectivo y el QR solo en las confirmadas.
   - cada elemento con `ADto` (estado efectivo; RF-015). No escribe nada.
 
   Depende de T016.
-- [ ] T039 [US5] Crear `tests/SI18.Api.Tests/Reservas/MisReservasTests.cs`
+- [X] T039 [US5] Crear `tests/SI18.Api.Tests/Reservas/MisReservasTests.cs`
   (`[Collection(ColeccionApi.Nombre)]`, Polideportivo Oeste, «Pista de tenis 1» y «Pista de tenis 2»;
   **solo** con `representante.norte@si18.test`):
   - **HU5 esc. 6**: reservas confirmadas el 26/12 y el 27/12/2026 y otra del 20/11/2026 → orden 26/12,

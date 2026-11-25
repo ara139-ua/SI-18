@@ -165,6 +165,31 @@ public sealed class ServicioReservar(
         return ADto(fila.Reserva, fila.Instalacion, fila.Centro, Ahora);
     }
 
+    /// <summary>
+    /// «Mis reservas»: todas las del usuario de la sesión, en cualquier estado y sin paginar (research.md E6). Orden
+    /// de RF-015a con la hora del servidor: primero las que no han terminado (<c>FinUtc &gt; ahora</c>) por inicio
+    /// ascendente; después las terminadas por inicio descendente; a igualdad, por <c>Id</c>. No escribe nada.
+    /// </summary>
+    public async Task<IReadOnlyList<ReservaDto>> Mias(CancellationToken ct)
+    {
+        var ahora = Ahora;
+        var usuarioId = usuario.Id;
+        var filas = await (
+                from r in db.Reservas.AsNoTracking()
+                join i in db.Instalaciones.AsNoTracking() on r.InstalacionId equals i.Id
+                join c in db.Centros.AsNoTracking() on i.CentroId equals c.Id
+                where r.UsuarioId == usuarioId
+                select new { Reserva = r, Instalacion = i, Centro = c })
+            .ToListAsync(ct);
+
+        return filas
+            .OrderBy(f => f.Reserva.FinUtc > ahora ? 0 : 1)
+            .ThenBy(f => f.Reserva.FinUtc > ahora ? f.Reserva.InicioUtc.Ticks : -f.Reserva.InicioUtc.Ticks)
+            .ThenBy(f => f.Reserva.Id)
+            .Select(f => ADto(f.Reserva, f.Instalacion, f.Centro, ahora))
+            .ToList();
+    }
+
     /// <summary>Caduca, con bloqueo, las pendientes de pago no vigentes de una franja (R8.2; RF-006).</summary>
     private async Task CaducarPendientesNoVigentes(int instalacionId, DateTime inicioUtc, DateTime ahora, CancellationToken ct)
     {
