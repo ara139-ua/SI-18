@@ -109,24 +109,31 @@ Comprobaciones automáticas complementarias:
   regla gana a `:focus-visible` de `app.css`. El enlace sigue siendo visible porque solo aparece con foco
   y tiene un borde de 2 px, pero no muestra el recuadro de foco común. Hay que confirmarlo a mano.
 
-### Comprobaciones manuales pendientes (quickstart.md §6)
+### Comprobaciones manuales (quickstart.md §6) · resultado de Saul, 2026-11-25
+
+Resumen: **pasan 2** (2 y 7), **fallan 2** (1 y 8, código de Artur) y **4 no se han podido verificar**
+(3–6: el lector de pantalla no emite voz en esta máquina). T073 sigue sin marcar.
 
 - [ ] ❌ **(1) FALLA** · Solo con teclado en `/iniciar-sesion`, `/` y `/mis-avisos`: el primer Tab muestra
   «Ir al contenido», el orden es lógico, el foco se ve siempre (también en el enlace de salto) y no hay
   trampas de foco. **Resultado manual (Saul, 2026-11-25)**: el foco **no se ve en ningún elemento
   interactivo de ninguna pantalla**, no solo en «Ir al contenido». Causa y propuesta: hallazgo 5 de
   «Para /speckit-converge».
-- [ ] Intro en «Ir al contenido»: el siguiente Tab sigue desde el contenido principal, no desde la cabecera.
-- [ ] Credenciales incorrectas con NVDA (o Narrador): el error se anuncia una vez, sin mover el ratón, y
-  no se transmite solo con color (hay texto e icono).
-- [ ] Enviar con los campos vacíos: los mensajes «Escribe tu…» se anuncian y quedan asociados a su campo.
-- [ ] Al cambiar de página (menú), el lector lee el nuevo `<h1>`.
-- [ ] `/mis-avisos`: el lector anuncia «No leído» (no basta el borde), y marcar como leído se anuncia.
-- [ ] Contraste de los nodos que axe deja «para revisar» (texto sobre la barra superior y botones
+- [x] ✅ **(2)** Intro en «Ir al contenido»: el siguiente Tab sigue desde el contenido principal, no desde la cabecera.
+- [ ] **(3)** Credenciales incorrectas con NVDA (o Narrador): el error se anuncia una vez, sin mover el ratón, y
+  no se transmite solo con color (hay texto e icono). ⚠️ **No verificada**: el lector de pantalla no emite voz en esta máquina (Saul, 2026-11-25). No se atribuye a la aplicación; hay que repetirla en otra máquina o con Narrador.
+- [ ] **(4)** Enviar con los campos vacíos: los mensajes «Escribe tu…» se anuncian y quedan asociados a su campo.
+  ⚠️ **No verificada**: el lector de pantalla no emite voz en esta máquina (Saul, 2026-11-25). No se atribuye a la aplicación; hay que repetirla en otra máquina o con Narrador.
+- [ ] **(5)** Al cambiar de página (menú), el lector lee el nuevo `<h1>`. ⚠️ **No verificada**: el lector de pantalla no emite voz en esta máquina (Saul, 2026-11-25). No se atribuye a la aplicación; hay que repetirla en otra máquina o con Narrador.
+- [ ] **(6)** `/mis-avisos`: el lector anuncia «No leído» (no basta el borde), y marcar como leído se anuncia.
+  ⚠️ **No verificada**: el lector de pantalla no emite voz en esta máquina (Saul, 2026-11-25). No se atribuye a la aplicación; hay que repetirla en otra máquina o con Narrador.
+- [x] ✅ **(7)** Contraste de los nodos que axe deja «para revisar» (texto sobre la barra superior y botones
   deshabilitados): con axe DevTools o el selector de color de DevTools, ≥ 4,5:1.
 - [ ] ❌ **(8) FALLA** · Zoom al 200 % y ancho de 320 px: sin desplazamiento horizontal ni texto cortado.
-  **Resultado manual (Saul, 2026-11-25)**: hay desplazamiento horizontal en `/mis-avisos` y
-  `/buscar-pistas`. Causa y propuesta: hallazgo 6 de «Para /speckit-converge».
+  **Resultado manual (Saul, 2026-11-25)**: en `/mis-avisos` y `/buscar-pistas`, con zoom al 200 % y a
+  320 px, **el menú de la barra superior se corta** (no es una barra de desplazamiento horizontal): el
+  nombre y «Cerrar sesión» quedan fuera. Sigue igual en la segunda revisión. Causa y propuesta: hallazgo
+  6 de «Para /speckit-converge».
 
 ## Para /speckit-converge (T076)
 
@@ -206,11 +213,10 @@ Hallazgos de esta validación. No se han corregido aquí: no se ha cambiado quic
        con tres botones, el nombre y «Cerrar sesión»;
      - `app.css`, líneas 122–126: `.menu-principal { display: flex; align-items: center; gap: 0.5rem; }`,
        **sin `flex-wrap`**, así que la fila no se parte y desborda la barra.
-   - **Nota**: en la medición, como la barra es `position: fixed`, el documento no llega a desplazarse
-     (`scrollWidth = clientWidth`): lo que desborda queda cortado e inalcanzable, que también incumple
-     1.4.10. Si en la prueba manual se ve una barra de desplazamiento horizontal, conviene anotar en qué
-     estado de la pantalla aparece (por ejemplo, con resultados de búsqueda o con el calendario abierto),
-     porque en el estado inicial de las dos pantallas no se ha reproducido.
+   - **Nota**: como la barra es `position: fixed`, el documento no llega a desplazarse
+     (`scrollWidth = clientWidth`): lo que desborda queda cortado e inalcanzable, que incumple 1.4.10.
+     La revisión manual lo confirma: con zoom al 200 % el menú se corta, sin barra de desplazamiento. En la
+     medición a 640 px no se cortaba, así que depende del ancho real de la ventana al 200 %.
    - **Cambio mínimo propuesto** (a validar con Artur en el navegador, porque toca la altura de la barra):
 
      ```css
