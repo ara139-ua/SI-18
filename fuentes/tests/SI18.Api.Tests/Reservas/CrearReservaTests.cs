@@ -206,4 +206,78 @@ public class CrearReservaTests(FabricaApi fabrica)
         Assert.Equal(CodigosError.PeticionInvalida, (await Problema(crear)).Codigo);
         Assert.Empty(await _datos.DeLaFranja(pista, inicio));
     }
+
+    // ── Historia 2 ───────────────────────────────────────────────────────────────
+
+    private Task<int> Padel2() => _datos.Pista(Sur, "Pista de pádel 2");
+
+    [Fact]
+    public async Task HU2_esc1_con_una_pendiente_vigente_de_otra_persona_la_franja_esta_ocupada()
+    {
+        var pista = await Padel2();
+        var inicio = Utc(new DateOnly(2026, 12, 22), 18);
+        await _datos.Pendiente(Ana, pista, inicio, _datos.Ahora - TimeSpan.FromMinutes(1));
+        using var cliente = await fabrica.CrearClienteConSesion(Bruno);
+
+        var respuesta = await PedirReserva(cliente, pista, inicio, 10.00m);
+
+        Assert.Equal(HttpStatusCode.Conflict, respuesta.StatusCode);
+        var problema = await Problema(respuesta);
+        Assert.Equal(CodigosError.FranjaOcupada, problema.Codigo);
+        Assert.Equal(CodigosError.Detalle(CodigosError.FranjaOcupada), problema.Detail);
+        Assert.Single(await _datos.DeLaFranja(pista, inicio));
+    }
+
+    [Fact]
+    public async Task Doble_envio_de_la_misma_reserva_crea_una_sola()
+    {
+        var pista = await Padel2();
+        var inicio = Utc(new DateOnly(2026, 12, 22), 19);
+        using var cliente = await fabrica.CrearClienteConSesion(Ana);
+
+        var primera = await PedirReserva(cliente, pista, inicio, 6.00m);
+        var segunda = await PedirReserva(cliente, pista, inicio, 6.00m);
+
+        Assert.Equal(HttpStatusCode.Created, primera.StatusCode);
+        Assert.Equal(HttpStatusCode.Conflict, segunda.StatusCode);
+        Assert.Equal(CodigosError.FranjaOcupada, (await Problema(segunda)).Codigo);
+        Assert.Single(await _datos.DeLaFranja(pista, inicio));
+    }
+
+    [Fact]
+    [Trait("Categoria", "Limites")]
+    public async Task HU2_esc4_una_pendiente_ajena_de_10_minutos_exactos_se_caduca_al_reservar()
+    {
+        var pista = await Padel2();
+        var inicio = Utc(new DateOnly(2026, 12, 22), 20);
+        var ahora = _datos.Ahora;
+        var anterior = await _datos.Pendiente(Bruno, pista, inicio, ahora - ValoresNegocio.TiempoBloqueoPago);
+        using var cliente = await fabrica.CrearClienteConSesion(Ana);
+
+        var respuesta = await PedirReserva(cliente, pista, inicio, 6.00m);
+
+        Assert.Equal(HttpStatusCode.Created, respuesta.StatusCode);
+        var caducada = await _datos.Leer(anterior);
+        Assert.Equal(SI18.Dominio.Comun.EstadoReserva.Caducada, caducada.Estado);
+        Assert.Equal(EstadoPago.Fallido, caducada.Pago!.Estado);
+        Assert.Equal(ahora, caducada.Pago.ResueltoEnUtc!.Value, TimeSpan.FromMilliseconds(1));
+        var nueva = await _datos.Leer((await Json<ReservaDto>(respuesta)).Id);
+        Assert.Equal(SI18.Dominio.Comun.EstadoReserva.PendientePago, nueva.Estado);
+    }
+
+    [Fact]
+    [Trait("Categoria", "Limites")]
+    public async Task HU2_esc4_una_pendiente_ajena_de_9_minutos_59_segundos_sigue_bloqueando()
+    {
+        var pista = await Padel2();
+        var inicio = Utc(new DateOnly(2026, 12, 22), 21);
+        var anterior = await _datos.Pendiente(Bruno, pista, inicio, _datos.Ahora - ValoresNegocio.TiempoBloqueoPago + TimeSpan.FromSeconds(1));
+        using var cliente = await fabrica.CrearClienteConSesion(Ana);
+
+        var respuesta = await PedirReserva(cliente, pista, inicio, 6.00m);
+
+        Assert.Equal(HttpStatusCode.Conflict, respuesta.StatusCode);
+        Assert.Equal(CodigosError.FranjaOcupada, (await Problema(respuesta)).Codigo);
+        Assert.Equal(SI18.Dominio.Comun.EstadoReserva.PendientePago, (await _datos.Leer(anterior)).Estado);
+    }
 }

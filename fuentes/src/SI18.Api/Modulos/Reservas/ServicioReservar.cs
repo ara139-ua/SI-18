@@ -1,5 +1,6 @@
 using System.Globalization;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using SI18.Api.Infraestructura;
 using SI18.Api.Modulos.Comun;
 using SI18.Api.Modulos.Disponibilidad;
@@ -24,6 +25,9 @@ public sealed class ServicioReservar(
     IPasarelaPago pasarela,
     IUsuarioActual usuario)
 {
+    /// <summary>Índice único de 000-core: una sola reserva activa por instalación y franja.</summary>
+    private const string IndiceReservaActiva = "ux_reservas_activa";
+
     /// <summary>
     /// Resumen de una franja antes de reservarla (research.md E2). Hace las mismas comprobaciones que
     /// <see cref="Crear"/> y no escribe nada.
@@ -66,9 +70,22 @@ public sealed class ServicioReservar(
 
         await using var transaccion = await db.Database.BeginTransactionAsync(ct);
 
+        // R8.2: las pendientes de esa franja que ya no están vigentes siguen en ux_reservas_activa hasta que se
+        // caducan. Se caducan aquí, bloqueadas, antes de insertar la nueva (data-model.md § 2.1).
+        await CaducarPendientesNoVigentes(peticion.InstalacionId, peticion.InicioUtc, ahora, ct);
+
         var reserva = new Reserva(usuario.Id, peticion.InstalacionId, peticion.InicioUtc, tarifa, importe, ahora);
         db.Reservas.Add(reserva);
-        await db.SaveChangesAsync(ct);
+        try
+        {
+            await db.SaveChangesAsync(ct);
+        }
+        catch (DbUpdateException error) when (EsFranjaOcupada(error))
+        {
+            // Otra petición ha ganado la franja entre la comprobación y el INSERT (R7; RF-007).
+            throw CodigosError.Error(CodigosError.FranjaOcupada);
+        }
+
         await transaccion.CommitAsync(ct);
 
         return ADto(reserva, instalacion, centro, ahora);
@@ -78,17 +95,40 @@ public sealed class ServicioReservar(
     /// Paga una reserva propia con la pasarela (research.md E4). El número de tarjeta solo se pasa a
     /// <see cref="IPasarelaPago.Cobrar"/>: no se guarda ni se registra (R9).
     /// </summary>
-    /// <exception cref="ErrorNegocio"><c>NO_ENCONTRADO</c> si no existe o es de otra persona.</exception>
+    /// <exception cref="ErrorNegocio">
+    /// <c>NO_ENCONTRADO</c> si no existe o es de otra persona; <c>RESERVA_CADUCADA</c> si han pasado los 10 minutos
+    /// (también si ya estaba guardada como caducada por tiempo); <c>TRANSICION_NO_PERMITIDA</c> si ya está confirmada.
+    /// </exception>
     public async Task<ReservaDto> Pagar(long id, string numeroTarjeta, CancellationToken ct)
     {
+        // Se lee una vez: una reserva vigente aquí no puede caducar entre el cobro y Confirmar.
         var ahora = Ahora;
 
         await using var transaccion = await db.Database.BeginTransactionAsync(ct);
         var reserva = await CargaReservas.CargarParaModificar(db, id, usuario.Id, ct)
             ?? throw CodigosError.Error(CodigosError.NoEncontrado);
 
-        if (reserva.Estado == EstadoReserva.PendientePago && reserva.EstaVigente(ahora)
-            && await pasarela.Cobrar(reserva.Importe, numeroTarjeta, ct))
+        // La misma respuesta antes y después del barrido o de la caducidad al reservar (research.md E4).
+        if (reserva.Estado == EstadoReserva.Caducada && CaducadaPorTiempo(reserva))
+        {
+            throw CodigosError.Error(CodigosError.ReservaCaducada);
+        }
+
+        if (reserva.Estado == EstadoReserva.Confirmada)
+        {
+            throw CodigosError.Error(CodigosError.TransicionNoPermitida);
+        }
+
+        if (!reserva.EstaVigente(ahora))
+        {
+            // R8.3: se guarda la caducidad y después se responde, sin llamar a la pasarela (RF-009).
+            reserva.Caducar(ahora);
+            await db.SaveChangesAsync(ct);
+            await transaccion.CommitAsync(ct);
+            throw CodigosError.Error(CodigosError.ReservaCaducada);
+        }
+
+        if (await pasarela.Cobrar(reserva.Importe, numeroTarjeta, ct))
         {
             reserva.Confirmar(GeneradorCodigoAcceso.Nuevo(), ahora);
         }
@@ -116,6 +156,39 @@ public sealed class ServicioReservar(
 
         return ADto(fila.Reserva, fila.Instalacion, fila.Centro, Ahora);
     }
+
+    /// <summary>Caduca, con bloqueo, las pendientes de pago no vigentes de una franja (R8.2; RF-006).</summary>
+    private async Task CaducarPendientesNoVigentes(int instalacionId, DateTime inicioUtc, DateTime ahora, CancellationToken ct)
+    {
+        var limite = ahora - ValoresNegocio.TiempoBloqueoPago;
+        var caducables = await db.Reservas
+            .FromSql($"SELECT * FROM reservas WHERE instalacion_id = {instalacionId} AND inicio_utc = {inicioUtc} AND estado = 'pendiente_pago' AND creada_en_utc <= {limite} FOR UPDATE")
+            .ToListAsync(ct);
+        if (caducables.Count == 0)
+        {
+            return;
+        }
+
+        await CargaReservas.CargarPagos(db, caducables, ct);
+        foreach (var caducable in caducables)
+        {
+            caducable.Caducar(ahora);
+        }
+
+        // Se guarda antes de insertar la nueva: si no, el INSERT podría llegar antes que el UPDATE y chocar con el índice.
+        await db.SaveChangesAsync(ct);
+    }
+
+    /// <summary>
+    /// Una reserva guardada como caducada lo está por tiempo si su pago se resolvió cuando ya no estaba vigente
+    /// (barrido, caducidad al reservar o el propio pago tardío). Un pago rechazado o un cierre la caducan antes.
+    /// </summary>
+    private static bool CaducadaPorTiempo(Reserva reserva) =>
+        reserva.Pago!.ResueltoEnUtc >= reserva.CreadaEnUtc + ValoresNegocio.TiempoBloqueoPago;
+
+    /// <summary>Violación de <c>ux_reservas_activa</c> (como en <c>ReservaActivaUnicaTests</c> de 000-core).</summary>
+    private static bool EsFranjaOcupada(DbUpdateException error) =>
+        error.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation, ConstraintName: IndiceReservaActiva };
 
     /// <summary>La franja tiene que estar libre ahora, con la misma regla que la búsqueda (RF-004).</summary>
     private async Task ExigirLibre(int instalacionId, DateTime inicioUtc, CancellationToken ct)

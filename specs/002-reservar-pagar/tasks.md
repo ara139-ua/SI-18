@@ -316,14 +316,14 @@ caducidad al reservar y al pagar, y la misma respuesta antes y después del barr
 
 **Prueba independiente**: quickstart.md R3, R4 y R9.
 
-- [ ] T026 [US2] Completar `ServicioReservar.Crear` (research.md E3 paso 4; data-model.md § 2.1):
+- [X] T026 [US2] Completar `ServicioReservar.Crear` (research.md E3 paso 4; data-model.md § 2.1):
   - dentro de la transacción y antes del `INSERT`, cargar con
     `FromSql(… WHERE instalacion_id = {…} AND inicio_utc = {…} AND estado = 'pendiente_pago' AND creada_en_utc <= {ahora − TiempoBloqueoPago} FOR UPDATE)`
     las pendientes **no vigentes** de esa franja y `Caducar(ahora)` cada una (R8.2; RF-006);
   - capturar `DbUpdateException` cuya `InnerException` sea `PostgresException` con `SqlState == "23505"`
     y `ConstraintName == "ux_reservas_activa"` → `CodigosError.Error(FranjaOcupada)` (R7; RF-007). La
     traducción vive aquí, no en `ManejadorErrores` (research.md E3).
-- [ ] T027 [US2] Completar `ServicioReservar.Pagar` con la caducidad (research.md E4 pasos 3 y 4;
+- [X] T027 [US2] Completar `ServicioReservar.Pagar` con la caducidad (research.md E4 pasos 3 y 4;
   aclaración del plan del 2026-11-25):
   - `PendientePago` y `!EstaVigente(ahora)` → `Caducar(ahora)`, `SaveChanges`, `Commit` y **después**
     `throw CodigosError.Error(ReservaCaducada)`, sin llamar a la pasarela (RF-009; R8.3);
@@ -333,7 +333,7 @@ caducidad al reservar y al pagar, y la misma respuesta antes y después del barr
     simultáneos encuentra la reserva ya confirmada).
 
   Una caducada por rechazo o por cierre y una cancelada **no** entran aquí (T033). Depende de T015.
-- [ ] T028 [US2] Ampliar `tests/SI18.Api.Tests/Reservas/CrearReservaTests.cs` (Polideportivo Sur,
+- [X] T028 [US2] Ampliar `tests/SI18.Api.Tests/Reservas/CrearReservaTests.cs` (Polideportivo Sur,
   «Pista de pádel 2»):
   - **HU2 esc. 1**: con una pendiente vigente de `ciudadana.empadronada`, `ciudadano.noempadronado`
     recibe 409 `FRANJA_OCUPADA` con el texto del catálogo;
@@ -344,14 +344,14 @@ caducidad al reservar y al pagar, y la misma respuesta antes y después del barr
     `resuelto_en_utc = ahora`; con una creada hace 9 min 59 s → 409 `FRANJA_OCUPADA`.
 
   Depende de T026.
-- [ ] T029 [US2] Crear `tests/SI18.Api.Tests/Reservas/ReservaConcurrenteTests.cs`
+- [X] T029 [US2] Crear `tests/SI18.Api.Tests/Reservas/ReservaConcurrenteTests.cs`
   (`[Collection(ColeccionApi.Nombre)]`, Polideportivo Oeste, «Pista de pádel 1», 22/12/2026 a las
   19:00; CE-002, HU2 esc. 2, RF-007): **20 peticiones `POST /api/reservas` simultáneas** sobre la misma
   franja (`Task.WhenAll`), repartidas entre las sesiones de `ciudadana.empadronada`,
   `ciudadano.noempadronado` y `representante.padel` (la siembra solo tiene esas personas que puedan
   reservar fuera de `MisReservasTests`) → exactamente una 201 y diecinueve 409 `FRANJA_OCUPADA`; en la
   base, una sola reserva activa y un solo pago. Depende de T026.
-- [ ] T030 [US2] Ampliar `tests/SI18.Api.Tests/Reservas/PagarReservaTests.cs` con los límites de los
+- [X] T030 [US2] Ampliar `tests/SI18.Api.Tests/Reservas/PagarReservaTests.cs` con los límites de los
   10 minutos (`[Trait("Categoria","Limites")]`; casos límite de la spec):
   - **9:59**: pendiente creada hace 9 min 59 s → se cobra y queda confirmada;
   - **10:00** (HU2 esc. 3): creada hace 10 min exactos → 409 `RESERVA_CADUCADA`; en la base,
@@ -366,7 +366,7 @@ caducidad al reservar y al pagar, y la misma respuesta antes y después del barr
     `creada + 10:00` exactos) → `RESERVA_CADUCADA`.
 
   Depende de T027.
-- [ ] T031 [US2] Añadir a `PagarReservaTests` **dos pagos simultáneos de la misma reserva** (E5): con
+- [X] T031 [US2] Añadir a `PagarReservaTests` **dos pagos simultáneos de la misma reserva** (E5): con
   `DatosReservas.ConServicio` y una `PasarelaContadora`, dos llamadas a `Pagar` en paralelo (cada una
   con su ámbito y su `Si18DbContext`) → una confirma y la otra recibe `TRANSICION_NO_PERMITIDA`; la
   pasarela se llama **una sola vez**. Depende de T027.
