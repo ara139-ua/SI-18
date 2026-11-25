@@ -18,12 +18,16 @@ public static class RegistroDisponibilidad
         // el último registro). Cada dueño borra la provisional en el PR que publica la definitiva.
         services.TryAddScoped<IConsultaReservas, ConsultaReservasProvisional>();
         services.TryAddScoped<IConsultaCierres, ConsultaCierresProvisional>();
-        services.TryAddScoped<IConsultaFranjasFijas, ConsultaFranjasFijasProvisional>();
 
         services.AddScoped<ServicioDisponibilidad>();
 
         // HU-02 pregunta aquí si una franja está libre y su precio: el mismo cálculo que la búsqueda (RF-013).
         services.AddScoped<IConsultaDisponibilidad>(sp => sp.GetRequiredService<ServicioDisponibilidad>());
+
+        // Solicitudes de franjas fijas (spec-005, HU-05) y su consulta definitiva, que sustituye a la provisional de
+        // spec-001 (RF-015): descuenta los cierres y ofrece RepresentantesAfectados a HU-07.
+        services.AddScoped<ServicioSolicitudesFranjasFijas>();
+        services.AddScoped<IConsultaFranjasFijas, ConsultaFranjasFijas>();
 
         return services;
     }
@@ -31,6 +35,7 @@ public static class RegistroDisponibilidad
     public static WebApplication MapDisponibilidad(this WebApplication app)
     {
         app.MapEndpointsDisponibilidad();
+        app.MapEndpointsSolicitudesFranjasFijas();
         return app;
     }
 }

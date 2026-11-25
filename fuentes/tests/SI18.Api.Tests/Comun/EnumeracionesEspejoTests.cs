@@ -4,6 +4,8 @@ using SI18.Contratos.Comun;
 using RolDominio = SI18.Dominio.Comun.Rol;
 using TipoInstalacionDominio = SI18.Dominio.Comun.TipoInstalacion;
 using TipoTarifaDominio = SI18.Dominio.Comun.TipoTarifa;
+using EstadoSolicitudContratos = SI18.Contratos.Disponibilidad.EstadoSolicitud;
+using EstadoSolicitudDominio = SI18.Dominio.Comun.EstadoSolicitud;
 
 namespace SI18.Api.Tests.Comun;
 
@@ -32,11 +34,18 @@ public class EnumeracionesEspejoTests
     }
 
     [Fact]
+    public void EstadoSolicitud_tiene_los_mismos_nombres()
+    {
+        Assert.Equal(Enum.GetNames<EstadoSolicitudDominio>(), Enum.GetNames<EstadoSolicitudContratos>());
+    }
+
+    [Fact]
     public void En_JSON_viajan_con_el_mismo_texto_que_en_la_base_de_datos()
     {
         Assert.Equal(ConversorEnumSnakeCase<RolDominio>.ValoresPermitidos, EnJson<Rol>());
         Assert.Equal(ConversorEnumSnakeCase<TipoTarifaDominio>.ValoresPermitidos, EnJson<TipoTarifa>());
         Assert.Equal(ConversorEnumSnakeCase<TipoInstalacionDominio>.ValoresPermitidos, EnJson<TipoInstalacion>());
+        Assert.Equal(ConversorEnumSnakeCase<EstadoSolicitudDominio>.ValoresPermitidos, EnJson<EstadoSolicitudContratos>());
     }
 
     private static string[] EnJson<TEnum>() where TEnum : struct, Enum =>
