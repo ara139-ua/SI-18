@@ -96,8 +96,10 @@ public sealed class ServicioReservar(
     /// <see cref="IPasarelaPago.Cobrar"/>: no se guarda ni se registra (R9).
     /// </summary>
     /// <exception cref="ErrorNegocio">
-    /// <c>NO_ENCONTRADO</c> si no existe o es de otra persona; <c>RESERVA_CADUCADA</c> si han pasado los 10 minutos
-    /// (también si ya estaba guardada como caducada por tiempo); <c>TRANSICION_NO_PERMITIDA</c> si ya está confirmada.
+    /// En este orden (research.md E4; data-model.md § 2.2): <c>NO_ENCONTRADO</c> si no existe o es de otra persona;
+    /// <c>RESERVA_CADUCADA</c> si ya estaba guardada como caducada por tiempo; <c>TRANSICION_NO_PERMITIDA</c> si está
+    /// confirmada, cancelada o caducada por un pago rechazado o un cierre; <c>RESERVA_CADUCADA</c> si han pasado los
+    /// 10 minutos (queda caducada); <c>PAGO_RECHAZADO</c> si la pasarela rechaza el cobro (queda caducada).
     /// </exception>
     public async Task<ReservaDto> Pagar(long id, string numeroTarjeta, CancellationToken ct)
     {
@@ -114,7 +116,8 @@ public sealed class ServicioReservar(
             throw CodigosError.Error(CodigosError.ReservaCaducada);
         }
 
-        if (reserva.Estado == EstadoReserva.Confirmada)
+        // Confirmada, cancelada o caducada por un pago rechazado o un cierre: sin reintento (RF-011).
+        if (reserva.Estado != EstadoReserva.PendientePago)
         {
             throw CodigosError.Error(CodigosError.TransicionNoPermitida);
         }
@@ -128,11 +131,16 @@ public sealed class ServicioReservar(
             throw CodigosError.Error(CodigosError.ReservaCaducada);
         }
 
-        if (await pasarela.Cobrar(reserva.Importe, numeroTarjeta, ct))
+        if (!await pasarela.Cobrar(reserva.Importe, numeroTarjeta, ct))
         {
-            reserva.Confirmar(GeneradorCodigoAcceso.Nuevo(), ahora);
+            // Pago rechazado: queda caducada y el pago fallido antes de responder (RF-011).
+            reserva.Caducar(ahora);
+            await db.SaveChangesAsync(ct);
+            await transaccion.CommitAsync(ct);
+            throw CodigosError.Error(CodigosError.PagoRechazado);
         }
 
+        reserva.Confirmar(GeneradorCodigoAcceso.Nuevo(), ahora);
         await db.SaveChangesAsync(ct);
         await transaccion.CommitAsync(ct);
 

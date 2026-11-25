@@ -387,7 +387,7 @@ sin cambios.
 
 **Prueba independiente**: quickstart.md R7, R8 y R9b.
 
-- [ ] T033 [US3] Completar `ServicioReservar.Pagar` (research.md E4 pasos 3 y 5; data-model.md § 2.2):
+- [X] T033 [US3] Completar `ServicioReservar.Pagar` (research.md E4 pasos 3 y 5; data-model.md § 2.2):
   - `Cobrar` devuelve `false` → `Caducar(ahora)`, `SaveChanges`, `Commit` y **después**
     `throw CodigosError.Error(PagoRechazado)` (RF-011);
   - `Cancelada` o `Caducada` **no** por tiempo (`Pago.ResueltoEnUtc < CreadaEnUtc + TiempoBloqueoPago`:
@@ -396,7 +396,7 @@ sin cambios.
   El orden queda: no es suya → 404; caducada por tiempo → `RESERVA_CADUCADA`; otro estado no
   pendiente → `TRANSICION_NO_PERMITIDA`; pendiente no vigente → caducar y `RESERVA_CADUCADA`; cobro.
   Depende de T027.
-- [ ] T034 [US3] Ampliar `tests/SI18.Api.Tests/Reservas/PagarReservaTests.cs`:
+- [X] T034 [US3] Ampliar `tests/SI18.Api.Tests/Reservas/PagarReservaTests.cs`:
   - **HU3 esc. 1**: `4000 0000 0000 0002` → 422 `PAGO_RECHAZADO`; `caducada`, pago `fallido`, sin código;
   - **E4/E13 · caducada por pago rechazado → `TRANSICION_NO_PERMITIDA`** (HU3 esc. 2;
     `[Trait("Categoria","Limites")]`): volver a pagar esa reserva con `…0001` → 409

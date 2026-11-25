@@ -1,8 +1,11 @@
 using System.Net;
+using System.Net.Http.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SI18.Api.Infraestructura;
 using SI18.Api.Tests.Infraestructura;
+using SI18.Contratos.Comun;
+using SI18.Contratos.Disponibilidad;
 using SI18.Contratos.Reservas;
 using SI18.Dominio.Comun;
 using SI18.Dominio.Reservas;
@@ -184,5 +187,135 @@ public class PagarReservaTests(FabricaApi fabrica)
         Assert.Single(resultados, r => r == CodigosError.TransicionNoPermitida);
         Assert.Equal(1, pasarela.Cobros);
         Assert.Equal(EstadoReservaDominio.Confirmada, (await _datos.Leer(id)).Estado);
+    }
+
+    // ── Historia 3: pago rechazado y formato de la tarjeta ───────────────────────
+
+    private Task<long> PendienteDeAna(int pista, int hora) =>
+        _datos.Pendiente(Ana, pista, Utc(Dia22, hora), _datos.Ahora - TimeSpan.FromMinutes(1));
+
+    [Fact]
+    public async Task HU3_esc1_con_una_tarjeta_rechazada_queda_caducada_sin_codigo()
+    {
+        var id = await PendienteDeAna(await Tenis2(), 10);
+
+        var respuesta = await Pagar(Ana, id, TarjetaRechazada);
+
+        await AssertProblema(respuesta, HttpStatusCode.UnprocessableEntity, CodigosError.PagoRechazado);
+        var guardada = await _datos.Leer(id);
+        Assert.Equal(EstadoReservaDominio.Caducada, guardada.Estado);
+        Assert.Equal(EstadoPago.Fallido, guardada.Pago!.Estado);
+        Assert.Null(guardada.CodigoAcceso);
+    }
+
+    [Fact]
+    [Trait("Categoria", "Limites")]
+    public async Task HU3_esc2_volver_a_pagar_tras_un_rechazo_es_TRANSICION_NO_PERMITIDA_sin_cobro()
+    {
+        var id = await PendienteDeAna(await Tenis2(), 11);
+        await Pagar(Ana, id, TarjetaRechazada);
+        var antes = await _datos.Leer(id);
+
+        var respuesta = await Pagar(Ana, id, TarjetaAceptada);
+
+        await AssertProblema(respuesta, HttpStatusCode.Conflict, CodigosError.TransicionNoPermitida);
+        var despues = await _datos.Leer(id);
+        Assert.Equal(EstadoReservaDominio.Caducada, despues.Estado);
+        Assert.Null(despues.CodigoAcceso);
+        Assert.Equal(antes.Pago!.ResueltoEnUtc, despues.Pago!.ResueltoEnUtc);
+    }
+
+    [Fact]
+    [Trait("Categoria", "Limites")]
+    public async Task Rechazada_a_los_9_59_sigue_siendo_TRANSICION_NO_PERMITIDA_a_los_10_01()
+    {
+        var creada = _datos.Ahora - TimeSpan.FromMinutes(30);
+        var id = await _datos.Pendiente(Ana, await Tenis2(), Utc(Dia22, 12), creada);
+        var pasarela = new PasarelaContadora();
+
+        var rechazo = await Assert.ThrowsAsync<ErrorNegocio>(() => _datos.ConServicio(
+            creada + ValoresNegocio.TiempoBloqueoPago - TimeSpan.FromSeconds(1), Ana,
+            servicio => servicio.Pagar(id, TarjetaRechazada, Ct), pasarela));
+        var reintento = await Assert.ThrowsAsync<ErrorNegocio>(() => _datos.ConServicio(
+            creada + ValoresNegocio.TiempoBloqueoPago + TimeSpan.FromSeconds(1), Ana,
+            servicio => servicio.Pagar(id, TarjetaAceptada, Ct), pasarela));
+
+        Assert.Equal(CodigosError.PagoRechazado, rechazo.Codigo);
+        Assert.Equal(CodigosError.TransicionNoPermitida, reintento.Codigo);
+        Assert.Equal(1, pasarela.Cobros);
+    }
+
+    [Fact]
+    [Trait("Categoria", "Limites")]
+    public async Task Con_el_pago_resuelto_antes_de_los_10_minutos_no_esta_caducada_por_tiempo()
+    {
+        var id = await _datos.CaducadaPorRechazo(Ana, await Tenis2(), Utc(Dia22, 13), _datos.Ahora - TimeSpan.FromMinutes(20));
+
+        var respuesta = await Pagar(Ana, id);
+
+        await AssertProblema(respuesta, HttpStatusCode.Conflict, CodigosError.TransicionNoPermitida);
+    }
+
+    [Fact]
+    public async Task Pagar_dos_veces_es_TRANSICION_NO_PERMITIDA_y_conserva_el_codigo()
+    {
+        var id = await PendienteDeAna(await Tenis2(), 14);
+        var codigo = (await Json<ReservaDto>(await Pagar(Ana, id))).CodigoAcceso;
+
+        var respuesta = await Pagar(Ana, id);
+
+        await AssertProblema(respuesta, HttpStatusCode.Conflict, CodigosError.TransicionNoPermitida);
+        Assert.NotNull(codigo);
+        Assert.Equal(codigo, (await _datos.Leer(id)).CodigoAcceso);
+    }
+
+    [Theory]
+    [InlineData("4000 0000 0000 001")]
+    [InlineData("4000-0000-0000-000A")]
+    public async Task HU3_esc4_una_tarjeta_con_formato_no_valido_da_400_y_no_cambia_nada(string tarjeta)
+    {
+        var hora = tarjeta.Contains('-', StringComparison.Ordinal) ? 16 : 15;
+        var id = await PendienteDeAna(await Tenis2(), hora);
+
+        var respuesta = await Pagar(Ana, id, tarjeta);
+
+        Assert.Equal(HttpStatusCode.BadRequest, respuesta.StatusCode);
+        var problema = await Problema(respuesta);
+        Assert.Equal(CodigosError.PeticionInvalida, problema.Codigo);
+        Assert.Equal(["Escribe los 16 dígitos de la tarjeta."], problema.Errors!["numeroTarjeta"]);
+        var guardada = await _datos.Leer(id);
+        Assert.Equal(EstadoReservaDominio.PendientePago, guardada.Estado);
+        Assert.Equal(EstadoPago.Pendiente, guardada.Pago!.Estado);
+    }
+
+    [Fact]
+    public async Task HU3_esc3_tras_un_rechazo_la_franja_vuelve_a_estar_libre()
+    {
+        var pista = await Tenis2();
+        var inicio = Utc(Dia22, 17);
+        var id = await _datos.Pendiente(Ana, pista, inicio, _datos.Ahora - TimeSpan.FromMinutes(1));
+        await Pagar(Ana, id, TarjetaRechazada);
+        using var cliente = await fabrica.CrearClienteConSesion(Ana);
+
+        var busqueda = await cliente.GetFromJsonAsync<ResultadoBusquedaDto>(
+            $"/api/disponibilidad/franjas?deporteId={await _datos.Disponibilidad.Deporte("Tenis")}&centroId={await _datos.Disponibilidad.Centro(Este)}&fecha=2026-12-22",
+            OpcionesJson.Predeterminadas, Ct);
+        var nueva = await PedirReserva(cliente, pista, inicio, 6.00m);
+
+        Assert.Contains(busqueda!.Pistas.Single(p => p.InstalacionId == pista).Franjas, f => f.InicioUtc == inicio);
+        Assert.Equal(HttpStatusCode.Created, nueva.StatusCode);
+    }
+
+    [Fact]
+    public async Task HU5_esc4_pagar_la_reserva_de_otra_persona_da_404_y_no_la_cambia()
+    {
+        var id = await _datos.Pendiente(Bruno, await Tenis2(), Utc(Dia22, 18), _datos.Ahora - TimeSpan.FromMinutes(1));
+
+        var respuesta = await Pagar(Ana, id);
+
+        await AssertProblema(respuesta, HttpStatusCode.NotFound, CodigosError.NoEncontrado);
+        var guardada = await _datos.Leer(id);
+        Assert.Equal(EstadoReservaDominio.PendientePago, guardada.Estado);
+        Assert.Equal(EstadoPago.Pendiente, guardada.Pago!.Estado);
     }
 }
