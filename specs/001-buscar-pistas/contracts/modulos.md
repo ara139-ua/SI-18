@@ -10,10 +10,11 @@ HU-01 **no define interfaces nuevas**: implementa y consume las de
 | `IConsultaDisponibilidad`   | `Modulos/Disponibilidad/ServicioDisponibilidad.cs`    | Reservas (HU-02)    |
 
 - `MotivoNoDisponible(instalacionId, inicioUtc, ct)`: `null` si la franja está libre, o el código del
-  primer motivo de RF-011 de 000-core (mismo orden que `ReglaDisponibilidad`).
-  - Si `inicioUtc` no es el inicio de una franja válida (no está en punto o está fuera de
-    08:00–21:00 en Madrid): `PETICION_INVALIDA`.
-  - Si la instalación no existe: lanza `ErrorNegocio(NO_ENCONTRADO)`.
+  primer motivo de RF-011 de 000-core (mismo orden que `ReglaDisponibilidad`). Nunca devuelve otro
+  código. Las peticiones mal formadas lanzan `ErrorNegocio`:
+  - si `inicioUtc` no es el inicio de una franja válida (no está en punto o está fuera de
+    08:00–21:00 en Madrid): `PETICION_INVALIDA`;
+  - si la instalación no existe: `NO_ENCONTRADO`.
 - `Precio(instalacionId, tarifa, ct)`: `CalculadoraPrecio` con el tipo de la instalación; sin tarifa
   para ese tipo, `INSTALACION_NO_RESERVABLE` (igual que en 000-core).
 - La búsqueda y estos dos métodos usan el mismo código interno (research.md D4): no pueden divergir.

@@ -23,12 +23,12 @@ y el reloj ya los fija 000-core.
 
 ## D2. Validación de la petición
 
-- **Decisión**:
-  - si falta algún parámetro o tiene un formato incorrecto → 400 `PETICION_INVALIDA`, con `errors`
-    por campo;
-  - si el deporte o el centro no existen → 404 `NO_ENCONTRADO`;
-  - si la fecha está fuera de hoy..hoy + 7 (fecha de Madrid) → 422 `FUERA_DE_ANTELACION`, antes de
-    consultar nada.
+- **Decisión**: se valida en este orden, y gana el primero que falla:
+  1. si falta algún parámetro o tiene un formato incorrecto → 400 `PETICION_INVALIDA`, con `errors`
+     por campo;
+  2. si la fecha está fuera de hoy..hoy + 7 (fecha de Madrid) → 422 `FUERA_DE_ANTELACION`, sin
+     consultar la base de datos;
+  3. si el deporte o el centro no existen → 404 `NO_ENCONTRADO`.
 
   Si el deporte existe pero el centro no tiene pistas reservables de ese deporte, la respuesta es 200
   con `totalPistas = 0`: no es un error, es un resultado vacío que el cliente explica (RF-011).
@@ -64,9 +64,15 @@ y el reloj ya los fija 000-core.
 - **Decisión**: `ServicioDisponibilidad` implementa también `IConsultaDisponibilidad` (contracts/
   modulos.md de 000-core), con la **misma** composición de D3 para una sola franja:
   - `MotivoNoDisponible(instalacionId, inicioUtc)`: localiza la franja de esa instalación que empieza
-    en `inicioUtc` (con `HorarioMadrid.ALocal`) y le aplica `ReglaDisponibilidad`. Si `inicioUtc` no es
-    el inicio de una franja válida (no está en punto o está fuera de 08:00–21:00), devuelve
-    `PETICION_INVALIDA`. Si la instalación no existe, `NO_ENCONTRADO`.
+    en `inicioUtc` (con `HorarioMadrid.ALocal`) y le aplica `ReglaDisponibilidad`. El `string?` que
+    devuelve es **solo** uno de los seis motivos de RF-011 de 000-core, o `null`. Las peticiones mal
+    formadas **lanzan** `ErrorNegocio`, igual en los dos casos:
+    - si `inicioUtc` no es el inicio de una franja válida (no está en punto o está fuera de
+      08:00–21:00): `PETICION_INVALIDA`;
+    - si la instalación no existe: `NO_ENCONTRADO`.
+
+    Así HU-02 trata los motivos como respuesta y deja que los errores lleguen solos a
+    `ManejadorErrores`.
   - `Precio(instalacionId, tarifa)`: `CalculadoraPrecio` con el tipo de la instalación.
 
   La búsqueda (D3) y `IConsultaDisponibilidad` comparten un único método privado que evalúa las
@@ -137,6 +143,13 @@ y el reloj ya los fija 000-core.
     El foco no se mueve: lo anuncia la región `aria-live`.
   - **Menú**: entrada «Buscar pistas» en el hueco «ciudadano, representante_club» de `MainLayout`
     (RF-002).
+  - **Acceso directo por URL**: la página comprueba la sesión al cargarse, porque los filtros salen de
+    endpoints anónimos y si no nadie la pararía hasta pulsar «Buscar».
+    - Sin sesión, lleva a `/iniciar-sesion`.
+    - Con un rol sin permiso, no muestra el formulario y explica para quién es la búsqueda.
+
+    Se hace en la propia página y no con `AuthorizeRouteView` en `App.razor`, que es un fichero común
+    de todos los módulos.
 - **Motivo**: RF-003–RF-011 y RF-015 de la spec, con los componentes y el patrón accesible que ya
   fijó 000-core (R16, `MensajeAccesible`, `FormatoEs`).
 - **Alternativas descartadas**: una tabla de 14 columnas por hora (se lee peor con lector de pantalla

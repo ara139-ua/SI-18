@@ -166,6 +166,8 @@ contra PostgreSQL.
     están las de 09:00 y 12:00;
   - **esc. 5**: una franja fija aprobada en el día de la semana de la fecha, de 19:00 a 21:00, en la
     «Pista de pádel 1» → faltan las de 19:00 y 20:00;
+  - **franja fija con cierre** (spec, «Casos límite»): en otra fecha, la misma franja fija más un
+    cierre de 19:00 a 20:00 en esa pista → faltan igualmente las de 19:00 y 20:00;
   - **esc. 6**: con la fecha de hoy (21/12/2026, 18:00), solo aparecen franjas de 19:00 en adelante, y
     con `Reloj` a las 17:59:59, la de 18:00 sí aparece (`[Trait("Categoria","Limites")]`);
   - **orden**: pistas por nombre y franjas por hora;
@@ -178,6 +180,16 @@ contra PostgreSQL.
   Restaurar `Reloj` a `FabricaApi.InicioReloj` al terminar cada prueba que lo cambie. Depende de T010.
 - [ ] T012 [US1] Crear `src/SI18.Cliente/Disponibilidad/BuscarPistas.razor` (ruta `/buscar-pistas`;
   research.md D7):
+  - **acceso** (spec, «Casos límite» y aclaración 2; RF-001): en `OnInitializedAsync`, antes de cargar
+    los filtros, se lee el `AuthenticationState` de `EstadoSesion`:
+    - sin sesión → `NavigationManager.NavigateTo("/iniciar-sesion")`;
+    - con sesión pero sin rol `ciudadano` ni `representante_club` → no se carga ni se muestra el
+      formulario, y aparece en `MensajeAccesible` (`Severity.Warning`) «La búsqueda de pistas es para
+      ciudadanos y representantes de club.». Es un texto propio de la pantalla, no el de
+      `ROL_NO_PERMITIDO`, para no duplicar el catálogo de errores. La API sigue respondiendo 403
+      (T010–T011).
+
+    No se toca `App.razor`, que es compartido;
   - `<form>` con `MudSelect` de deporte y de centro, y `MudDatePicker` de fecha, los tres con `Label`
     visible y `Required`. Deportes: solo los de `deporteIds` de
     `GET /api/instalaciones?reservablePorFranjas=true` con el nombre de `GET /api/deportes` (RF-004).
@@ -212,9 +224,10 @@ la misma disponibilidad y el mismo precio por `IConsultaDisponibilidad`.
   - `MotivoNoDisponible(instalacionId, inicioUtc, ct)`:
     - si la instalación no existe, lanza `CodigosError.Error(NoEncontrado)`;
     - con `HorarioMadrid.ALocal(inicioUtc)` obtiene la fecha y la hora; si no es en punto o no
-      coincide con el inicio de ninguna franja de `CalculadoraFranjas.FranjasDelDia`, devuelve
-      `CodigosError.PeticionInvalida`;
-    - si no, devuelve el `Motivo` de esa franja según `EvaluarPista`.
+      coincide con el inicio de ninguna franja de `CalculadoraFranjas.FranjasDelDia`, **lanza**
+      `CodigosError.Error(PeticionInvalida)`;
+    - si no, devuelve el `Motivo` de esa franja según `EvaluarPista`: solo uno de los seis motivos de
+      RF-011 o `null` (contracts/modulos.md).
   - `Precio(instalacionId, tarifa, ct)`: `CalculadoraPrecio.Precio(instalacion.Tipo, tarifa, tarifas)`.
 
   Registrar `services.AddScoped<IConsultaDisponibilidad>(sp => sp.GetRequiredService<ServicioDisponibilidad>())`
@@ -226,7 +239,10 @@ la misma disponibilidad y el mismo precio por `IConsultaDisponibilidad`.
     mismo importe (CE-004);
   - tras insertar una reserva confirmada, un cierre y una franja fija, da `FRANJA_OCUPADA`,
     `INSTALACION_CERRADA` y `FRANJA_BLOQUEADA_CLUB` en esas franjas, que tampoco aparecen en la búsqueda;
-  - una hora que no es en punto (18:30) y una de las 22:00 dan `PETICION_INVALIDA`;
+  - con una franja fija de 19:00 a 21:00 y un cierre de 19:00 a 20:00 en la misma pista, da
+    `INSTALACION_CERRADA` a las 19:00 (el cierre va antes en el orden de RF-011) y
+    `FRANJA_BLOQUEADA_CLUB` a las 20:00;
+  - una hora que no es en punto (18:30) y una de las 22:00 lanzan `ErrorNegocio` con `PETICION_INVALIDA`;
   - una instalación inexistente lanza `ErrorNegocio` con `NO_ENCONTRADO`;
   - el pabellón da `INSTALACION_NO_RESERVABLE`.
 
@@ -250,9 +266,11 @@ deporte y cuando la fecha está fuera de plazo.
   - **«Baloncesto»** → 200 con `TotalPistas = 0` y `Pistas` vacía;
   - **hoy + 7** (28/12/2026) → 200 con franjas; **hoy + 8** (29/12/2026) → 422 `FUERA_DE_ANTELACION`
     con el texto «Solo puedes reservar desde hoy hasta dentro de 7 días.»; **ayer** → 422;
-  - **hoy a las 21:00:00** (`Reloj`) → 200 con `TotalPistas = 2` y `Pistas` vacía.
+  - **hoy a las 21:00:00** (`Reloj`) → 200 con `TotalPistas = 2` y `Pistas` vacía;
+  - **orden de validación** (research.md D2): `centroId=999999` con fecha hoy + 8 → 422 (la fecha se
+    valida antes que la existencia del centro).
 
-  Depende de T010.
+  Restaurar `Reloj` a `FabricaApi.InicioReloj` al terminar cada prueba que lo cambie. Depende de T010.
 - [ ] T019 [US3] En `src/SI18.Cliente/Disponibilidad/BuscarPistas.razor`, mostrar con
   `MensajeAccesible` (RF-011):
   - con `TotalPistas == 0`: «{centro} no tiene pistas de {deporte}.» (`Severity.Info`);
@@ -295,11 +313,16 @@ deporte y cuando la fecha está fuera de plazo.
 
 - [ ] T022 Ejecutar quickstart.md §2–§4 de principio a fin: `dotnet test SI18.slnx` en verde
   (también con `--filter-trait "Categoria=Limites"`), los escenarios B1–B10 contra la API y los pasos
-  de la pantalla.
+  de la pantalla. Medir el tiempo de B1 con la API local (por ejemplo, 10 peticiones con
+  `Measure-Command`) y anotar en el PR el peor valor: debe ser < 2 s (CE-002) y, como objetivo,
+  < 500 ms (research.md D10).
 - [ ] T023 [P] Avisar al grupo de las consultas provisionales (constitución, «Acuerdos de
   colaboración»): mensaje a Saul (`IConsultaReservas`, spec-002) y a C (`IConsultaCierres`, spec-007)
   con la ruta del fichero provisional y su prueba en `ConsultasProvisionalesTests`, para que las
-  sustituyan y las borren en su PR. Anotarlo en la descripción del PR.
+  sustituyan y las borren en su PR. Anotarlo en la descripción del PR. Como las specs 002, 005 y 007
+  aún no existen, pedir a cada dueño que, al crearla con `/speckit-specify`, anote en su sección de
+  dependencias la provisional que sustituye (constitución: «la dependencia se anota en las dos
+  specs»). Para la 005, que es tuya, hacerlo tú.
 - [ ] T024 Abrir el PR de `feature/001-buscar-pistas` a `develop`, con la propuesta de convención de
   `Program.cs` (dos líneas por módulo, research.md D6), la lista de los principios I–IX revisados y la
   comprobación de accesibilidad de T021. Lo aprueba otra persona del grupo.

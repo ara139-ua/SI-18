@@ -36,7 +36,7 @@ hoy en Madrid; los identificadores salen de `GET /api/centros` y `GET /api/depor
 | B5  | Igual con `fecha={hoy+7}` y con `fecha={hoy+8}`                                                           | 200 con franjas; y 422 `FUERA_DE_ANTELACION`                                                           | HU3 esc. 3 |
 | B6  | `deporteId={baloncesto}`                                                                                  | 200 con `totalPistas = 0` y `pistas = []`                                                              | HU3 esc. 2 |
 | B7  | Sin el parámetro `fecha`                                                                                  | 400 `PETICION_INVALIDA` con `errors.fecha`                                                             | RF-003 |
-| B8  | `centroId=999999`                                                                                         | 404 `NO_ENCONTRADO`                                                                                    | D2 |
+| B8  | `centroId=999999` (con una fecha válida)                                                                  | 404 `NO_ENCONTRADO`                                                                                    | D2 |
 | B9  | Sesión como `personal.norte@si18.test` o `tecnico@si18.test`                                              | 403 `ROL_NO_PERMITIDO`                                                                                 | RF-001 |
 | B10 | Sin sesión                                                                                                | 401 `NO_AUTENTICADO`                                                                                   | RF-001 |
 
@@ -53,8 +53,10 @@ hacen así). Después repite B1: esas franjas ya no aparecen (HU1 esc. 2–5).
    6,00 €» y las demás franjas, y el mensaje «Hay 28 franjas libres en 2 pistas.».
 4. Busca «Pádel» en un centro y un día sin franjas (por ejemplo, hoy a partir de las 21:00): aparece el
    mensaje «No hay pistas libres…».
-5. Como `personal.norte@si18.test`, el menú no muestra «Buscar pistas», y `/buscar-pistas` muestra
-   el rechazo `ROL_NO_PERMITIDO`.
+5. Como `personal.norte@si18.test`, el menú no muestra «Buscar pistas», y si se escribe la dirección
+   `/buscar-pistas` no aparece el formulario, sino el aviso «La búsqueda de pistas es para ciudadanos y
+   representantes de club.».
+6. Sin sesión, al escribir la dirección `/buscar-pistas` se va directamente a «Iniciar sesión».
 
 ## 5. Accesibilidad (quickstart.md §6 de 000-core, aplicado a `/buscar-pistas`)
 
