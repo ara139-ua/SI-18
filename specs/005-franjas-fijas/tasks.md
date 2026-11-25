@@ -32,7 +32,12 @@ hora usan un reloj propio, como `DatosDisponibilidad.ConServicio`. Temporada sem
 Para que las solicitudes de clases distintas no se solapen entre sí, cada clase usa **un centro
 distinto**: `SolicitarFranjasFijasTests` → Sur; `RevisarFranjasFijasTests` → Este;
 `ConflictosFranjasFijasTests` → Oeste; `ConsultaFranjasFijasTests` → Norte, pabellón y «Pista de tenis 2»
-(las pistas de pádel de Norte las usa spec-001).
+(las pistas de pádel de Norte las usa spec-001). La única excepción son las dos pruebas que T023 mueve
+desde spec-001, que conservan sus pistas de Oeste (T023 explica por qué no chocan).
+
+**No se insertan temporadas ni usuarios**: `InicializadorDatosTests` (000-core) exige exactamente
+`Temporadas: 1` y `Usuarios: 10` en la base compartida. Las fechas fuera de la temporada se prueban con un
+reloj propio (`ConServicioSolicitudes`, T006).
 
 ---
 
@@ -109,9 +114,13 @@ distinto**: `SolicitarFranjasFijasTests` → Sur; `RevisarFranjasFijasTests` →
     el primero, como ahora);
   - `Instalacion(string centro, string nombre)` ya existe como `Pista`: se reutiliza para pabellones,
     salas y piscinas;
-  - `Task<int> Temporada(string nombre)`.
+  - `Task<int> Temporada(string nombre)`;
+  - `ConServicioSolicitudes<T>(DateTime ahoraUtc, Func<ServicioSolicitudesFranjasFijas, Task<T>> accion)`,
+    igual que `ConServicio` pero para el servicio de solicitudes, con su propio `FakeTimeProvider`. Sirve
+    para probar fechas sin tocar el reloj compartido y **sin insertar** temporadas ni usuarios:
+    `InicializadorDatosTests` exige exactamente `Temporadas: 1` y `Usuarios: 10` en la base compartida.
 
-  Depende de T003.
+  Depende de T003 (y de T005 para la última ayuda).
 
 **Punto de control**: `ReglaFranjasFijasTests` en verde y el servicio compila.
 
@@ -154,8 +163,11 @@ bloquear nada, y ve la lista de su club.
   - **esc. 3**: la sala y la piscina de Sur → 400 con `errors.instalacionId`;
   - **esc. 4**: días `[]`, `[2,2]` y `[0]`; `19:30`; `07:00`; fin = inicio; fin < inicio → 400 con el
     campo marcado;
-  - **esc. 5**: una temporada terminada (insertar «2025-2026», 01/09/2025–30/06/2026) → 400 con
-    `errors.temporadaId`, y no aparece en `GET …/temporadas`;
+  - **esc. 5**: temporada terminada **sin insertar ninguna** (no se pueden añadir temporadas a la base
+    compartida: `InicializadorDatosTests` exige `Temporadas: 1`). Con
+    `DatosDisponibilidad.ConServicioSolicitudes` y el reloj el 01/07/2027, «2026-2027» ya ha terminado:
+    `Crear` lanza `PETICION_INVALIDA` con `errors.temporadaId`, y la lista de temporadas no terminadas
+    sale vacía. El 30/06/2027 a las 23:59 de Madrid todavía se acepta (`[Trait("Categoria","Limites")]`);
   - **esc. 6**: `representante.padel` no ve las solicitudes de Norte;
   - **roles**: `ciudadana.empadronada` y `tecnico` en `POST` → 403; sin sesión → 401.
 
@@ -203,15 +215,21 @@ reciben un aviso.
 
   Depende de T005.
 - [ ] T012 [US2] Crear `tests/SI18.Api.Tests/Disponibilidad/RevisarFranjasFijasTests.cs`
-  (`[Collection(ColeccionApi.Nombre)]`, Polideportivo Este), parte de aprobar:
+  (`[Collection(ColeccionApi.Nombre)]`, Polideportivo Este). Reparto dentro de la clase, para que una
+  aprobación no estropee otra prueba: **aprobar** usa «Pista de pádel 1» los **martes**; **rechazar**
+  (T019) usa «Pista de pádel 2» los **miércoles**; **ya resuelta** (T019) usa «Pista de tenis 1» los
+  **viernes**. Parte de aprobar:
   - **esc. 1**: una solicitud pendiente sin conflictos sobre «Pista de pádel 1» de Este, martes 19–21 →
     200, `Aprobada`, `ResueltaEnUtc` informada;
   - **esc. 2 y 5**: la búsqueda de HU-01 de pádel en Este el martes 22/12/2026 ya no tiene las franjas de
     19:00 ni de 20:00 de esa pista; un miércoles sí; julio de 2027 no se busca (fuera de antelación),
     así que se comprueba con `IConsultaFranjasFijas.FranjasBloqueadas` para el 06/07/2027 → vacía;
   - **esc. 3**: `IConsultaDisponibilidad.MotivoNoDisponible` en esa franja → `FRANJA_BLOQUEADA_CLUB`;
-  - **esc. 4**: `representante.norte` (y cualquier otro representante del club) tiene en `GET /api/avisos`
-    el aviso «… ha sido aprobada.» con «martes» y «19:00 a 21:00»;
+  - **esc. 4**: `representante.norte` tiene en `GET /api/avisos` el aviso «… ha sido aprobada.» con
+    «martes» y «19:00 a 21:00». Como la siembra solo tiene un representante por club y no se pueden
+    añadir usuarios (`InicializadorDatosTests` exige `Usuarios: 10`), «todos los representantes» se
+    comprueba así: el número de avisos nuevos es igual al número de usuarios `RepresentanteClub` del club
+    consultado en la base, y hay uno para cada uno;
   - **listado del técnico**: las pendientes salen antes que las resueltas;
   - **roles**: `representante.norte` en `POST …/aprobacion` → 403; id inexistente → 404.
 
@@ -285,11 +303,15 @@ existan.
   (`EsTecnico`): no existe → `NO_ENCONTRADO`; `solicitud.Rechazar(ahora)` (ya resuelta →
   `SOLICITUD_YA_RESUELTA`), aviso a cada representante con «… ha sido rechazada.» (sin motivo,
   aclaración 1) y un único `SaveChanges` → 200. Se puede rechazar aunque tenga conflictos. Depende de T011.
-- [ ] T019 [US4] Añadir a `tests/SI18.Api.Tests/Disponibilidad/RevisarFranjasFijasTests.cs`:
-  - **esc. 1–3**: rechazar una pendiente (también una con conflictos) → 200, `Rechazada`, la búsqueda de
-    HU-01 sigue mostrando esas franjas y los representantes tienen el aviso «… ha sido rechazada.»;
-  - **esc. 4**: aprobar o rechazar una ya aprobada, y una ya rechazada → 409 `SOLICITUD_YA_RESUELTA`, sin
-    aviso nuevo;
+- [ ] T019 [US4] Añadir a `tests/SI18.Api.Tests/Disponibilidad/RevisarFranjasFijasTests.cs`, con el reparto
+  de T012 (rechazar en «Pista de pádel 2» de Este los **miércoles**; ya resuelta en «Pista de tenis 1» de
+  Este los **viernes**), para que la aprobación de los martes en «Pista de pádel 1» no bloquee nada aquí:
+  - **esc. 1–3**: rechazar una pendiente de «Pista de pádel 2», miércoles 19–21 (también una con
+    conflictos) → 200, `Rechazada`; la búsqueda de HU-01 de pádel en Este el miércoles 23/12/2026 sigue
+    mostrando las franjas de 19:00 y 20:00 de esa pista; los representantes tienen el aviso «… ha sido
+    rechazada.»;
+  - **esc. 4**: en «Pista de tenis 1», viernes: aprobar o rechazar una ya aprobada, y una ya rechazada →
+    409 `SOLICITUD_YA_RESUELTA`, sin aviso nuevo;
   - **atomicidad** (CE-004): tras un 409, el número de avisos del club no cambia.
 
   Depende de T012 y T018.
@@ -332,7 +354,11 @@ provisional de spec-001 retirada.
   (`[Collection(ColeccionApi.Nombre)]`, `[Trait("Categoria","Limites")]`, Polideportivo Norte, pabellón
   y «Pista de tenis 2»):
   - **movidas** de `ConsultasProvisionalesTests` (y borradas de allí): «una franja fija aprobada bloquea
-    sus días y horas dentro de la temporada» y «una solicitud no aprobada no bloquea nada»;
+    sus días y horas dentro de la temporada» y «una solicitud no aprobada no bloquea nada». **Conservan sus
+    pistas de Oeste** («Pista de pádel 2» y «Pista de tenis 1», enero de 2027), aunque Oeste sea el centro
+    de `ConflictosFranjasFijasTests`: esta usa «Pista de tenis 1» los martes de 19 a 21 en diciembre, y las
+    movidas usan martes y jueves de 19 a 21 en «Pista de pádel 2» y miércoles por la tarde en «Pista de
+    tenis 1», así que no se solapan. Las pruebas nuevas de esta tarea usan Norte;
   - **esc. 1–2**: martes 19–21 aprobada y un cierre ese martes de 19:00 a 20:00 → solo la franja de 20:00;
     un cierre de 18:00 a 22:00 → ninguna;
   - **esc. 3**: dos clubes con franjas fijas aprobadas en la misma instalación que se solapan con un

@@ -254,8 +254,8 @@ pantalla, y se pasa la comprobación de quickstart.md §6 de `000-core`.
   como cerradas.
 - **Roles**: un ciudadano, un miembro del personal o un técnico no puede enviar solicitudes; un
   representante no puede aprobar ni rechazar. Se rechaza con `ROL_NO_PERMITIDO`.
-- **Solicitud de otro club**: un representante que pide ver una solicitud de otro club recibe
-  `NO_ENCONTRADO`, sin revelar que existe.
+- **Solicitud de otro club**: un representante solo ve en su lista las solicitudes de su club; las de
+  otros clubes no aparecen y no hay ninguna forma de consultarlas una a una.
 
 ## Requisitos *(obligatorio)*
 
