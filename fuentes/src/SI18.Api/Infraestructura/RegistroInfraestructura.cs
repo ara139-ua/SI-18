@@ -25,6 +25,9 @@ public static class RegistroInfraestructura
 
         services.AddHostedService<InicializadorDatos>();
 
+        // Persiste la caducidad de las reservas pendientes no vigentes (research.md R8.4).
+        services.AddHostedService<BarridoCaducidades>();
+
         return services;
     }
 }
