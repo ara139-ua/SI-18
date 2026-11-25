@@ -91,7 +91,7 @@ definitiva de reservas activas (y la retirada de la provisional) y los datos de 
 > en un PR y se retira la provisional en otro: durante ese intervalo habría dos implementaciones de la
 > misma regla registradas (research.md E7).
 
-- [ ] T004 Crear `src/SI18.Api/Modulos/Reservas/CargaReservas.cs` (clase `internal static`) con
+- [X] T004 Crear `src/SI18.Api/Modulos/Reservas/CargaReservas.cs` (clase `internal static`) con
   `Task<Reserva?> CargarParaModificar(Si18DbContext db, long reservaId, int? usuarioId, CancellationToken ct)`
   (research.md E5):
   - si `db.Database.CurrentTransaction` es nulo, lanza `InvalidOperationException` («Hay que abrir la
@@ -101,7 +101,7 @@ definitiva de reservas activas (y la retirada de la provisional) y los datos de 
     `UsuarioId == usuarioId` si se pasa;
   - `AplicarCierre` (T045) y la caducidad al reservar (T026) cargan varias reservas: escriben su
     propia consulta `FOR UPDATE` con el mismo patrón y la misma comprobación de transacción.
-- [ ] T005 Cambiar `src/SI18.Api/Infraestructura/BarridoCaducidades.cs` (dueño: Saul, T068 de 000-core)
+- [X] T005 Cambiar `src/SI18.Api/Infraestructura/BarridoCaducidades.cs` (dueño: Saul, T068 de 000-core)
   a **`FOR UPDATE SKIP LOCKED`** (research.md E5; data-model.md § 2.3):
   - `EjecutarUnaVez` abre una transacción (`BeginTransactionAsync`) y carga las pendientes no vigentes
     con `FromSql($"SELECT * FROM reservas WHERE estado = 'pendiente_pago' AND creada_en_utc <= {limite} FOR UPDATE SKIP LOCKED")`
@@ -111,7 +111,7 @@ definitiva de reservas activas (y la retirada de la provisional) y los datos de 
     `SKIP LOCKED`: no espera a un pago en curso; lo que se salta lo coge en la siguiente vuelta.
 
   `Comun/BarridoCaducidadesTests.cs` debe seguir en verde sin cambios.
-- [ ] T006 Añadir a `tests/SI18.Api.Tests/Comun/BarridoCaducidadesTests.cs` el caso
+- [X] T006 Añadir a `tests/SI18.Api.Tests/Comun/BarridoCaducidadesTests.cs` el caso
   `El_barrido_salta_una_reserva_bloqueada_y_la_caduca_en_la_siguiente_vuelta`
   (`[Trait("Categoria","Limites")]`): con una pendiente creada hace 10 min (instante insertado, sin
   adelantar el reloj) y bloqueada por otra transacción abierta con `FOR UPDATE`, `EjecutarUnaVez`
