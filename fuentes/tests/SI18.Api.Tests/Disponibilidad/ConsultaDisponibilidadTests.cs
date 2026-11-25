@@ -105,6 +105,20 @@ public class ConsultaDisponibilidadTests(FabricaApi fabrica)
         Assert.Equal(CodigosError.PeticionInvalida, error.Codigo);
     }
 
+    [Theory]
+    [InlineData(DateTimeKind.Local)]
+    [InlineData(DateTimeKind.Unspecified)]
+    public async Task Un_instante_que_no_es_UTC_lanza_peticion_invalida(DateTimeKind tipo)
+    {
+        var pista = await _datos.Pista(Este, "Pista de pádel 1");
+        var noUtc = DateTime.SpecifyKind(Utc(Fecha, 10), tipo);
+
+        var error = await Con((consulta, _) =>
+            Assert.ThrowsAsync<ErrorNegocio>(() => consulta.MotivoNoDisponible(pista, noUtc, Ct)));
+
+        Assert.Equal(CodigosError.PeticionInvalida, error.Codigo);
+    }
+
     [Fact]
     public async Task Una_instalacion_inexistente_lanza_no_encontrado()
     {
