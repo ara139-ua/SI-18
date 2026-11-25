@@ -1,0 +1,192 @@
+openapi: 3.1.0
+info:
+  title: SI-18 · Solicitudes de franjas fijas (HU-05)
+  version: 0.1.0
+  description: >
+    Solicitud, revisión y resolución de franjas fijas de temporada para clubes. Convenciones HTTP, errores
+    y sesión según specs/000-core/contracts (README.md y errores.md). Problema es el esquema de
+    api-comun.openapi.yaml de 000-core.
+paths:
+  /api/solicitudes-franjas-fijas:
+    get:
+      summary: Solicitudes visibles para el usuario (representante, las de su club; técnico, todas)
+      description: Pendientes primero; dentro de cada estado, la más antigua primero.
+      security: [{ cookieSesion: [] }]
+      responses:
+        '200':
+          description: Lista de solicitudes.
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/SolicitudFranjasFijas' } }
+        '401': { $ref: '#/components/responses/Problema' }
+        '403': { $ref: '#/components/responses/Problema' }
+    post:
+      summary: Crear una solicitud pendiente a nombre del club de la sesión (solo representante)
+      security: [{ cookieSesion: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PeticionSolicitudFranjasFijas' }
+      responses:
+        '201':
+          description: Solicitud creada en estado pendiente.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SolicitudFranjasFijas' }
+        '400':
+          description: >
+            PETICION_INVALIDA con errors por campo (días, horas, instalación que no es pista ni pabellón,
+            temporada inexistente o terminada).
+          content:
+            application/problem+json:
+              schema: { $ref: '../../000-core/contracts/api-comun.openapi.yaml#/components/schemas/Problema' }
+        '401': { $ref: '#/components/responses/Problema' }
+        '403': { $ref: '#/components/responses/Problema' }
+  /api/solicitudes-franjas-fijas/temporadas:
+    get:
+      summary: Temporadas no terminadas (fecha de fin ≥ hoy en Madrid), para el formulario
+      security: [{ cookieSesion: [] }]
+      responses:
+        '200':
+          description: Temporadas.
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/Temporada' } }
+        '401': { $ref: '#/components/responses/Problema' }
+        '403': { $ref: '#/components/responses/Problema' }
+  /api/solicitudes-franjas-fijas/{id}/conflictos:
+    get:
+      summary: Reservas en conflicto y solicitudes aprobadas solapadas (solo técnico)
+      security: [{ cookieSesion: [] }]
+      parameters: [{ $ref: '#/components/parameters/Id' }]
+      responses:
+        '200':
+          description: Conflictos calculados en el momento de la petición.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ConflictosSolicitud' }
+        '401': { $ref: '#/components/responses/Problema' }
+        '403': { $ref: '#/components/responses/Problema' }
+        '404': { $ref: '#/components/responses/Problema' }
+  /api/solicitudes-franjas-fijas/{id}/aprobacion:
+    post:
+      summary: Aprobar una solicitud pendiente sin conflictos (solo técnico)
+      description: >
+        Vuelve a calcular los conflictos. Avisa en «Mis avisos» a todos los representantes del club, en la
+        misma operación que el cambio de estado.
+      security: [{ cookieSesion: [] }]
+      parameters: [{ $ref: '#/components/parameters/Id' }]
+      responses:
+        '200':
+          description: Solicitud aprobada.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SolicitudFranjasFijas' }
+        '401': { $ref: '#/components/responses/Problema' }
+        '403': { $ref: '#/components/responses/Problema' }
+        '404': { $ref: '#/components/responses/Problema' }
+        '409':
+          description: SOLICITUD_YA_RESUELTA, SOLICITUD_CON_CONFLICTOS o FRANJA_FIJA_SOLAPADA (en ese orden).
+          content:
+            application/problem+json:
+              schema: { $ref: '../../000-core/contracts/api-comun.openapi.yaml#/components/schemas/Problema' }
+  /api/solicitudes-franjas-fijas/{id}/rechazo:
+    post:
+      summary: Rechazar una solicitud pendiente (solo técnico), tenga o no conflictos
+      security: [{ cookieSesion: [] }]
+      parameters: [{ $ref: '#/components/parameters/Id' }]
+      responses:
+        '200':
+          description: Solicitud rechazada; se avisa a los representantes del club.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SolicitudFranjasFijas' }
+        '401': { $ref: '#/components/responses/Problema' }
+        '403': { $ref: '#/components/responses/Problema' }
+        '404': { $ref: '#/components/responses/Problema' }
+        '409':
+          description: SOLICITUD_YA_RESUELTA.
+          content:
+            application/problem+json:
+              schema: { $ref: '../../000-core/contracts/api-comun.openapi.yaml#/components/schemas/Problema' }
+components:
+  securitySchemes:
+    cookieSesion: { type: apiKey, in: cookie, name: si18.sesion }
+  parameters:
+    Id: { name: id, in: path, required: true, schema: { type: integer } }
+  responses:
+    Problema:
+      description: Error con Problem Details (000-core, contracts/errores.md).
+      content:
+        application/problem+json:
+          schema: { $ref: '../../000-core/contracts/api-comun.openapi.yaml#/components/schemas/Problema' }
+  schemas:
+    PeticionSolicitudFranjasFijas:
+      type: object
+      required: [instalacionId, temporadaId, diasSemana, horaInicio, horaFin]
+      properties:
+        instalacionId: { type: integer }
+        temporadaId: { type: integer }
+        diasSemana:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items: { type: integer, minimum: 1, maximum: 7 }
+          description: Días ISO, 1 = lunes … 7 = domingo.
+        horaInicio: { type: string, examples: ['19:00'], description: En punto, desde 08:00. }
+        horaFin: { type: string, examples: ['21:00'], description: En punto, hasta 22:00, posterior a horaInicio. }
+    EstadoSolicitud:
+      type: string
+      enum: [pendiente, aprobada, rechazada]
+    SolicitudFranjasFijas:
+      type: object
+      required: [id, clubNombre, instalacionId, instalacionNombre, centroNombre, temporadaNombre, diasSemana, horaInicio, horaFin, estado, creadaEnUtc]
+      properties:
+        id: { type: integer }
+        clubNombre: { type: string }
+        instalacionId: { type: integer }
+        instalacionNombre: { type: string }
+        centroNombre: { type: string }
+        temporadaNombre: { type: string }
+        diasSemana: { type: array, items: { type: integer, minimum: 1, maximum: 7 } }
+        horaInicio: { type: string, examples: ['19:00'] }
+        horaFin: { type: string, examples: ['21:00'] }
+        estado: { $ref: '#/components/schemas/EstadoSolicitud' }
+        creadaEnUtc: { type: string, format: date-time }
+        resueltaEnUtc: { type: [string, 'null'], format: date-time }
+    ConflictosSolicitud:
+      type: object
+      required: [reservas, solapadas, puedeAprobarse]
+      properties:
+        reservas:
+          type: array
+          description: Sin datos personales del titular.
+          items:
+            type: object
+            required: [fecha, horaInicio, horaFin, estado]
+            properties:
+              fecha: { type: string, format: date }
+              horaInicio: { type: string }
+              horaFin: { type: string }
+              estado: { type: string, enum: [confirmada, pendiente_pago] }
+        solapadas:
+          type: array
+          items:
+            type: object
+            required: [id, clubNombre, diasSemana, horaInicio, horaFin]
+            properties:
+              id: { type: integer }
+              clubNombre: { type: string }
+              diasSemana: { type: array, items: { type: integer } }
+              horaInicio: { type: string }
+              horaFin: { type: string }
+        puedeAprobarse: { type: boolean }
+    Temporada:
+      type: object
+      required: [id, nombre, fechaInicio, fechaFin]
+      properties:
+        id: { type: integer }
+        nombre: { type: string, examples: ['2026-2027'] }
+        fechaInicio: { type: string, format: date }
+        fechaFin: { type: string, format: date }
