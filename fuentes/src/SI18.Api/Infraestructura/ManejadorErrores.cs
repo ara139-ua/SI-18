@@ -105,7 +105,8 @@ public sealed class ManejadorErrores(ILogger<ManejadorErrores> logger) : IExcept
     public static string Tipo(string codigo) =>
         $"https://si18.test/errores/{codigo.ToLowerInvariant().Replace('_', '-')}";
 
-    private static HttpValidationProblemDetails CrearValidacion(HttpContext httpContext, IDictionary<string, string[]> errores)
+    /// <summary>400 <c>PETICION_INVALIDA</c> con los errores por campo (<c>errors</c>).</summary>
+    public static HttpValidationProblemDetails CrearValidacion(HttpContext httpContext, IDictionary<string, string[]> errores)
     {
         var problema = new HttpValidationProblemDetails(errores);
         Rellenar(problema, CodigosError.PeticionInvalida, httpContext);

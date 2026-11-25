@@ -512,7 +512,7 @@ llamado con otro rol, devuelve 403 `ROL_NO_PERMITIDO`.
 - [X] T051 [P] [US3] [Saul] Crear `fuentes/tests/SI18.Dominio.Tests/Comun/CalculadoraTarifaTests.cs`
   (los cuatro casos, incluido el representante empadronado → `Club`) y `PermisosCentroTests.cs`
   (mismo centro → pasa; otro centro → `OTRO_CENTRO`; null → `OTRO_CENTRO`).
-- [ ] T052 [US3] [Ambos · sugerido: Artur] Crear la sesión en la API:
+- [X] T052 [US3] [Ambos · sugerido: Artur] Crear la sesión en la API:
   - `fuentes/src/SI18.Api/Modulos/Comun/IUsuarioActual.cs` y `UsuarioActual.cs`, que leen los claims
     `sub`, `role`, `tipo_tarifa`, `centro_id` y `club_id` del `HttpContext`.
   - En `RegistroComun.cs`:
@@ -521,7 +521,7 @@ llamado con otro rol, devuelve 403 `ROL_NO_PERMITIDO`.
     - eventos `OnRedirectToLogin` → 401 Problem Details `NO_AUTENTICADO` y
       `OnRedirectToAccessDenied` → 403 `ROL_NO_PERMITIDO`, nunca una redirección;
     - políticas `EsCiudadanoORepresentante`, `EsRepresentante`, `EsPersonal` y `EsTecnico`.
-- [ ] T053 [US3] [Ambos · sugerido: Artur] Crear `fuentes/src/SI18.Api/Modulos/Comun/EndpointsSesion.cs`
+- [X] T053 [US3] [Ambos · sugerido: Artur] Crear `fuentes/src/SI18.Api/Modulos/Comun/EndpointsSesion.cs`
   según el OpenAPI:
   - `POST /api/sesion`:
     - normaliza el correo a minúsculas y verifica con `PasswordHasher<Usuario>`;
@@ -555,7 +555,7 @@ llamado con otro rol, devuelve 403 `ROL_NO_PERMITIDO`.
   `AuthenticationStateProvider` que consulta `GET /api/sesion/usuario`. Completar el menú por rol en
   `MainLayout.razor`: «Mis avisos» para cualquier usuario identificado y «Cerrar sesión», más los
   huecos de menú de cada módulo según `Rol`. Depende de T024, T026 y T053.
-- [ ] T057 [P] [US3] [Ambos · sugerido: Artur] Crear `fuentes/tests/SI18.Api.Tests/Comun/SesionTests.cs`:
+- [X] T057 [P] [US3] [Ambos · sugerido: Artur] Crear `fuentes/tests/SI18.Api.Tests/Comun/SesionTests.cs`:
   - V1–V4 de quickstart.md (rol, tarifa y centro de cada usuario precargado; cookie con `HttpOnly`);
   - V5: contraseña incorrecta y correo inexistente dan el mismo 401 y el mismo `detail`;
   - V6: `GET /api/avisos` sin cookie → 401 `NO_AUTENTICADO` en `application/problem+json`;
