@@ -29,6 +29,9 @@ public static class CodigosError
     public const string QrReservaNoConfirmada = "QR_RESERVA_NO_CONFIRMADA";
     public const string QrFueraDeVentana = "QR_FUERA_DE_VENTANA";
     public const string QrOtroCentro = "QR_OTRO_CENTRO";
+    public const string SolicitudConConflictos = "SOLICITUD_CON_CONFLICTOS";
+    public const string FranjaFijaSolapada = "FRANJA_FIJA_SOLAPADA";
+    public const string SolicitudYaResuelta = "SOLICITUD_YA_RESUELTA";
     public const string ErrorInterno = "ERROR_INTERNO";
 
     private static readonly Dictionary<string, (string Titulo, string Detalle)> Textos = new()
@@ -54,6 +57,9 @@ public static class CodigosError
         [QrReservaNoConfirmada] = ("Reserva no confirmada", "La reserva de este código no está confirmada (cancelada o caducada)."),
         [QrFueraDeVentana] = ("Código fuera de horario", "El código solo es válido desde 15 minutos antes del inicio hasta el final de la reserva."),
         [QrOtroCentro] = ("Código de otro centro", "Este código pertenece a una reserva de otro centro."),
+        [SolicitudConConflictos] = ("Solicitud con conflictos", "Hay reservas en esos días y horas durante la temporada. Recházala o espera a que pasen o se cancelen."),
+        [FranjaFijaSolapada] = ("Franja fija solapada", "Se solapa con otra franja fija ya aprobada en esa instalación y temporada."),
+        [SolicitudYaResuelta] = ("Solicitud ya resuelta", "Esta solicitud ya está resuelta y no se puede volver a aprobar ni rechazar."),
         [ErrorInterno] = ("Error inesperado", "Ha ocurrido un error inesperado. Inténtalo de nuevo más tarde."),
     };
 

@@ -38,6 +38,9 @@ public sealed class ManejadorErrores(ILogger<ManejadorErrores> logger) : IExcept
         [CodigosError.QrReservaNoConfirmada] = StatusCodes.Status422UnprocessableEntity,
         [CodigosError.QrFueraDeVentana] = StatusCodes.Status422UnprocessableEntity,
         [CodigosError.QrOtroCentro] = StatusCodes.Status403Forbidden,
+        [CodigosError.SolicitudConConflictos] = StatusCodes.Status409Conflict,
+        [CodigosError.FranjaFijaSolapada] = StatusCodes.Status409Conflict,
+        [CodigosError.SolicitudYaResuelta] = StatusCodes.Status409Conflict,
         [CodigosError.ErrorInterno] = StatusCodes.Status500InternalServerError,
     };
 

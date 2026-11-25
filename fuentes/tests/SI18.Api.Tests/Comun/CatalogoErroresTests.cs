@@ -9,9 +9,10 @@ public class CatalogoErroresTests
     public static TheoryData<string> Codigos() => new(CodigosError.Todos);
 
     [Fact]
-    public void El_catalogo_tiene_los_22_codigos_de_contracts()
+    public void El_catalogo_tiene_los_25_codigos_de_contracts()
     {
-        Assert.Equal(22, CodigosError.Todos.Count);
+        // 22 de 000-core + 3 de spec-005 (contracts/errores.md).
+        Assert.Equal(25, CodigosError.Todos.Count);
     }
 
     [Fact]
