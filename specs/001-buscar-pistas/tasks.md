@@ -43,12 +43,12 @@ Cada centro sembrado tiene «Pista de tenis 1», «Pista de tenis 2», «Pista d
 
 **Propósito**: que el módulo `Disponibilidad` exista en la API con su registro y sus contratos.
 
-- [ ] T001 Crear `src/SI18.Api/Modulos/Disponibilidad/RegistroDisponibilidad.cs` con
+- [X] T001 Crear `src/SI18.Api/Modulos/Disponibilidad/RegistroDisponibilidad.cs` con
   `AddDisponibilidad(this IServiceCollection)` y `MapDisponibilidad(this WebApplication)`, de momento
   vacíos, y añadir en `src/SI18.Api/Program.cs` **solo dos líneas**: `builder.Services.AddDisponibilidad();`
   después de `AddComun()` y `app.MapDisponibilidad();` después de `MapComun()` (research.md D6;
   convención propuesta para 002–008).
-- [ ] T002 [P] Crear los DTO en `src/SI18.Contratos/Disponibilidad/`, uno por fichero, según
+- [X] T002 [P] Crear los DTO en `src/SI18.Contratos/Disponibilidad/`, uno por fichero, según
   [data-model.md § 4](./data-model.md) y [contracts/api-disponibilidad.openapi.yaml](./contracts/api-disponibilidad.openapi.yaml):
   - `ResultadoBusquedaDto(DateOnly Fecha, int CentroId, int DeporteId, int TotalPistas, IReadOnlyList<PistaLibreDto> Pistas)`;
   - `PistaLibreDto(int InstalacionId, string Nombre, TipoInstalacion Tipo, IReadOnlyList<FranjaLibreDto> Franjas)`,

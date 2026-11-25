@@ -1,5 +1,6 @@
 using SI18.Api.Infraestructura;
 using SI18.Api.Modulos.Comun;
+using SI18.Api.Modulos.Disponibilidad;
 
 // Solo composición (tasks.md T009). Cada responsable registra lo suyo en su fichero de extensión:
 // RegistroInfraestructura (Saul), RegistroErrores (Artur) y RegistroComun (Ambos).
@@ -8,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddInfraestructura(builder.Configuration);
 builder.Services.AddErrores();
 builder.Services.AddComun();
+builder.Services.AddDisponibilidad();
 
 var app = builder.Build();
 
@@ -17,6 +19,7 @@ app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapComun();
+app.MapDisponibilidad();
 app.MapFallbackToFile("index.html");
 
 app.Run();
