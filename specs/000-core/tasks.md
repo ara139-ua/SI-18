@@ -36,7 +36,8 @@ defecto (`sugerido: …`) para no duplicar trabajo.
 - **Solo Saul genera migraciones.**
 - Cada uno registra sus servicios en su propio fichero de extensión (`RegistroInfraestructura.cs`
   para Saul, `RegistroErrores.cs` para Artur, `RegistroComun.cs` para Ambos). `Program.cs` no se toca
-  después de T009.
+  después de T009, salvo las dos líneas de entrada de cada módulo (`Add<Modulo>()` y `Map<Modulo>()`),
+  que añade cada spec 001–008 en el orden fijo de plan.md, «Registro de los módulos en la API».
 - **Accesibilidad en cada PR** (principio I): todo PR que incluya ficheros de `SI18.Cliente` anota en
   su descripción la comprobación de quickstart.md §6 (teclado, foco, anuncio de mensajes y
   Lighthouse/axe). T073 es la revisión final conjunta, no la única.
@@ -690,7 +691,8 @@ responsable.
     `ManejadorErrores.TryHandleAsync` con `DefaultHttpContext` y `ErrorNegocio(FRANJA_OCUPADA)` → 409 y
     `application/problem+json` con `type`, `title`, `detail`, `codigo` y `traceId`.
 - [ ] T072 [Ambos · sugerido: Saul] Revisar `fuentes/src/SI18.Api/Program.cs`:
-  - solo contiene la composición de T009;
+  - solo contiene la composición de T009 más las líneas `Add<Modulo>()` y `Map<Modulo>()` de los módulos
+    ya fusionados, en el orden de plan.md, «Registro de los módulos en la API»;
   - añadir `AddOpenApi()` y `MapOpenApi()` (solo en Development) para servir `/openapi/v1.json`;
   - comprobar que ningún `.cs` de `src/` usa `DateTime.Now` ni `UtcNow` (lo garantiza el analizador:
     `dotnet build` en verde).
