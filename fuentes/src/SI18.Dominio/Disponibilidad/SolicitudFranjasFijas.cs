@@ -64,9 +64,10 @@ public class SolicitudFranjasFijas
 
     private void Resolver(EstadoSolicitud nuevoEstado, DateTime ahoraUtc)
     {
+        // Una solicitud ya aprobada o rechazada no se vuelve a resolver (spec-005 RF-012).
         if (Estado != EstadoSolicitud.Pendiente)
         {
-            throw CodigosError.Error(CodigosError.TransicionNoPermitida);
+            throw CodigosError.Error(CodigosError.SolicitudYaResuelta);
         }
 
         Estado = nuevoEstado;

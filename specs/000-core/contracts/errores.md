@@ -64,6 +64,9 @@ Content-Type: application/problem+json
 | `QR_RESERVA_NO_CONFIRMADA` | 422  | «La reserva de este código no está confirmada (cancelada o caducada).»             | RF-018         |
 | `QR_FUERA_DE_VENTANA`      | 422  | «El código solo es válido desde 15 minutos antes del inicio hasta el final de la reserva.» | RF-018 |
 | `QR_OTRO_CENTRO`           | 403  | «Este código pertenece a una reserva de otro centro.»                              | D7             |
+| `SOLICITUD_CON_CONFLICTOS` | 409  | «Hay reservas en esos días y horas durante la temporada. Recházala o espera a que pasen o se cancelen.» | RF-022, D8 (spec-005) |
+| `FRANJA_FIJA_SOLAPADA`     | 409  | «Se solapa con otra franja fija ya aprobada en esa instalación y temporada.»       | RF-022 (spec-005) |
+| `SOLICITUD_YA_RESUELTA`    | 409  | «Esta solicitud ya está resuelta y no se puede volver a aprobar ni rechazar.»      | RF-022 (spec-005) |
 | `ERROR_INTERNO`            | 500  | «Ha ocurrido un error inesperado. Inténtalo de nuevo más tarde.»                   | Comun          |
 
 El catálogo vive en el código como constantes en `SI18.Dominio/Comun/CodigosError.cs`, y la tabla
