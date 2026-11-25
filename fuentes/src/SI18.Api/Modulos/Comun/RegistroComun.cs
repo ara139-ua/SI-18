@@ -42,6 +42,7 @@ public static class RegistroComun
     public static WebApplication MapComun(this WebApplication app)
     {
         app.MapSesion();
+        app.MapCatalogo();
         app.MapAvisos();
         return app;
     }
