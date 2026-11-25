@@ -412,15 +412,15 @@ a los dos lados del límite.
 **Prueba independiente**: `dotnet test --filter "Categoria=Limites"` en verde, con casos de
 7 días, 10 min, 24 h y 15 min, incluido el cambio de hora (CE-006).
 
-- [ ] T042 [P] [US2] [Artur] Crear `fuentes/src/SI18.Dominio/Disponibilidad/Franja.cs`
+- [X] T042 [P] [US2] [Artur] Crear `fuentes/src/SI18.Dominio/Disponibilidad/Franja.cs`
   (`sealed record Franja(int InstalacionId, DateOnly Fecha, TimeOnly HoraInicio, DateTime InicioUtc, DateTime FinUtc)`)
   y `CalculadoraFranjas.cs`: `FranjasDelDia(int instalacionId, DateOnly fecha)` devuelve las
   14 franjas de `ValoresNegocio.HoraApertura` a `HoraCierre − DuracionFranja`, convertidas con
   `HorarioMadrid.AUtc`.
-- [ ] T043 [P] [US2] [Artur] Crear `fuentes/src/SI18.Dominio/Disponibilidad/CalculadoraPrecio.cs`:
+- [X] T043 [P] [US2] [Artur] Crear `fuentes/src/SI18.Dominio/Disponibilidad/CalculadoraPrecio.cs`:
   `decimal Precio(TipoInstalacion tipo, TipoTarifa tarifa, IReadOnlyList<Tarifa> tarifas)` =
   `precio_hora × 1 h`. Si no hay tarifa para ese tipo, lanza `INSTALACION_NO_RESERVABLE`.
-- [ ] T044 [US2] [Artur] Crear `fuentes/src/SI18.Dominio/Disponibilidad/ReglaDisponibilidad.cs`, una
+- [X] T044 [US2] [Artur] Crear `fuentes/src/SI18.Dominio/Disponibilidad/ReglaDisponibilidad.cs`, una
   función pura:
 
   ```
@@ -475,7 +475,7 @@ a los dos lados del límite.
     - null → `QR_DESCONOCIDO`.
 
   Depende de T045 y T046.
-- [ ] T048 [P] [US2] [Artur] Crear `fuentes/src/SI18.Contratos/Comun/FormatoEs.cs` (RF-027, principio
+- [X] T048 [P] [US2] [Artur] Crear `fuentes/src/SI18.Contratos/Comun/FormatoEs.cs` (RF-027, principio
   IX). Va en Contratos para que el cliente lo use y se pueda probar:
   - `Importe(decimal)` → `ToString("C2", new CultureInfo("es-ES"))`, que da «6,00 €»;
   - `FechaHora(DateTime utc)` → hora de Madrid con `TimeZoneInfo.FindSystemTimeZoneById("Europe/Madrid")`,
