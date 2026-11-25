@@ -129,6 +129,7 @@ fuentes/
     ├── Reservas/                                       # E13 (nuevo)
     │   ├── DatosReservas.cs
     │   ├── CrearReservaTests.cs
+    │   ├── MotivosRechazoTests.cs                      # HU4: cada motivo de RF-011, PRECIO_CAMBIADO y cambio de hora
     │   ├── ReservaConcurrenteTests.cs
     │   ├── PagarReservaTests.cs
     │   ├── MisReservasTests.cs
@@ -136,7 +137,10 @@ fuentes/
     │   ├── ServicioReservasTests.cs
     │   ├── ReservarComoEnLaBusquedaTests.cs
     │   └── EstadoReservaEspejoTests.cs
-    └── Disponibilidad/ConsultasProvisionalesTests.cs   # − las dos pruebas de IConsultaReservas (E7)
+    ├── Comun/BarridoCaducidadesTests.cs                # + el barrido salta una reserva bloqueada (SKIP LOCKED, E5)
+    └── Disponibilidad/
+        ├── ConsultasProvisionalesTests.cs              # − las dos pruebas de IConsultaReservas (E7)
+        └── DatosDisponibilidad.cs                      # ConServicio: ConsultaReservasProvisional → ConsultaReservas (E7)
 ```
 
 **Decisión de estructura**: la de 000-core, sin proyectos nuevos. El código nuevo va en las carpetas
@@ -145,7 +149,8 @@ fuentes/
 - `Program.cs`: las dos líneas de la convención de 000-core;
 - `MainLayout.razor`: la entrada en el hueco reservado para Reservas (T056 de 000-core);
 - `BarridoCaducidades.cs`: es de Saul (T068 de 000-core);
-- tres ficheros de Artur, solo con lo ya pactado y con su revisión (ver «Puntos a coordinar»).
+- cinco ficheros de Artur, solo con lo ya pactado y con su revisión (ver «Puntos a coordinar»): los
+  cuatro de la retirada de la provisional (C2) y `BuscarPistas.razor` (C1).
 
 No se añaden pruebas en `SI18.Dominio.Tests`: las reglas de dominio que usa HU-02 ya están probadas.
 
@@ -187,7 +192,7 @@ HU-01 (Artur) ──► IConsultaReservas.Activas ──► ConsultaReservas (an
 | # | Con quién | Qué | Propuesta | Cuándo |
 | - | --------- | --- | --------- | ------ |
 | C1 | **Artur** (dueño de `/buscar-pistas`) | Botón «Reservar» en cada franja (aclaración de spec-001, RF-003) | Componente `EnlaceReservar` de Reservas; en `BuscarPistas.razor` solo `@using SI18.Cliente.Reservas` y `<EnlaceReservar Pista="pista" Franja="franja" Fecha="_resultado.Fecha" />` dentro del `<li>`. Sin cambios en DTO, endpoint ni pruebas de HU-01. Lo puede hacer Saul en el PR de implementación de 002 o Artur en el suyo; en los dos casos Artur revisa (E10) | Antes de implementar la pantalla de resumen |
-| C2 | **Artur** (dueño de `Disponibilidad`) | Retirada de la provisional | Borrar `ConsultaReservasProvisional.cs`, su línea en `RegistroDisponibilidad.cs` y mover sus dos pruebas a `Reservas/ConsultaReservasTests.cs`, como pactó D5 de spec-001. Artur revisa el PR (E7) | En el mismo PR que publica `ConsultaReservas` |
+| C2 | **Artur** (dueño de `Disponibilidad`) | Retirada de la provisional | Borrar `ConsultaReservasProvisional.cs`, su línea en `RegistroDisponibilidad.cs`, mover sus dos pruebas a `Reservas/ConsultaReservasTests.cs` y cambiar en `DatosDisponibilidad.ConServicio` la provisional por `ConsultaReservas` (si no, no compila), como pactó D5 de spec-001. Artur revisa el PR (E7) | En el mismo PR que publica `ConsultaReservas` |
 | C3 | **C** (HU-03, HU-07) | Uso de `CancelarPorUsuario` y `AplicarCierre` | Abrir la transacción antes de llamar, no esperar `SaveChanges` de Reservas, y guardar devolución y aviso en la misma transacción. `AplicarCierre` caduca también las pendientes guardadas ya no vigentes; C decide a quién avisa. Contrato en [contracts/modulos.md](./contracts/modulos.md) (E8) | Al publicar este plan (aviso al grupo) |
 | C4 | **C** (HU-03) | Botón «Cancelar» en «Mis reservas» | `MisReservas.razor` deja marcado el hueco; HU-03 lo rellena llamando a `/api/reservas/{id}/cancelacion` | Cuando se planifique spec-003 |
 

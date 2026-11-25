@@ -57,6 +57,7 @@ await tx.CommitAsync(ct);
 | `ConsultaReservasProvisional`                                       | `Modulos/Disponibilidad/Provisional/ConsultaReservasProvisional.cs` | Se borra el fichero |
 | `services.TryAddScoped<IConsultaReservas, ConsultaReservasProvisional>();` | `Modulos/Disponibilidad/RegistroDisponibilidad.cs` | Se borra **solo esa línea** (y el `using` que deje de usarse) |
 | Las dos pruebas de `IConsultaReservas`                              | `tests/SI18.Api.Tests/Disponibilidad/ConsultasProvisionalesTests.cs` | Se mueven a `tests/SI18.Api.Tests/Reservas/ConsultaReservasTests.cs`, con los mismos casos |
+| `new ConsultaReservasProvisional(db, reloj)` en `ConServicio`       | `tests/SI18.Api.Tests/Disponibilidad/DatosDisponibilidad.cs` | Se cambia por `new ConsultaReservas(db, reloj)` (una línea y su `using`) |
 
 Es lo acordado en spec-001 (research.md D5, RF-014a). Las provisionales de cierres y franjas fijas no
 se tocan.

@@ -196,7 +196,7 @@ que hay en un servicio, unos endpoints y unas pantallas.
   - `BuscarFranjasTests`, `BuscarSinResultadosTests`, `ConsultaDisponibilidadTests` y
     `PrecioPorTarifaTests` de spec-001 **no se tocan** y deben seguir en verde (RF-019; CE-007).
 - **Motivo**: RF-018, RF-019 y CE-007. Con la misma consulta y las mismas pruebas, la búsqueda da el
-  mismo resultado. Los tres ficheros que se tocan son de Artur, pero el cambio es el que él mismo dejó
+  mismo resultado. Los cuatro ficheros que se tocan (también `DatosDisponibilidad.cs`, que construye la provisional en `ConServicio`) son de Artur, pero el cambio es el que él mismo dejó
   pactado en D5 y se le pide revisión en el PR (plan.md, «Puntos a coordinar»).
 - **Alternativas descartadas**: dejar la provisional registrada «por si acaso» (dos implementaciones de
   la misma regla; `/speckit-converge` la marcaría); reutilizar `Reserva.EstaVigente` en memoria
@@ -346,8 +346,9 @@ que hay en un servicio, unos endpoints y unas pantallas.
     - `CrearReservaTests`: HU1 esc. 1–2 y 4–5, HU4 esc. 1–5 (cada motivo de RF-011, en orden), 400,
       404, 403 con personal y técnico, 401 sin sesión; doble envío de la misma persona; caducidad
       perezosa de una pendiente ajena de 10 min exactos (HU2 esc. 4).
-    - `ReservaConcurrenteTests`: 20 peticiones simultáneas sobre la misma franja con usuarios
-      distintos → exactamente una 201 y diecinueve 409 `FRANJA_OCUPADA` (CE-002).
+    - `ReservaConcurrenteTests`: 20 peticiones simultáneas sobre la misma franja, repartidas entre
+      las sesiones sembradas que pueden reservar (la siembra no tiene 20 personas; RF-007 cubre también
+      a la misma persona) → exactamente una 201 y diecinueve 409 `FRANJA_OCUPADA` (CE-002).
     - `PagarReservaTests`: aceptada → confirmada con código de 22 caracteres; `…0002` → 422, caducada y
       pago fallido; 9:59 → se cobra; 10:00 → 409 `RESERVA_CADUCADA` sin llamar a la pasarela;
       **caso límite: reserva ya guardada como caducada por el barrido (`EjecutarUnaVez`) → 409
