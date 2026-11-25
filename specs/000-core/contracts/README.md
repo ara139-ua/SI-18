@@ -21,6 +21,8 @@
 ## Prefijos de ruta reservados por módulo
 
 Cada spec define sus endpoints dentro de su prefijo; ningún módulo publica rutas en el prefijo de otro.
+Los endpoints de cada módulo se mapean en su `Map<Modulo>()` (`Modulos/<Modulo>/Registro<Modulo>.cs`),
+que `Program.cs` llama en un orden fijo (plan.md, «Registro de los módulos en la API»).
 
 | Prefijo                                 | Módulo (dueño)  | Historia |
 | --------------------------------------- | --------------- | -------- |

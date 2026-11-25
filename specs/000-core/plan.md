@@ -173,6 +173,36 @@ Dependencias entre proyectos:
 - `Dominio.Tests` → `Dominio`;
 - `Api.Tests` → `Api`.
 
+### Registro de los módulos en la API
+
+Cada módulo entra en la API por **un único fichero de extensión propio**,
+`Modulos/<Modulo>/Registro<Modulo>.cs`, con dos métodos:
+
+- `Add<Modulo>(this IServiceCollection)`: servicios, consultas e interfaces del módulo;
+- `Map<Modulo>(this WebApplication)`: sus endpoints, dentro de su prefijo de ruta
+  ([contracts/README.md](./contracts/README.md)).
+
+`Program.cs` solo añade **dos líneas por módulo**, la primera vez que la spec de ese módulo tiene
+servicios o endpoints. Siempre van en este orden fijo, para que dos ramas que añadan su módulo no
+choquen más que en líneas contiguas:
+
+```csharp
+builder.Services.AddComun();
+builder.Services.AddDisponibilidad();   // spec-001 / spec-005 (Artur)
+builder.Services.AddReservas();         // spec-002 / spec-006 (Saul)
+builder.Services.AddCancelaciones();    // spec-003 / spec-007 (C)
+builder.Services.AddCursosInformes();   // spec-004 / spec-008 (D)
+// …
+app.MapComun();
+app.MapDisponibilidad();
+app.MapReservas();
+app.MapCancelaciones();
+app.MapCursosInformes();
+```
+
+Fuera de esas líneas, `Program.cs` no cambia (tasks.md, «Reglas de colaboración»). Todo lo demás de
+cada módulo se registra dentro de su `Registro<Modulo>.cs`, que solo toca su dueño.
+
 ### Dueños de módulo
 
 | Módulo           | Historias    | Tablas que escribe                                   | Dueño (propuesta README; definitivo en `docs/agrupamiento.md`) |
