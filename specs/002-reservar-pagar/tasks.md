@@ -328,9 +328,11 @@ caducidad al reservar y al pagar, y la misma respuesta antes y después del barr
   - `PendientePago` y `!EstaVigente(ahora)` → `Caducar(ahora)`, `SaveChanges`, `Commit` y **después**
     `throw CodigosError.Error(ReservaCaducada)`, sin llamar a la pasarela (RF-009; R8.3);
   - `Caducada` **por tiempo** (`Pago.ResueltoEnUtc ≥ CreadaEnUtc + ValoresNegocio.TiempoBloqueoPago`:
-    barrido o caducidad al reservar) → `RESERVA_CADUCADA`, sin cambios ni pasarela.
+    barrido o caducidad al reservar) → `RESERVA_CADUCADA`, sin cambios ni pasarela;
+  - `Confirmada` → `TRANSICION_NO_PERMITIDA`, sin pasarela (la necesita T031: el segundo de dos pagos
+    simultáneos encuentra la reserva ya confirmada).
 
-  Una caducada por rechazo o por cierre **no** entra aquí (T033). Depende de T015.
+  Una caducada por rechazo o por cierre y una cancelada **no** entran aquí (T033). Depende de T015.
 - [ ] T028 [US2] Ampliar `tests/SI18.Api.Tests/Reservas/CrearReservaTests.cs` (Polideportivo Sur,
   «Pista de pádel 2»):
   - **HU2 esc. 1**: con una pendiente vigente de `ciudadana.empadronada`, `ciudadano.noempadronado`
@@ -367,7 +369,7 @@ caducidad al reservar y al pagar, y la misma respuesta antes y después del barr
 - [ ] T031 [US2] Añadir a `PagarReservaTests` **dos pagos simultáneos de la misma reserva** (E5): con
   `DatosReservas.ConServicio` y una `PasarelaContadora`, dos llamadas a `Pagar` en paralelo (cada una
   con su ámbito y su `Si18DbContext`) → una confirma y la otra recibe `TRANSICION_NO_PERMITIDA`; la
-  pasarela se llama **una sola vez**. Depende de T027 y T033.
+  pasarela se llama **una sola vez**. Depende de T027.
 - [ ] T032 [US2] En `src/SI18.Cliente/Reservas/PagarReserva.razor`, con 409 `RESERVA_CADUCADA`: el
   formulario desaparece, `<h2 tabindex="-1">La reserva ha caducado</h2>` recibe el foco y
   `MensajeAccesible` (`Severity.Warning`) anuncia el `Detalle` del catálogo, con el enlace «Volver a
@@ -388,7 +390,7 @@ sin cambios.
 - [ ] T033 [US3] Completar `ServicioReservar.Pagar` (research.md E4 pasos 3 y 5; data-model.md § 2.2):
   - `Cobrar` devuelve `false` → `Caducar(ahora)`, `SaveChanges`, `Commit` y **después**
     `throw CodigosError.Error(PagoRechazado)` (RF-011);
-  - `Confirmada`, `Cancelada` o `Caducada` **no** por tiempo (`Pago.ResueltoEnUtc < CreadaEnUtc + TiempoBloqueoPago`:
+  - `Cancelada` o `Caducada` **no** por tiempo (`Pago.ResueltoEnUtc < CreadaEnUtc + TiempoBloqueoPago`:
     rechazo o cierre) → `TRANSICION_NO_PERMITIDA`, sin pasarela.
 
   El orden queda: no es suya → 404; caducada por tiempo → `RESERVA_CADUCADA`; otro estado no
@@ -442,7 +444,7 @@ sin cambios.
     las 18:00 de hoy a las 18:00:00 → `FRANJA_YA_EMPEZADA`; a las 17:59:59 → se crea; a las 18:01 →
     `FRANJA_YA_EMPEZADA`;
   - **HU4 esc. 3**: un cierre (`DatosDisponibilidad.Cierre`) → 422 `INSTALACION_CERRADA`; una franja
-    fija aprobada (`DatosDisponibilidad.FranjaFija`) → 409 `FRANJA_BLOQUEADA_CLUB`;
+    fija aprobada (`DatosDisponibilidad.FranjaFija`) → 422 `FRANJA_BLOQUEADA_CLUB`;
   - **HU4 esc. 4**: la «Sala polivalente» y el «Pabellón» → 422 `INSTALACION_NO_RESERVABLE`;
   - **HU4 esc. 5**: `importeMostrado = 5.00` → 409 `PRECIO_CAMBIADO`;
   - **cambio de hora** (`[Trait("Categoria","Limites")]`, con `DatosReservas.ConServicio` y reloj el
@@ -618,7 +620,8 @@ efectivo y el QR solo en las confirmadas.
   «0001». Depende de T034.
 - [ ] T049 Ejecutar quickstart.md §2–§4 de principio a fin: `dotnet test SI18.slnx` en verde (también
   con `--filter-trait "Categoria=Limites"`), los escenarios R1–R18 contra la API y los pasos de la
-  pantalla. Medir con la API local 10 veces `POST /api/reservas` y `POST /api/reservas/{id}/pago` y
+  pantalla. Cronometrar los pasos 2–4 de §4 (de pulsar «Reservar» a ver el QR) y anotar el tiempo:
+  debe ser < 2 min (CE-001). Medir con la API local 10 veces `POST /api/reservas` y `POST /api/reservas/{id}/pago` y
   anotar en el PR el peor valor (objetivo < 500 ms, research.md E14).
 - [ ] T050 [P] Avisar al grupo (constitución, «Acuerdos de colaboración»; plan.md, «Puntos a coordinar»):
   - a **C** (C3, C4): `IServicioReservas` ya está implementada; enlace a contracts/modulos.md (abrir la
@@ -649,7 +652,7 @@ Fase 1 Setup (T001 ∥ T002 → T003)
    └─► Fase 2 Fundacional (T004 ∥ T005 → T006 ∥ T007 → T008 → T009 → T010; T011)
           ├─► US1 (T012 → T013 → T014 ∥ T015 ∥ T016 → T017 → T018 ∥ T019 ∥ T020)
           │      (cliente: T021 → T022; T023 → T024 ∥ T025)
-          │      ├─► US2 (T026 → T028 ∥ T029; T027 → T030; T031 tras T033; T032 tras T025)
+          │      ├─► US2 (T026 → T028 ∥ T029; T027 → T030 ∥ T031; T032 tras T025)
           │      │      └─► US3 (T033 → T034; T035 tras T032)
           │      ├─► US4 (T036 tras T026; T037 tras T024)
           │      └─► US5 (T038 → T039 ∥ T040; T041)
@@ -680,7 +683,7 @@ Fase 1 Setup (T001 ∥ T002 → T003)
 ```text
 Día 1:  T001 ∥ T002 → T003 → T004 ∥ T005 ∥ T007 → T006 → T008 → T009 → T010 → T011
 Día 2:  T012 → T013 → T014 → T015 → T016 → T017 → T018 → T019 → T020          (MVP de API)
-Día 3:  T026 → T028 → T029 → T027 → T030 → T033 → T034 → T031 → T036 → T038 → T039
+Día 3:  T026 → T028 → T029 → T027 → T030 → T031 → T033 → T034 → T036 → T038 → T039
 Día 4:  T044 → T045 → T046 → T047 → T048                                       (PR de API)
 Día 5:  T021 → T022 → T023 → T024 → T025 → T032 → T035 → T037 → T040 → T041 → T042 → T043
 Día 6:  T049 → T050 → T051 → T052
