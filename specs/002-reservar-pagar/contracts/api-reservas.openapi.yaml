@@ -188,9 +188,10 @@ paths:
         '404': { $ref: '#/components/responses/NoEncontradoReserva' }
         '409':
           description: >
-            RESERVA_CADUCADA (han pasado 10 minutos o más; queda caducada y el pago fallido, sin cobro) o
-            TRANSICION_NO_PERMITIDA (la reserva ya no está pendiente de pago: confirmada, caducada o
-            cancelada).
+            RESERVA_CADUCADA (han pasado 10 minutos o más: queda caducada y el pago fallido, sin cobro;
+            la misma respuesta si el barrido ya la había guardado como caducada por tiempo) o
+            TRANSICION_NO_PERMITIDA (confirmada, cancelada, o caducada por un pago rechazado o por un
+            cierre).
           content:
             application/problem+json:
               schema: { $ref: '../../000-core/contracts/api-comun.openapi.yaml#/components/schemas/Problema' }

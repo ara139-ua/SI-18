@@ -53,7 +53,8 @@ al guardar se traduce en `FRANJA_OCUPADA`.
 
 | Situación al pagar (reserva del usuario) | Transición                                   | Respuesta                    |
 | ---------------------------------------- | -------------------------------------------- | ---------------------------- |
-| Estado guardado ≠ `pendiente_pago`       | ninguna                                      | 409 `TRANSICION_NO_PERMITIDA` |
+| `caducada` por tiempo (`pago.resuelto_en_utc ≥ creada_en_utc + TiempoBloqueoPago`: barrido o caducidad al reservar) | ninguna | 409 `RESERVA_CADUCADA` |
+| `confirmada`, `cancelada` o `caducada` por pago rechazado o cierre | ninguna                  | 409 `TRANSICION_NO_PERMITIDA` |
 | `pendiente_pago` y `!EstaVigente(ahora)` | `Caducar` (pago → `fallido`)                 | 409 `RESERVA_CADUCADA`       |
 | Vigente y la pasarela acepta             | `Confirmar(GeneradorCodigoAcceso.Nuevo(), ahora)` (pago → `completado`) | 200 con `codigoAcceso` |
 | Vigente y la pasarela rechaza            | `Caducar` (pago → `fallido`)                 | 422 `PAGO_RECHAZADO`         |

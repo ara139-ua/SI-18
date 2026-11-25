@@ -56,6 +56,10 @@ spec-003 y spec-007 los cambios de estado de las reservas (RF-019a).
   antigua; sin paginación.
 - Q: ¿La pantalla de pago muestra cuánto queda para que caduque la reserva? → A: Sí, como hora límite
   fija en hora de Madrid («Paga antes de las 18:42; después la reserva caduca»), sin cuenta atrás.
+- Q (plan, 2026-11-25): ¿Qué responde el pago de una reserva que el barrido ya ha guardado como
+  caducada por tiempo? → A: `RESERVA_CADUCADA`, igual que si aún no se hubiera guardado: el usuario no
+  ve un mensaje distinto según haya pasado o no el barrido. Las caducadas por un pago rechazado o por
+  un cierre siguen dando `TRANSICION_NO_PERMITIDA` (plan, research.md E4).
 
 ## Escenarios de usuario y pruebas *(obligatorio)*
 
@@ -250,12 +254,14 @@ al reservar y pagar:
   17:59:59, sí.
 - **Pagar en el límite del bloqueo**: pagar 9 minutos y 59 segundos después de crear la reserva → se
   intenta el cobro; pagar a los 10 minutos exactos → `RESERVA_CADUCADA`, sin cobro.
+- **Caducada por el barrido**: pagar una reserva que el barrido ya ha guardado como caducada por tiempo
+  → `RESERVA_CADUCADA` (el mismo mensaje que antes del barrido), sin cobro.
 - **Reservar una franja con una pendiente ajena que acaba de caducar**: con la otra reserva creada hace
   exactamente 10 minutos, se puede reservar; la anterior queda caducada en el mismo momento.
 - **Doble clic**: si la misma persona envía dos veces la misma reserva, la segunda recibe
   `FRANJA_OCUPADA`; nunca hay dos reservas activas en la misma franja.
-- **Pagar dos veces**: pagar una reserva ya confirmada o ya caducada → `TRANSICION_NO_PERMITIDA`, sin
-  cobro.
+- **Pagar dos veces**: pagar una reserva ya confirmada, o ya caducada por un pago rechazado →
+  `TRANSICION_NO_PERMITIDA`, sin cobro.
 - **Cambio de hora**: los días 25/10/2026 y 28/03/2027 se pueden reservar las 14 franjas de 08:00 a
   21:00 en hora de Madrid, cada una de una hora real.
 - **Cierre posterior**: si se registra un cierre por mantenimiento que cubre una reserva pendiente
@@ -314,13 +320,15 @@ al reservar y pagar:
   18:42; después la reserva caduca». No hay cuenta atrás que se actualice en pantalla.
 - **RF-009**: Si al pagar la reserva ya no está vigente (10 minutos o más desde su creación), el
   sistema DEBE caducarla, dejar su pago fallido, no llamar a la pasarela y responder
-  `RESERVA_CADUCADA`.
+  `RESERVA_CADUCADA`. Lo mismo si la reserva ya está guardada como caducada por tiempo (por el barrido o
+  por la caducidad al reservar): la respuesta no depende de si el barrido ha pasado.
 - **RF-010**: Si la pasarela acepta el cobro, la reserva DEBE pasar a confirmada, su pago a completado
   y la reserva DEBE recibir un código de acceso opaco y aleatorio (RF-017 de `000-core`), que se
   muestra al usuario como QR y como texto.
 - **RF-011**: Si la pasarela rechaza el cobro, la reserva DEBE pasar a caducada y su pago a fallido, y
   el usuario DEBE ver el mensaje de `PAGO_RECHAZADO`. El pago NO DEBE poder reintentarse; cualquier
-  intento de pagar una reserva que no está pendiente DEBE rechazarse con `TRANSICION_NO_PERMITIDA`.
+  intento de pagar una reserva que no está pendiente DEBE rechazarse con `TRANSICION_NO_PERMITIDA`,
+  salvo una caducada por tiempo, que responde `RESERVA_CADUCADA` (RF-009).
 - **RF-012**: Un número de tarjeta con un formato no válido DEBE rechazarse con `PETICION_INVALIDA`
   sin llamar a la pasarela y sin cambiar el estado de la reserva.
 - **RF-013**: Solo el titular DEBE poder pagar o ver una reserva; para cualquier otra persona, la

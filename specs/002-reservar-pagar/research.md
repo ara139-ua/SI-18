@@ -107,10 +107,13 @@ que hay en un servicio, unos endpoints y unas pantallas.
      endpoint, antes de cargar nada, así que tampoco revela si la reserva existe;
   2. transacción; se carga la reserva con su pago y con bloqueo (E5) **filtrando por
      `usuario_id = IUsuarioActual.Id`**: si no existe o es de otro → 404 `NO_ENCONTRADO` (RF-013);
-  3. estado guardado distinto de `pendiente_pago` → 409 `TRANSICION_NO_PERMITIDA` (RF-011: sin
-     reintento);
-  4. `!EstaVigente(ahora)` → `Caducar(ahora)`, `SaveChanges`, `COMMIT` y 409 `RESERVA_CADUCADA`, sin
-     llamar a la pasarela (RF-009; R8.3);
+  3. según el estado guardado:
+     - `caducada` **por tiempo** → 409 `RESERVA_CADUCADA`, sin cambios (es lo que habría respondido el
+       paso 4 antes de que el barrido o la caducidad al reservar la guardaran así);
+     - `confirmada`, `cancelada` o `caducada` por un pago rechazado o por un cierre → 409
+       `TRANSICION_NO_PERMITIDA` (RF-011: sin reintento);
+  4. `pendiente_pago` y `!EstaVigente(ahora)` → `Caducar(ahora)`, `SaveChanges`, `COMMIT` y 409
+     `RESERVA_CADUCADA`, sin llamar a la pasarela (RF-009; R8.3);
   5. `IPasarelaPago.Cobrar(reserva.Importe, numeroTarjeta)`:
      - `true` → `Confirmar(GeneradorCodigoAcceso.Nuevo(), ahora)`, `SaveChanges`, `COMMIT` y 200 con
        la reserva confirmada y su `codigoAcceso` (RF-010);
@@ -122,10 +125,16 @@ que hay en un servicio, unos endpoints y unas pantallas.
 - **Datos de la tarjeta**: el número solo vive en la petición. No se guarda, no se registra (ni el
   cuerpo de la petición ni el número en ningún `ILogger`), no se devuelve y la clase de la petición
   redefine `ToString()` para no imprimirlo (R9; RF-008).
-- **Después del barrido**: si `BarridoCaducidades` ya ha guardado la reserva como caducada, el paso 3
-  responde `TRANSICION_NO_PERMITIDA` en vez de `RESERVA_CADUCADA`. Es coherente con RF-011 (no se paga
-  lo que no está pendiente) y el texto del catálogo es válido para ese caso. La pantalla de pago, que ya
-  muestra la hora límite, lo explica igual (E11).
+- **Caducada por tiempo** (ajuste del 2026-11-25, antes de la revisión): el usuario no debe ver un
+  mensaje distinto según haya pasado o no el barrido. Una reserva guardada como `caducada` lo está
+  **por tiempo** si su pago se resolvió cuando ya no estaba vigente:
+  `pago.ResueltoEnUtc ≥ reserva.CreadaEnUtc + ValoresNegocio.TiempoBloqueoPago`. Es el caso del barrido
+  (R8.4), de la caducidad al reservar (R8.2) y del propio paso 4. En cambio, un pago rechazado (paso 5)
+  o un cierre sobre una pendiente vigente (E8) la caducan **antes** de ese límite, y para ellas el texto
+  de `RESERVA_CADUCADA` («Han pasado más de 10 minutos…») sería falso: siguen con
+  `TRANSICION_NO_PERMITIDA`. La comprobación vive en `ServicioReservar` con los campos que ya existen;
+  no cambia el dominio ni el modelo de 000-core. Solo las confirmadas, las canceladas y las caducadas
+  por otro motivo dan `TRANSICION_NO_PERMITIDA`.
 - **Alternativas descartadas**: llamar a la pasarela y luego comprobar la vigencia (cobraría una
   reserva caducada); dejar que `PasarelaSimulada` valide el formato (lanza el mismo código, pero ya
   dentro de la transacción y después de cargar la reserva; RF-012 pide no llamarla).
@@ -340,8 +349,12 @@ que hay en un servicio, unos endpoints y unas pantallas.
     - `ReservaConcurrenteTests`: 20 peticiones simultáneas sobre la misma franja con usuarios
       distintos → exactamente una 201 y diecinueve 409 `FRANJA_OCUPADA` (CE-002).
     - `PagarReservaTests`: aceptada → confirmada con código de 22 caracteres; `…0002` → 422, caducada y
-      pago fallido; 9:59 → se cobra; 10:00 → 409 `RESERVA_CADUCADA` sin llamar a la pasarela; segundo
-      pago → 409 `TRANSICION_NO_PERMITIDA`; tarjeta de 15 dígitos → 400 y sigue pendiente; reserva
+      pago fallido; 9:59 → se cobra; 10:00 → 409 `RESERVA_CADUCADA` sin llamar a la pasarela;
+      **caso límite: reserva ya guardada como caducada por el barrido (`EjecutarUnaVez`) → 409
+      `RESERVA_CADUCADA`, sin cobro y sin cambios**; volver a pagar tras un `PAGO_RECHAZADO` → 409
+      `TRANSICION_NO_PERMITIDA`; segundo pago de una confirmada → 409 `TRANSICION_NO_PERMITIDA`;
+      pendiente vigente caducada por `AplicarCierre` → 409 `TRANSICION_NO_PERMITIDA`; tarjeta de 15
+      dígitos → 400 y sigue pendiente; reserva
       ajena → 404; dos pagos simultáneos de la misma reserva → un solo cobro (con una pasarela de
       prueba que cuenta llamadas).
     - `MisReservasTests`: solo las propias; orden de RF-015a; pendiente no vigente devuelta como

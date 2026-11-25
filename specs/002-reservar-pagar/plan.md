@@ -169,7 +169,8 @@ POST /api/reservas { instalacionId, inicioUtc, importeMostrado }
 POST /api/reservas/{id}/pago { numeroTarjeta }
    ├─ ≠ 16 dígitos                                          → 400 (sin pasarela, sin cambios)
    ├─ BEGIN · FOR UPDATE reserva del usuario + pago          → 404 si no es suya
-   ├─ estado ≠ pendiente_pago                               → 409 TRANSICION_NO_PERMITIDA
+   ├─ caducada por tiempo (barrido, caducidad al reservar)  → 409 RESERVA_CADUCADA      (E4)
+   ├─ confirmada · cancelada · caducada por rechazo o cierre → 409 TRANSICION_NO_PERMITIDA
    ├─ !EstaVigente(ahora): Caducar · COMMIT                 → 409 RESERVA_CADUCADA     (R8.3)
    ├─ IPasarelaPago.Cobrar
    │    ok → Confirmar(GeneradorCodigoAcceso.Nuevo()) · COMMIT → 200 ReservaDto(codigoAcceso)
