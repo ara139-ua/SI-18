@@ -392,7 +392,7 @@ crea los datos indicados y ejecutarla dos veces no duplica nada.
   - los recuentos son los de T038;
   - ejecutar el inicializador dos veces no cambia los recuentos;
   - `hash_contrasena` no contiene `clave-de-prueba` (quickstart V10).
-- [ ] T041 [P] [US1] [Ambos · sugerido: Artur] Crear
+- [X] T041 [P] [US1] [Ambos · sugerido: Artur] Crear
   `fuentes/tests/SI18.Api.Tests/Comun/ReservaActivaUnicaTests.cs` con `[Trait("Categoria","Limites")]`:
   - 20 tareas simultáneas insertan una reserva `pendiente_pago` (y su pago) en la misma instalación e
     inicio, cada una con su propio `DbContext` → exactamente 1 éxito y 19 `DbUpdateException` con
@@ -680,7 +680,7 @@ responsable.
 
 ## Fase 7: Pulido y validación (Fase 2 del reparto · Ambos)
 
-- [ ] T071 [Ambos · sugerido: Artur] Crear las pruebas de errores, sin endpoints de prueba:
+- [X] T071 [Ambos · sugerido: Artur] Crear las pruebas de errores, sin endpoints de prueba:
   - `fuentes/tests/SI18.Api.Tests/Comun/ErroresTests.cs`: una `FabricaApi` con `ConnectionStrings:Si18`
     apuntando a un puerto cerrado **y `SI18_SEMBRAR_DATOS=false`** (si no, `InicializadorDatos`
     intentaría migrar al arrancar y la API no llegaría a levantarse); `GET /api/centros` → 500

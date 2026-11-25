@@ -38,7 +38,14 @@ public class FabricaApi : WebApplicationFactory<Program>, IAsyncLifetime
     public FakeTimeProvider Reloj { get; } = new(InicioReloj);
 
     /// <summary>Cadena de conexión de la base de datos de pruebas.</summary>
-    public string CadenaConexion => _cadenaConexion ?? throw new InvalidOperationException("La fábrica aún no se ha inicializado.");
+    public string CadenaConexion
+    {
+        get => _cadenaConexion ?? throw new InvalidOperationException("La fábrica aún no se ha inicializado.");
+        protected set => _cadenaConexion = value;
+    }
+
+    /// <summary>Si el arranque aplica las migraciones y siembra los datos (<c>SI18_SEMBRAR_DATOS</c>).</summary>
+    protected virtual bool SembrarDatos => true;
 
     public virtual async ValueTask InitializeAsync()
     {
@@ -57,7 +64,7 @@ public class FabricaApi : WebApplicationFactory<Program>, IAsyncLifetime
         builder.UseEnvironment("Development");
         builder.UseSetting("ConnectionStrings:Si18", CadenaConexion);
         builder.UseSetting(InicializadorDatos.VariableClaveDemo, ClaveDemo);
-        builder.UseSetting(InicializadorDatos.VariableSembrar, "true");
+        builder.UseSetting(InicializadorDatos.VariableSembrar, SembrarDatos ? "true" : "false");
 
         builder.ConfigureTestServices(servicios =>
         {
