@@ -217,11 +217,11 @@ la misma disponibilidad y el mismo precio por `IConsultaDisponibilidad`.
 
 **Prueba independiente**: quickstart.md B1–B3 y la coherencia búsqueda ↔ `IConsultaDisponibilidad`.
 
-- [ ] T014 [P] [US2] Crear `tests/SI18.Api.Tests/Disponibilidad/PrecioPorTarifaTests.cs`
+- [X] T014 [P] [US2] Crear `tests/SI18.Api.Tests/Disponibilidad/PrecioPorTarifaTests.cs`
   (`[Collection(ColeccionApi.Nombre)]`, Polideportivo Sur, «Tenis», 23/12/2026): la misma franja
   vale `6.00` para `ciudadana.empadronada@si18.test`, `10.00` para `ciudadano.noempadronado@si18.test`
   y `4.00` para `representante.padel@si18.test` (no empadronado, tarifa club). Depende de T010.
-- [ ] T015 [US2] Hacer que `ServicioDisponibilidad` implemente `IConsultaDisponibilidad`
+- [X] T015 [US2] Hacer que `ServicioDisponibilidad` implemente `IConsultaDisponibilidad`
   (contracts/modulos.md; research.md D4):
   - `MotivoNoDisponible(instalacionId, inicioUtc, ct)`:
     - si la instalación no existe, lanza `CodigosError.Error(NoEncontrado)`;
@@ -234,7 +234,7 @@ la misma disponibilidad y el mismo precio por `IConsultaDisponibilidad`.
 
   Registrar `services.AddScoped<IConsultaDisponibilidad>(sp => sp.GetRequiredService<ServicioDisponibilidad>())`
   en `AddDisponibilidad()`. Depende de T008.
-- [ ] T016 [US2] Crear `tests/SI18.Api.Tests/Disponibilidad/ConsultaDisponibilidadTests.cs`
+- [X] T016 [US2] Crear `tests/SI18.Api.Tests/Disponibilidad/ConsultaDisponibilidadTests.cs`
   (`[Collection(ColeccionApi.Nombre)]`, Polideportivo Este, «Pádel», 24/12/2026), con la
   `IConsultaDisponibilidad` resuelta de `fabrica.Services`:
   - para cada franja que la búsqueda devuelve libre, `MotivoNoDisponible` da `null` y `Precio` da el
