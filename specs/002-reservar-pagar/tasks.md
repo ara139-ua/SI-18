@@ -54,12 +54,12 @@ Tarjetas ficticias (R9 de 000-core): `4000000000000001` se acepta, `400000000000
 
 **Propósito**: que el módulo `Reservas` exista en la API con su registro y sus DTO.
 
-- [ ] T001 Crear `src/SI18.Api/Modulos/Reservas/RegistroReservas.cs` con
+- [X] T001 Crear `src/SI18.Api/Modulos/Reservas/RegistroReservas.cs` con
   `AddReservas(this IServiceCollection)` y `MapReservas(this WebApplication)`, de momento vacíos, y
   añadir en `src/SI18.Api/Program.cs` **solo dos líneas** (research.md E9; convención de 000-core):
   `builder.Services.AddReservas();` justo después de `AddDisponibilidad()` y `app.MapReservas();` justo
   después de `MapDisponibilidad()`.
-- [ ] T002 [P] Crear los DTO en `src/SI18.Contratos/Reservas/`, uno por fichero, según
+- [X] T002 [P] Crear los DTO en `src/SI18.Contratos/Reservas/`, uno por fichero, según
   [data-model.md § 3](./data-model.md) y [contracts/api-reservas.openapi.yaml](./contracts/api-reservas.openapi.yaml):
   - `EstadoReserva` (`PendientePago`, `Confirmada`, `Caducada`, `Cancelada`; JSON `pendiente_pago`,
     `confirmada`, `caducada`, `cancelada`), con los mismos nombres y orden que `SI18.Dominio.Comun.EstadoReserva`;
@@ -71,7 +71,7 @@ Tarjetas ficticias (R9 de 000-core): `4000000000000001` se acepta, `400000000000
   - `ResumenReservaDto(int InstalacionId, string Pista, string Centro, DateOnly Fecha, string HoraInicio, string HoraFin, DateTime InicioUtc, decimal Importe)`,
     con horas «`HH:mm`» de Madrid;
   - `ReservaDto(long Id, int InstalacionId, string Pista, string Centro, DateOnly Fecha, string HoraInicio, string HoraFin, DateTime InicioUtc, DateTime FinUtc, decimal Importe, EstadoReserva Estado, DateTime? LimitePagoUtc, string? HoraLimitePago, string? CodigoAcceso)`.
-- [ ] T003 [P] Crear `tests/SI18.Api.Tests/Reservas/EstadoReservaEspejoTests.cs` con el patrón de
+- [X] T003 [P] Crear `tests/SI18.Api.Tests/Reservas/EstadoReservaEspejoTests.cs` con el patrón de
   `Comun/EnumeracionesEspejoTests.cs`: mismos nombres y orden que el enumerado de dominio y mismo texto
   JSON con `OpcionesJson` (research.md E12). Depende de T002.
 

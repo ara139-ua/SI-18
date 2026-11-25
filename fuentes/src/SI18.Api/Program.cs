@@ -1,6 +1,7 @@
 using SI18.Api.Infraestructura;
 using SI18.Api.Modulos.Comun;
 using SI18.Api.Modulos.Disponibilidad;
+using SI18.Api.Modulos.Reservas;
 
 // Solo composición (tasks.md T009, T072). Cada responsable registra lo suyo en su fichero de extensión:
 // RegistroInfraestructura (Saul), RegistroErrores (Artur) y RegistroComun (Ambos). Cada módulo entra con dos
@@ -12,6 +13,7 @@ builder.Services.AddErrores();
 builder.Services.AddOpenApi();
 builder.Services.AddComun();
 builder.Services.AddDisponibilidad();
+builder.Services.AddReservas();
 
 var app = builder.Build();
 
@@ -29,6 +31,7 @@ if (app.Environment.IsDevelopment())
 
 app.MapComun();
 app.MapDisponibilidad();
+app.MapReservas();
 app.MapFallbackToFile("index.html");
 
 app.Run();
