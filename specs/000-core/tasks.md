@@ -542,7 +542,7 @@ llamado con otro rol, devuelve 403 `ROL_NO_PERMITIDO`.
   - `GET /api/instalaciones?centroId&deporteId&reservablePorFranjas`, con `deporteIds`.
 
   Usar `AsNoTracking`.
-- [ ] T055 [P] [US3] [Artur] Crear `fuentes/src/SI18.Cliente/Comun/InicioSesion.razor` (ruta
+- [X] T055 [P] [US3] [Artur] Crear `fuentes/src/SI18.Cliente/Comun/InicioSesion.razor` (ruta
   `/iniciar-sesion`):
   - `MudTextField` con `Label="Correo electrónico"`, `InputType.Email` y `autocomplete="username"`;
   - `MudTextField` con `Label="Contraseña"`, `InputType.Password` y
@@ -551,7 +551,7 @@ llamado con otro rol, devuelve 403 `ROL_NO_PERMITIDO`.
   - los errores se muestran con `MensajeAccesible`, y el foco vuelve al primer campo si hay error.
 
   Antes del PR: comprobar quickstart.md §6 sobre esta pantalla y anotarlo en el PR.
-- [ ] T056 [US3] [Artur] Crear `fuentes/src/SI18.Cliente/Comun/EstadoSesion.cs`, un
+- [X] T056 [US3] [Artur] Crear `fuentes/src/SI18.Cliente/Comun/EstadoSesion.cs`, un
   `AuthenticationStateProvider` que consulta `GET /api/sesion/usuario`. Completar el menú por rol en
   `MainLayout.razor`: «Mis avisos» para cualquier usuario identificado y «Cerrar sesión», más los
   huecos de menú de cada módulo según `Rol`. Depende de T024, T026 y T053.

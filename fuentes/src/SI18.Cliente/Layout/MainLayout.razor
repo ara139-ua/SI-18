@@ -1,6 +1,9 @@
 ﻿@inherits LayoutComponentBase
+@inject EstadoSesion Sesion
+@inject NavigationManager Navegacion
 
-@* Layout común (research.md R16). El menú por rol se completa en tasks.md T056. *@
+@* Layout común (research.md R16) con el menú por rol (tasks.md T056). Cada módulo añade sus entradas en
+   el hueco de su rol; el resto del layout no se toca. *@
 
 <MudThemeProvider Theme="_tema" />
 <MudPopoverProvider />
@@ -11,10 +14,35 @@
 
 <MudLayout>
     <MudAppBar Elevation="1">
-        <MudText Typo="Typo.h6" Class="ml-2">SI-18 · Reservas deportivas</MudText>
+        <MudLink Href="/" Color="Color.Inherit" Typo="Typo.h6" Underline="Underline.None" Class="ml-2">
+            SI-18 · Reservas deportivas
+        </MudLink>
         <MudSpacer />
-        <nav aria-label="Menú principal">
-            @* Hueco para el menú por rol (T056). *@
+        <nav aria-label="Menú principal" class="menu-principal">
+            <AuthorizeView>
+                <Authorized>
+                    <AuthorizeView Roles="ciudadano,representante_club" Context="reserva">
+                        @* Hueco de Disponibilidad y Reservas (spec-001, 002, 003): buscar pistas, mis reservas. *@
+                        @* Hueco de CursosInformes (spec-004): cursos. *@
+                    </AuthorizeView>
+                    <AuthorizeView Roles="representante_club" Context="club">
+                        @* Hueco de Disponibilidad (spec-005): franjas fijas del club. *@
+                    </AuthorizeView>
+                    <AuthorizeView Roles="personal_centro" Context="personal">
+                        @* Hueco de Reservas y Cancelaciones (spec-006, 007): validar QR, cierres. *@
+                    </AuthorizeView>
+                    <AuthorizeView Roles="tecnico_concejalia" Context="tecnico">
+                        @* Hueco de Disponibilidad y CursosInformes (spec-005, 008): solicitudes de clubes, informes. *@
+                    </AuthorizeView>
+
+                    <MudButton Href="/mis-avisos" Color="Color.Inherit" Variant="Variant.Text">Mis avisos</MudButton>
+                    <MudText Typo="Typo.body2" Class="mx-3 nombre-usuario">@context.User.Identity?.Name</MudText>
+                    <MudButton OnClick="CerrarSesion" Color="Color.Inherit" Variant="Variant.Outlined">Cerrar sesión</MudButton>
+                </Authorized>
+                <NotAuthorized>
+                    <MudButton Href="/iniciar-sesion" Color="Color.Inherit" Variant="Variant.Outlined">Iniciar sesión</MudButton>
+                </NotAuthorized>
+            </AuthorizeView>
         </nav>
     </MudAppBar>
 
@@ -33,4 +61,10 @@
 
     // Con <base href="/">, un enlace a «#contenido» navegaría a la raíz: se mueve el foco desde código.
     private async Task IrAlContenido() => await _contenido.FocusAsync();
+
+    private async Task CerrarSesion()
+    {
+        await Sesion.CerrarSesion();
+        Navegacion.NavigateTo("/");
+    }
 }
