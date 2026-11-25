@@ -9,7 +9,8 @@ namespace SI18.Api.Tests.Disponibilidad;
 
 /// <summary>
 /// Fija el comportamiento de las consultas provisionales de spec-001 (tasks.md T007; research.md D5), para que
-/// las definitivas de spec-002, spec-005 y spec-007 lo puedan reutilizar. Polideportivo Oeste, enero de 2027.
+/// las definitivas de spec-002 y spec-007 lo puedan reutilizar. Polideportivo Oeste, enero de 2027. Las de franjas
+/// fijas pasaron a ConsultaFranjasFijasTests al publicar spec-005 su consulta definitiva.
 /// </summary>
 [Collection(ColeccionApi.Nombre)]
 [Trait("Categoria", "Limites")]
@@ -77,37 +78,5 @@ public class ConsultasProvisionalesTests(FabricaApi fabrica)
         Assert.Empty(antes);
         Assert.Single(dentro);
         Assert.Empty(despues);
-    }
-
-    // ── IConsultaFranjasFijas ────────────────────────────────────────────────────
-
-    [Fact]
-    public async Task Una_franja_fija_aprobada_bloquea_sus_dias_y_horas_dentro_de_la_temporada()
-    {
-        var pista = await _datos.Pista(Centro, "Pista de pádel 2");
-        await _datos.FranjaFija(pista, [2, 4], 19, 21);   // martes y jueves de 19:00 a 21:00
-
-        var martes = await ConContexto(db => new ConsultaFranjasFijasProvisional(db).FranjasBloqueadas(pista, Martes, Martes, Ct));
-        var miercoles = await ConContexto(db => new ConsultaFranjasFijasProvisional(db).FranjasBloqueadas(pista, Miercoles, Miercoles, Ct));
-        var julio = new DateOnly(2027, 7, 6);              // martes fuera de la temporada 2026-2027
-        var enJulio = await ConContexto(db => new ConsultaFranjasFijasProvisional(db).FranjasBloqueadas(pista, julio, julio, Ct));
-
-        Assert.Equal([new TimeOnly(19, 0), new TimeOnly(20, 0)], martes.Select(f => f.HoraInicio));
-        Assert.Empty(miercoles);
-        Assert.Empty(enJulio);
-    }
-
-    [Theory]
-    [InlineData(EstadoSolicitud.Pendiente)]
-    [InlineData(EstadoSolicitud.Rechazada)]
-    public async Task Una_solicitud_no_aprobada_no_bloquea_nada(EstadoSolicitud estado)
-    {
-        var pista = await _datos.Pista(Centro, "Pista de tenis 1");
-        var hora = estado == EstadoSolicitud.Pendiente ? 15 : 17;
-        await _datos.FranjaFija(pista, [3], hora, hora + 1, estado);   // miércoles
-
-        var bloqueadas = await ConContexto(db => new ConsultaFranjasFijasProvisional(db).FranjasBloqueadas(pista, Miercoles, Miercoles, Ct));
-
-        Assert.DoesNotContain(bloqueadas, f => f.HoraInicio == new TimeOnly(hora, 0));
     }
 }

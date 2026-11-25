@@ -330,7 +330,7 @@ provisional de spec-001 retirada.
 
 **Prueba independiente**: `ConsultaFranjasFijasTests` y todas las pruebas de spec-001 en verde (CE-005).
 
-- [ ] T021 [US5] Crear `src/SI18.Api/Modulos/Disponibilidad/ConsultaFranjasFijas.cs` (implementa
+- [X] T021 [US5] Crear `src/SI18.Api/Modulos/Disponibilidad/ConsultaFranjasFijas.cs` (implementa
   `IConsultaFranjasFijas`; dependencias `Si18DbContext` e `IConsultaCierres`; research.md F6):
   - `FranjasBloqueadas(instalacionId, desde, hasta)`: solicitudes `Aprobada` de la instalación cuya
     temporada se cruza con `[desde, hasta]`, `ReglaFranjasFijas.Expandir` y **menos** las franjas a las
@@ -340,7 +340,7 @@ provisional de spec-001 retirada.
   - `RepresentantesAfectados(instalacionId, inicioUtc, finUtc)`: expandir las aprobadas para las fechas
     de Madrid de `[inicioUtc, finUtc)` **sin** descontar cierres; los `ClubId` con alguna franja que se
     solape con ese periodo; y los usuarios `RepresentanteClub` de esos clubes, sin repetir.
-- [ ] T022 [US5] Retirar la provisional (research.md F6):
+- [X] T022 [US5] Retirar la provisional (research.md F6):
   - en `src/SI18.Api/Modulos/Disponibilidad/RegistroDisponibilidad.cs`,
     `TryAddScoped<IConsultaFranjasFijas, ConsultaFranjasFijasProvisional>()` pasa a
     `AddScoped<IConsultaFranjasFijas, ConsultaFranjasFijas>()`;
@@ -350,7 +350,7 @@ provisional de spec-001 retirada.
     ya existe.
 
   Depende de T021.
-- [ ] T023 [US5] Crear `tests/SI18.Api.Tests/Disponibilidad/ConsultaFranjasFijasTests.cs`
+- [X] T023 [US5] Crear `tests/SI18.Api.Tests/Disponibilidad/ConsultaFranjasFijasTests.cs`
   (`[Collection(ColeccionApi.Nombre)]`, `[Trait("Categoria","Limites")]`, Polideportivo Norte, pabellón
   y «Pista de tenis 2»):
   - **movidas** de `ConsultasProvisionalesTests` (y borradas de allí): «una franja fija aprobada bloquea

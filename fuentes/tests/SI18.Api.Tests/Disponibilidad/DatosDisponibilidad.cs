@@ -154,7 +154,7 @@ public sealed class DatosDisponibilidad(FabricaApi fabrica)
             reloj,
             new ConsultaReservasProvisional(db, reloj),
             new ConsultaCierresProvisional(db),
-            new ConsultaFranjasFijasProvisional(db));
+            new ConsultaFranjasFijas(db, new ConsultaCierresProvisional(db)));
 
         return await accion(servicio);
     }
