@@ -690,7 +690,7 @@ responsable.
   - `fuentes/tests/SI18.Api.Tests/Comun/ManejadorErroresTests.cs`: invocar
     `ManejadorErrores.TryHandleAsync` con `DefaultHttpContext` y `ErrorNegocio(FRANJA_OCUPADA)` → 409 y
     `application/problem+json` con `type`, `title`, `detail`, `codigo` y `traceId`.
-- [ ] T072 [Ambos · sugerido: Saul] Revisar `fuentes/src/SI18.Api/Program.cs`:
+- [X] T072 [Ambos · sugerido: Saul] Revisar `fuentes/src/SI18.Api/Program.cs`:
   - solo contiene la composición de T009 más las líneas `Add<Modulo>()` y `Map<Modulo>()` de los módulos
     ya fusionados, en el orden de plan.md, «Registro de los módulos en la API»;
   - añadir `AddOpenApi()` y `MapOpenApi()` (solo en Development) para servir `/openapi/v1.json`;

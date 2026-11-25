@@ -2,12 +2,14 @@ using SI18.Api.Infraestructura;
 using SI18.Api.Modulos.Comun;
 using SI18.Api.Modulos.Disponibilidad;
 
-// Solo composición (tasks.md T009). Cada responsable registra lo suyo en su fichero de extensión:
-// RegistroInfraestructura (Saul), RegistroErrores (Artur) y RegistroComun (Ambos).
+// Solo composición (tasks.md T009, T072). Cada responsable registra lo suyo en su fichero de extensión:
+// RegistroInfraestructura (Saul), RegistroErrores (Artur) y RegistroComun (Ambos). Cada módulo entra con dos
+// líneas, Add<Modulo>() y Map<Modulo>(), en el orden fijo de plan.md, «Registro de los módulos en la API».
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddInfraestructura(builder.Configuration);
 builder.Services.AddErrores();
+builder.Services.AddOpenApi();
 builder.Services.AddComun();
 builder.Services.AddDisponibilidad();
 
@@ -18,6 +20,13 @@ app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Documento OpenAPI en /openapi/v1.json, solo en desarrollo (quickstart.md §3).
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+}
+
 app.MapComun();
 app.MapDisponibilidad();
 app.MapFallbackToFile("index.html");
