@@ -264,6 +264,10 @@ al reservar y pagar:
   cambiado respecto al mostrado, no se reserva (`PRECIO_CAMBIADO`).
 - **Datos de la tarjeta**: nunca se guardan ni se registran, ni siquiera los últimos dígitos (R9 de
   `000-core`).
+- **Petición mal formada**: si la pista no existe se rechaza con `NO_ENCONTRADO`, y si la hora no es el
+  inicio de una franja (no está en punto o queda fuera de 08:00–21:00 en Madrid), con
+  `PETICION_INVALIDA`; son los mismos rechazos que da la comprobación de HU-01 (spec-001,
+  contracts/modulos.md).
 - **Usuario sin permiso**: el personal de centro y el técnico de concejalía no pueden reservar; se
   rechaza con `ROL_NO_PERMITIDO`.
 - **Sin sesión**: quien no ha iniciado sesión es llevado a «Iniciar sesión».
@@ -281,9 +285,10 @@ al reservar y pagar:
 
 **Crear la reserva**
 
-- **RF-003**: Cada franja libre del resultado de la búsqueda (HU-01) DEBE ofrecer la acción
-  «Reservar», que lleva a un resumen con la pista, el centro, la fecha, la hora de inicio y de fin en
-  hora de Madrid y el importe de la tarifa del usuario.
+- **RF-003**: Cada franja libre del resultado de la pantalla «Buscar pistas» de HU-01 DEBE ofrecer la
+  acción «Reservar», que lleva a un resumen con la pista, el centro, la fecha, la hora de inicio y de
+  fin en hora de Madrid y el importe de la tarifa del usuario. La franja se identifica por la pista y
+  su hora de inicio, tal como la entrega el resultado de HU-01.
 - **RF-004**: Al confirmar el resumen, el sistema DEBE volver a comprobar en ese momento que la franja
   está libre y su precio, con la misma regla que la búsqueda (RF-013 de `000-core`), consultándolos a
   HU-01 sin recalcularlos por su cuenta. Si no está libre, DEBE rechazarse con el código del primer
@@ -346,8 +351,10 @@ al reservar y pagar:
   contracts/modulos.md) la consulta de las reservas activas de una instalación en un periodo: las
   confirmadas y las pendientes de pago vigentes, con la misma regla de vigencia de `000-core`.
 - **RF-019**: Al publicar esa consulta, la versión **provisional** que aportó HU-01 (spec-001,
-  RF-014a) DEBE retirarse, y la búsqueda de HU-01 DEBE seguir dando exactamente el mismo resultado
-  (spec-001, CE-003).
+  RF-014a), ya presente en el código, DEBE retirarse junto con su registro, como acordó spec-001
+  (research.md D5). La consulta definitiva DEBE cumplir el mismo comportamiento que fijan las pruebas de
+  la provisional (vigencia de 10 minutos y rango semiabierto), y la búsqueda de HU-01 DEBE seguir dando
+  exactamente el mismo resultado (spec-001, CE-003).
 - **RF-019a**: Esta historia DEBE ofrecer a HU-03 y a HU-07 las dos operaciones de escritura sobre
   reservas que define `000-core` (contracts/modulos.md), sin que esas historias escriban en las tablas
   de reservas y pagos:
@@ -405,16 +412,21 @@ HU-02 no crea entidades nuevas. Usa las de `000-core` (spec.md, «Entidades clav
 - **CE-006**: En el 100 % de los intentos rechazados (fuera de plazo, ya empezada, ocupada, cerrada,
   bloqueada, precio cambiado, caducada, pago rechazado), el usuario ve un mensaje que explica el motivo.
 - **CE-007**: Tras retirar la consulta provisional de HU-01, sus pruebas de búsqueda siguen pasando sin
-  cambios.
+  cambios, y la consulta definitiva supera los mismos casos que fijaban el comportamiento de la
+  provisional.
 - **CE-008**: La reserva y el pago se completan enteros solo con el teclado, la revisión automática de
   accesibilidad (Lighthouse) da 95 o más y la revisión con axe no encuentra infracciones graves ni
   críticas.
 
 ## Supuestos
 
-- **Punto de partida**: se reserva siempre desde una franja del resultado de la búsqueda de HU-01; no
-  hay otro formulario para elegir pista y hora. HU-01 entrega cada franja identificada (pista, fecha y
-  hora de inicio) y HU-02 añade el botón «Reservar» (aclaración de spec-001).
+- **Punto de partida**: se reserva siempre desde una franja del resultado de la pantalla «Buscar
+  pistas» de HU-01; no hay otro formulario para elegir pista y hora. HU-01 entrega cada franja
+  identificada (pista y hora de inicio) y HU-02 añade el botón «Reservar» en esa pantalla (aclaración de
+  spec-001). Hoy esa pantalla muestra cada franja solo como texto; el cambio se coordina con Artur, su
+  dueño.
+- **Menú**: «Mis reservas» ocupa el hueco del menú que el layout común ya reserva para el módulo
+  Reservas.
 - **Dos pasos**: primero se crea la reserva (y se bloquea la franja) y después se paga. Así el bloqueo
   de 10 minutos de `000-core` protege la franja mientras se introducen los datos de la tarjeta.
 - **Precio confirmado al reservar**: el usuario envía el precio que vio; si no coincide con el actual,
@@ -435,8 +447,9 @@ HU-02 no crea entidades nuevas. Usa las de `000-core` (spec.md, «Entidades clav
   (contracts/modulos.md). También implementa las operaciones de cancelar por el usuario y aplicar un
   cierre que piden HU-03 y HU-07 (confirmado en «Clarifications», RF-019a), para que nadie más escriba
   en esas tablas; C (HU-03, HU-07) solo las usa y se le avisa de la dependencia.
-- **Dependencias**: necesita de HU-01 la comprobación de disponibilidad y precio y el resultado de la
-  búsqueda donde va el botón «Reservar»; la consulta provisional que hay que retirar está en el código
-  de HU-01. Esta historia no escribe en datos de otros módulos.
+- **Dependencias**: necesita de HU-01 la comprobación de disponibilidad y precio y la pantalla «Buscar
+  pistas», donde va el botón «Reservar»; las dos ya están en `develop`, igual que la consulta provisional
+  que hay que retirar. HU-03 pondrá su acción «Cancelar» sobre la pantalla «Mis reservas» de esta
+  historia. Esta historia no escribe en datos de otros módulos.
 - **Datos de demostración**: se usan los centros, pistas, tarifas y usuarios ficticios sembrados por
   `000-core`; no se siembran reservas.
