@@ -655,7 +655,7 @@ responsable.
   - mensaje «No tienes avisos» si la lista está vacía.
 
   Depende de T066. Antes del PR: comprobar quickstart.md §6 sobre esta pantalla y anotarlo en el PR.
-- [ ] T068 [US4] [Ambos · sugerido: Saul] Crear `fuentes/src/SI18.Api/Infraestructura/BarridoCaducidades.cs`
+- [X] T068 [US4] [Ambos · sugerido: Saul] Crear `fuentes/src/SI18.Api/Infraestructura/BarridoCaducidades.cs`
   (R8.4):
   - un `BackgroundService` con `PeriodicTimer(TimeSpan.FromSeconds(60), timeProvider)`;
   - en cada ciclo crea un ámbito y llama a `EjecutarUnaVez(ct)`;
@@ -669,7 +669,7 @@ responsable.
   - un usuario solo ve sus avisos;
   - marcar como leído dos veces → 204 las dos veces;
   - marcar el aviso de otra persona → 404 `NO_ENCONTRADO`.
-- [ ] T070 [P] [US4] [Ambos · sugerido: Saul] Crear
+- [X] T070 [P] [US4] [Ambos · sugerido: Saul] Crear
   `fuentes/tests/SI18.Api.Tests/Comun/BarridoCaducidadesTests.cs` con `[Trait("Categoria","Limites")]`:
   se inserta una reserva `pendiente_pago` creada en `T`;
   - con `Reloj` en `T + 9:59`, `EjecutarUnaVez` → sigue pendiente;
