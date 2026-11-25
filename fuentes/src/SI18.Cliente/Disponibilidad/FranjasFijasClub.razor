@@ -1,0 +1,223 @@
+@page "/franjas-fijas"
+@using System.Globalization
+@using SI18.Contratos.Disponibilidad
+@inject ClienteApi Api
+@inject EstadoSesion Sesion
+@inject NavigationManager Navegacion
+
+@* Solicitar franjas fijas de temporada para mi club (spec-005 HU-05, historia 1; research.md F7; tasks.md T009, T024).
+   Las reglas las aplica la API: la pantalla solo ofrece horas en punto y marca los campos que la API rechaza. *@
+
+<PageTitle>Franjas fijas · SI-18</PageTitle>
+
+<MudText Typo="Typo.h4" HtmlTag="h1" GutterBottom="true">Franjas fijas de mi club</MudText>
+
+<MensajeAccesible @ref="_mensaje" />
+
+@if (_puede)
+{
+    <MudText Typo="Typo.h5" HtmlTag="h2" Class="mb-2">Nueva solicitud</MudText>
+
+    <form @onsubmit="Enviar" novalidate class="formulario-franjas-fijas">
+        <MudSelect T="int?" @ref="_selectInstalacion" Value="_instalacionId" ValueChanged="v => Elegir(() => _instalacionId = v, _selectInstalacion)"
+                   Label="Instalación" Required="true" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomLeft" Class="campo-instalacion"
+                   Error="@(Error("instalacionId") is not null)" ErrorText="@Error("instalacionId")">
+            @foreach (var instalacion in _instalaciones)
+            {
+                <MudSelectItem T="int?" Value="@instalacion.Id">@instalacion.Texto</MudSelectItem>
+            }
+        </MudSelect>
+
+        <fieldset class="dias-semana" aria-describedby="@(Error("diasSemana") is null ? null : "error-dias")">
+            <legend>Días de la semana</legend>
+            @for (var i = 0; i < 7; i++)
+            {
+                var dia = i;
+                <MudCheckBox T="bool" Value="_dias[dia]" ValueChanged="v => _dias[dia] = v" Label="@Capitalizar(TextosFranjasFijas.NombresDias[dia])" />
+            }
+            @if (Error("diasSemana") is { } errorDias)
+            {
+                <MudText id="error-dias" Typo="Typo.body2" Color="Color.Error">@errorDias</MudText>
+            }
+        </fieldset>
+
+        <MudSelect T="string" @ref="_selectInicio" Value="_horaInicio" ValueChanged="v => Elegir(() => _horaInicio = v, _selectInicio)"
+                   Label="Hora de inicio" Required="true" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomLeft"
+                   Error="@(Error("horaInicio") is not null)" ErrorText="@Error("horaInicio")">
+            @foreach (var hora in HorasInicio)
+            {
+                <MudSelectItem T="string" Value="@hora">@hora</MudSelectItem>
+            }
+        </MudSelect>
+
+        <MudSelect T="string" @ref="_selectFin" Value="_horaFin" ValueChanged="v => Elegir(() => _horaFin = v, _selectFin)"
+                   Label="Hora de fin" Required="true" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomLeft"
+                   Error="@(Error("horaFin") is not null)" ErrorText="@Error("horaFin")">
+            @foreach (var hora in HorasFin)
+            {
+                <MudSelectItem T="string" Value="@hora">@hora</MudSelectItem>
+            }
+        </MudSelect>
+
+        <MudSelect T="int?" @ref="_selectTemporada" Value="_temporadaId" ValueChanged="v => Elegir(() => _temporadaId = v, _selectTemporada)"
+                   Label="Temporada" Required="true" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomLeft"
+                   Error="@(Error("temporadaId") is not null)" ErrorText="@Error("temporadaId")">
+            @foreach (var temporada in _temporadas)
+            {
+                <MudSelectItem T="int?" Value="@temporada.Id">@temporada.Nombre</MudSelectItem>
+            }
+        </MudSelect>
+
+        @* No se desactiva al enviar: un botón desactivado pierde el foco (lección de spec-001). *@
+        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Enviar solicitud</MudButton>
+    </form>
+
+    <MudText Typo="Typo.h5" HtmlTag="h2" Class="mt-6 mb-2">Solicitudes de mi club</MudText>
+
+    <div tabindex="-1" @ref="_contenedorLista" class="contenedor-avisos">
+        @if (_solicitudes.Count == 0)
+        {
+            <MudText>Tu club todavía no ha hecho ninguna solicitud.</MudText>
+        }
+        else
+        {
+            <ul role="list" class="lista-solicitudes">
+                @foreach (var s in _solicitudes)
+                {
+                    <li role="listitem">
+                        <span>@TextosFranjasFijas.Resumen(s)</span> —
+                        <strong>@TextosFranjasFijas.Estado(s.Estado)</strong>
+                        @if (s.ResueltaEnUtc is { } resuelta)
+                        {
+                            <span> (el @FormatoEs.FechaHora(resuelta.ToUniversalTime()))</span>
+                        }
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+}
+
+@code {
+    private static readonly string[] HorasInicio = Enumerable.Range(8, 14).Select(h => $"{h:00}:00").ToArray();
+    private static readonly string[] HorasFin = Enumerable.Range(9, 14).Select(h => $"{h:00}:00").ToArray();
+
+    private sealed record Opcion(int Id, string Texto);
+
+    private MensajeAccesible _mensaje = null!;
+    private MudSelect<int?> _selectInstalacion = null!;
+    private MudSelect<string> _selectInicio = null!;
+    private MudSelect<string> _selectFin = null!;
+    private MudSelect<int?> _selectTemporada = null!;
+    private ElementReference _contenedorLista;
+
+    private bool _puede;
+    private bool _sinPermiso;
+    private bool _enviando;
+    private (string Texto, Severity Tipo)? _mensajePendiente;
+
+    private List<Opcion> _instalaciones = [];
+    private List<TemporadaDto> _temporadas = [];
+    private List<SolicitudFranjasFijasDto> _solicitudes = [];
+    private IReadOnlyDictionary<string, string[]> _errores = new Dictionary<string, string[]>();
+
+    private int? _instalacionId;
+    private readonly bool[] _dias = new bool[7];
+    private string? _horaInicio;
+    private string? _horaFin;
+    private int? _temporadaId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var estado = await Sesion.GetAuthenticationStateAsync();
+        if (estado.User.Identity?.IsAuthenticated != true)
+        {
+            Navegacion.NavigateTo(ClienteApi.RutaInicioSesion);
+            return;
+        }
+
+        if (!estado.User.IsInRole("representante_club"))
+        {
+            _sinPermiso = true;
+            return;
+        }
+
+        try
+        {
+            var centros = (await Api.GetAsync<List<CentroDto>>("/api/centros")).ToDictionary(c => c.Id, c => c.Nombre);
+            _instalaciones = (await Api.GetAsync<List<InstalacionDto>>("/api/instalaciones"))
+                .Where(i => i.Tipo is TipoInstalacion.PistaTenis or TipoInstalacion.PistaPadel or TipoInstalacion.Pabellon)
+                .Select(i => new Opcion(i.Id, $"{centros[i.CentroId]} · {i.Nombre}"))
+                .OrderBy(o => o.Texto, StringComparer.Create(new CultureInfo("es-ES"), false))
+                .ToList();
+            _temporadas = await Api.GetAsync<List<TemporadaDto>>("/api/solicitudes-franjas-fijas/temporadas");
+            _temporadaId = _temporadas.FirstOrDefault()?.Id;
+            await CargarSolicitudes();
+            _puede = true;
+        }
+        catch (ErrorApi error)
+        {
+            _mensajePendiente = (error.Detalle, Severity.Error);
+        }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        // MensajeAccesible solo existe después del primer renderizado.
+        if (_sinPermiso)
+        {
+            _sinPermiso = false;
+            _mensaje.Mostrar("Las franjas fijas son para representantes de club.", Severity.Warning);
+        }
+        else if (_mensajePendiente is { } pendiente)
+        {
+            _mensajePendiente = null;
+            _mensaje.Mostrar(pendiente.Texto, pendiente.Tipo);
+        }
+    }
+
+    private async Task CargarSolicitudes() =>
+        _solicitudes = await Api.GetAsync<List<SolicitudFranjasFijasDto>>("/api/solicitudes-franjas-fijas");
+
+    /// <summary>Guarda el valor y devuelve el foco al desplegable: MudBlazor lo deja en &lt;body&gt; (T026 de spec-001).</summary>
+    private static async Task Elegir<T>(Action asignar, MudSelect<T> select)
+    {
+        asignar();
+        await Task.Yield();
+        await select.FocusAsync();
+    }
+
+    private async Task Enviar()
+    {
+        if (_enviando)
+        {
+            return;
+        }
+
+        _enviando = true;
+        _errores = new Dictionary<string, string[]>();
+        _mensaje.Limpiar();
+
+        try
+        {
+            var dias = Enumerable.Range(1, 7).Where(d => _dias[d - 1]).ToList();
+            var peticion = new PeticionSolicitudFranjasFijas(_instalacionId ?? 0, _temporadaId ?? 0, dias, _horaInicio ?? "", _horaFin ?? "");
+            await Api.PostAsync<PeticionSolicitudFranjasFijas, SolicitudFranjasFijasDto>("/api/solicitudes-franjas-fijas", peticion);
+            await CargarSolicitudes();
+            _mensaje.Mostrar("Solicitud enviada. Queda pendiente de revisión.", Severity.Success);
+        }
+        catch (ErrorApi error)
+        {
+            _errores = error.Errores;
+            _mensaje.Mostrar(error.Detalle, Severity.Error);
+        }
+        finally
+        {
+            _enviando = false;
+        }
+    }
+
+    private string? Error(string campo) => _errores.TryGetValue(campo, out var mensajes) ? mensajes.FirstOrDefault() : null;
+
+    private static string Capitalizar(string texto) => char.ToUpper(texto[0], new CultureInfo("es-ES")) + texto[1..];
+}

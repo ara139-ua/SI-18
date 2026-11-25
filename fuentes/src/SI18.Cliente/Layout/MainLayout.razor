@@ -27,13 +27,14 @@
                         @* Hueco de CursosInformes (spec-004): cursos. *@
                     </AuthorizeView>
                     <AuthorizeView Roles="representante_club" Context="club">
-                        @* Hueco de Disponibilidad (spec-005): franjas fijas del club. *@
+                        <MudButton Href="/franjas-fijas" Color="Color.Inherit" Variant="Variant.Text">Franjas fijas</MudButton>
                     </AuthorizeView>
                     <AuthorizeView Roles="personal_centro" Context="personal">
                         @* Hueco de Reservas y Cancelaciones (spec-006, 007): validar QR, cierres. *@
                     </AuthorizeView>
                     <AuthorizeView Roles="tecnico_concejalia" Context="tecnico">
-                        @* Hueco de Disponibilidad y CursosInformes (spec-005, 008): solicitudes de clubes, informes. *@
+                        <MudButton Href="/franjas-fijas/revision" Color="Color.Inherit" Variant="Variant.Text">Revisar franjas fijas</MudButton>
+                        @* Hueco de CursosInformes (spec-008): informes. *@
                     </AuthorizeView>
 
                     <MudButton Href="/mis-avisos" Color="Color.Inherit" Variant="Variant.Text">Mis avisos</MudButton>

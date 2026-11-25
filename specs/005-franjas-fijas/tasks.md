@@ -172,7 +172,7 @@ bloquear nada, y ve la lista de su club.
   - **roles**: `ciudadana.empadronada` y `tecnico` en `POST` → 403; sin sesión → 401.
 
   Depende de T006 y T007.
-- [ ] T009 [US1] Crear `src/SI18.Cliente/Disponibilidad/FranjasFijasClub.razor` (ruta `/franjas-fijas`;
+- [X] T009 [US1] Crear `src/SI18.Cliente/Disponibilidad/FranjasFijasClub.razor` (ruta `/franjas-fijas`;
   research.md F7):
   - acceso como en `BuscarPistas`: sin sesión → `/iniciar-sesion`; otro rol que no sea
     `representante_club` → aviso «Las franjas fijas son para representantes de club.» sin formulario;
@@ -186,7 +186,7 @@ bloquear nada, y ve la lista de su club.
     {nombre} — **{Pendiente|Aprobada|Rechazada}**», y la fecha de resolución si la hay.
 
   Depende de T007.
-- [ ] T010 [P] [US1] Añadir «Franjas fijas» (`MudButton Href="/franjas-fijas"`) en el hueco
+- [X] T010 [P] [US1] Añadir «Franjas fijas» (`MudButton Href="/franjas-fijas"`) en el hueco
   `<AuthorizeView Roles="representante_club">` de `src/SI18.Cliente/Layout/MainLayout.razor`, quitando
   el comentario de ese hueco.
 
@@ -234,7 +234,7 @@ reciben un aviso.
   - **roles**: `representante.norte` en `POST …/aprobacion` → 403; id inexistente → 404.
 
   Depende de T006 y T011.
-- [ ] T013 [US2] Crear `src/SI18.Cliente/Disponibilidad/RevisarFranjasFijas.razor` (ruta
+- [X] T013 [US2] Crear `src/SI18.Cliente/Disponibilidad/RevisarFranjasFijas.razor` (ruta
   `/franjas-fijas/revision`; research.md F8), parte de aprobar:
   - acceso: sin sesión → `/iniciar-sesion`; otro rol que no sea `tecnico_concejalia` → aviso «La revisión
     de franjas fijas es para técnicos de la concejalía.» sin lista;
@@ -244,7 +244,7 @@ reciben un aviso.
     {días} de {inicio} a {fin}»; resultado en `MensajeAccesible` y la lista se recarga.
 
   Depende de T011.
-- [ ] T014 [P] [US2] Añadir «Revisar franjas fijas» (`MudButton Href="/franjas-fijas/revision"`) en el
+- [X] T014 [P] [US2] Añadir «Revisar franjas fijas» (`MudButton Href="/franjas-fijas/revision"`) en el
   hueco `<AuthorizeView Roles="tecnico_concejalia">` de `src/SI18.Cliente/Layout/MainLayout.razor`,
   quitando la parte del comentario que se refiere a las solicitudes de clubes.
 
@@ -282,7 +282,7 @@ existan.
   - **roles**: un representante en `GET …/conflictos` → 403.
 
   Depende de T006, T011 y T015.
-- [ ] T017 [US3] En `src/SI18.Cliente/Disponibilidad/RevisarFranjasFijas.razor`, para cada pendiente:
+- [X] T017 [US3] En `src/SI18.Cliente/Disponibilidad/RevisarFranjasFijas.razor`, para cada pendiente:
   botón «Ver conflictos» (`aria-expanded`) que carga `GET …/conflictos` y muestra debajo «No hay
   conflictos» o una lista con «{día dd/MM/yyyy}, {inicio}–{fin} · {confirmada|pendiente de pago}» y
   «Franja fija de {club}: {días} de {inicio} a {fin}». Si `PuedeAprobarse` es `false`, «Aprobar» queda
@@ -315,7 +315,7 @@ existan.
   - **atomicidad** (CE-004): tras un 409, el número de avisos del club no cambia.
 
   Depende de T012 y T018.
-- [ ] T020 [US4] En `src/SI18.Cliente/Disponibilidad/RevisarFranjasFijas.razor`, botón «Rechazar» en cada
+- [X] T020 [US4] En `src/SI18.Cliente/Disponibilidad/RevisarFranjasFijas.razor`, botón «Rechazar» en cada
   pendiente (con `aria-label` como el de «Aprobar»), siempre activo; resultado en `MensajeAccesible` y
   la lista se recarga. Depende de T017 y T018.
 
@@ -374,7 +374,7 @@ provisional de spec-001 retirada.
 
 ## Fase 8: Historia 6 · Solicitar y revisar sin barreras de accesibilidad (P3)
 
-- [ ] T024 [US6] Completar la accesibilidad de `src/SI18.Cliente/Disponibilidad/FranjasFijasClub.razor` y
+- [X] T024 [US6] Completar la accesibilidad de `src/SI18.Cliente/Disponibilidad/FranjasFijasClub.razor` y
   `src/SI18.Cliente/Disponibilidad/RevisarFranjasFijas.razor` (RF-018; research.md F7, F8):
   - tras elegir en cada `MudSelect`, el foco vuelve al desplegable (`ValueChanged` + `FocusAsync`, como
     T026 de spec-001);
@@ -392,10 +392,13 @@ provisional de spec-001 retirada.
 
 ## Fase 9: Pulido y cierre
 
-- [ ] T026 Ejecutar quickstart.md §2–§4: `dotnet test SI18.slnx` en verde (también
+- [X] T026 Ejecutar quickstart.md §2–§4: `dotnet test SI18.slnx` en verde (también
   `--filter-trait "Categoria=Limites"`), los escenarios S1–S13 contra la API y los pasos de las
   pantallas. Medir el tiempo de `GET …/conflictos` sobre una solicitud con reservas (10 peticiones) y
   anotar el peor valor en el PR (objetivo < 500 ms).
+  **Resultado (2026-11-25)**: 298/298 pruebas (129 de límites); en el navegador, solicitud con el
+  teclado, errores por campo, conflictos, aprobar, rechazar y avisos; `GET …/conflictos` entre 14 y
+  17 ms en 10 peticiones locales.
 - [ ] T027 [P] Avisar al grupo (constitución, «Acuerdos de colaboración»):
   - a Saul: este PR toca `RegistroDisponibilidad.cs`, `ConsultasProvisionalesTests.cs` y
     `DatosDisponibilidad.cs`, igual que su retirada de `ConsultaReservasProvisional`; el segundo PR hace
