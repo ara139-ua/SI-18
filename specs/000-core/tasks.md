@@ -706,7 +706,7 @@ responsable.
 - [ ] T074 [Ambos] Ejecutar quickstart.md §2–§5 de principio a fin en las dos máquinas, con .NET 10:
   docker compose, `dotnet ef database update`, siembra, V1–V10 manuales y `dotnet test SI18.slnx`
   en verde.
-- [ ] T075 [Ambos] Revisar los secretos según quickstart.md §7 (`git grep` sin resultados) y comprobar
+- [X] T075 [Ambos] Revisar los secretos según quickstart.md §7 (`git grep` sin resultados) y comprobar
   con `git ls-files fuentes/.env` que `.env` no está versionado.
 - [ ] T076 [Ambos] Abrir el PR final de `develop` → `main`, con la lista de los principios I–IX
   revisados (constitución, «Flujo de trabajo»). Después, ejecutar `/speckit-converge` para 000-core.
