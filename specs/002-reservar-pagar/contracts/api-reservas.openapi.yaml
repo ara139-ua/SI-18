@@ -1,0 +1,315 @@
+openapi: 3.1.0
+info:
+  title: SI-18 · Reservas (HU-02, reservar y pagar una pista)
+  version: 0.1.0
+  description: >
+    Resumen, creación, pago y consulta de las reservas propias. Convenciones HTTP, errores y sesión
+    según specs/000-core/contracts (README.md y errores.md). El esquema Problema y la cookie de sesión
+    son los de api-comun.openapi.yaml de 000-core. Todos los endpoints exigen sesión con rol ciudadano
+    o representante_club (política EsCiudadanoORepresentante): sin sesión → 401 NO_AUTENTICADO; con
+    otro rol → 403 ROL_NO_PERMITIDO. /api/reservas/{id}/cancelacion es de Cancelaciones (HU-03) y no
+    está aquí.
+security:
+  - cookieSesion: []
+paths:
+  /api/reservas/resumen:
+    get:
+      summary: Resumen de una franja antes de reservarla (pista, centro, fecha, horas e importe)
+      description: >
+        Hace las mismas comprobaciones que POST /api/reservas (pasos 1 y 2 de research.md E3) sin crear
+        nada. El importe es el de la tarifa del usuario, calculado por HU-01 (IConsultaDisponibilidad).
+      parameters:
+        - name: instalacionId
+          in: query
+          required: true
+          schema: { type: integer }
+        - name: inicioUtc
+          in: query
+          required: true
+          description: Inicio de la franja tal como lo entrega GET /api/disponibilidad/franjas.
+          schema: { type: string, format: date-time, examples: ['2026-12-26T17:00:00Z'] }
+      responses:
+        '200':
+          description: La franja está libre.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ResumenReserva' }
+              examples:
+                padel:
+                  value:
+                    instalacionId: 3
+                    pista: Pista de pádel 1
+                    centro: Polideportivo Norte
+                    fecha: '2026-12-26'
+                    horaInicio: '18:00'
+                    horaFin: '19:00'
+                    inicioUtc: '2026-12-26T17:00:00Z'
+                    importe: 6.00
+        '400': { $ref: '#/components/responses/PeticionInvalida' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/RolNoPermitido' }
+        '404': { $ref: '#/components/responses/NoEncontradoInstalacion' }
+        '409': { $ref: '#/components/responses/FranjaOcupada' }
+        '422': { $ref: '#/components/responses/FranjaNoDisponible' }
+  /api/reservas:
+    post:
+      summary: Crear una reserva pendiente de pago (bloquea la franja durante 10 minutos)
+      description: >
+        Secuencia de research.md E3 y del «Flujo de una reserva» de 000-core/plan.md. La reserva se crea
+        con su pago pendiente; la franja deja de estar libre mientras la reserva esté vigente.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PeticionReserva' }
+            examples:
+              padel:
+                value: { instalacionId: 3, inicioUtc: '2026-12-26T17:00:00Z', importeMostrado: 6.00 }
+      responses:
+        '201':
+          description: Reserva creada en estado pendiente_pago.
+          headers:
+            Location:
+              schema: { type: string, examples: ['/api/reservas/42'] }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Reserva' }
+              examples:
+                pendiente:
+                  value:
+                    id: 42
+                    instalacionId: 3
+                    pista: Pista de pádel 1
+                    centro: Polideportivo Norte
+                    fecha: '2026-12-26'
+                    horaInicio: '18:00'
+                    horaFin: '19:00'
+                    inicioUtc: '2026-12-26T17:00:00Z'
+                    finUtc: '2026-12-26T18:00:00Z'
+                    importe: 6.00
+                    estado: pendiente_pago
+                    limitePagoUtc: '2026-12-21T17:42:10Z'
+                    horaLimitePago: '18:42'
+                    codigoAcceso: null
+        '400': { $ref: '#/components/responses/PeticionInvalida' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/RolNoPermitido' }
+        '404': { $ref: '#/components/responses/NoEncontradoInstalacion' }
+        '409':
+          description: >
+            FRANJA_OCUPADA (otra reserva activa, también si llega a la vez: índice ux_reservas_activa) o
+            PRECIO_CAMBIADO (importeMostrado distinto del actual; el cliente vuelve a pedir el resumen).
+          content:
+            application/problem+json:
+              schema: { $ref: '../../000-core/contracts/api-comun.openapi.yaml#/components/schemas/Problema' }
+        '422': { $ref: '#/components/responses/FranjaNoDisponible' }
+    get:
+      summary: «Mis reservas» — todas las reservas del usuario de la sesión, en cualquier estado
+      description: >
+        Sin paginación. Orden (RF-015a): primero las no terminadas (finUtc > ahora) por inicioUtc
+        ascendente; después las terminadas por inicioUtc descendente. El estado es el efectivo: una
+        pendiente_pago no vigente se devuelve como caducada.
+      responses:
+        '200':
+          description: Lista (puede estar vacía).
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Reserva' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/RolNoPermitido' }
+  /api/reservas/{id}:
+    get:
+      summary: Ver una reserva propia
+      parameters:
+        - $ref: '#/components/parameters/IdReserva'
+      responses:
+        '200':
+          description: La reserva, con su estado efectivo.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Reserva' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/RolNoPermitido' }
+        '404': { $ref: '#/components/responses/NoEncontradoReserva' }
+  /api/reservas/{id}/pago:
+    post:
+      summary: Pagar una reserva propia pendiente de pago con la pasarela simulada
+      description: >
+        Secuencia de research.md E4. Una tarjeta de 16 dígitos que termina en 0002 se rechaza; cualquier
+        otra se acepta (R9 de 000-core). El número de tarjeta no se guarda ni se registra. Si el pago se
+        rechaza o la reserva ya no está vigente, la reserva queda caducada y el pago fallido antes de
+        responder; no hay reintento.
+      parameters:
+        - $ref: '#/components/parameters/IdReserva'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PeticionPago' }
+            examples:
+              aceptada:
+                value: { numeroTarjeta: '4000 0000 0000 0001' }
+              rechazada:
+                value: { numeroTarjeta: '4000000000000002' }
+      responses:
+        '200':
+          description: Pago completado; la reserva está confirmada y trae su código de acceso.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Reserva' }
+              examples:
+                confirmada:
+                  value:
+                    id: 42
+                    instalacionId: 3
+                    pista: Pista de pádel 1
+                    centro: Polideportivo Norte
+                    fecha: '2026-12-26'
+                    horaInicio: '18:00'
+                    horaFin: '19:00'
+                    inicioUtc: '2026-12-26T17:00:00Z'
+                    finUtc: '2026-12-26T18:00:00Z'
+                    importe: 6.00
+                    estado: confirmada
+                    limitePagoUtc: null
+                    horaLimitePago: null
+                    codigoAcceso: 'q3V0b1hS0k9fXz1aYm5DdA'
+        '400':
+          description: >
+            PETICION_INVALIDA con errors.numeroTarjeta (no tiene 16 dígitos). No se llama a la pasarela y
+            la reserva no cambia.
+          content:
+            application/problem+json:
+              schema: { $ref: '../../000-core/contracts/api-comun.openapi.yaml#/components/schemas/Problema' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/RolNoPermitido' }
+        '404': { $ref: '#/components/responses/NoEncontradoReserva' }
+        '409':
+          description: >
+            RESERVA_CADUCADA (han pasado 10 minutos o más; queda caducada y el pago fallido, sin cobro) o
+            TRANSICION_NO_PERMITIDA (la reserva ya no está pendiente de pago: confirmada, caducada o
+            cancelada).
+          content:
+            application/problem+json:
+              schema: { $ref: '../../000-core/contracts/api-comun.openapi.yaml#/components/schemas/Problema' }
+        '422':
+          description: PAGO_RECHAZADO (la pasarela rechaza el cobro; la reserva queda caducada y el pago fallido).
+          content:
+            application/problem+json:
+              schema: { $ref: '../../000-core/contracts/api-comun.openapi.yaml#/components/schemas/Problema' }
+components:
+  securitySchemes:
+    cookieSesion:
+      type: apiKey
+      in: cookie
+      name: si18.sesion
+  parameters:
+    IdReserva:
+      name: id
+      in: path
+      required: true
+      schema: { type: integer, format: int64 }
+  responses:
+    PeticionInvalida:
+      description: >
+        PETICION_INVALIDA: falta un campo o tiene un formato incorrecto, o inicioUtc no es el inicio de una
+        franja (no está en punto o queda fuera de 08:00–21:00 en Madrid). Con errors por campo cuando aplica.
+      content:
+        application/problem+json:
+          schema: { $ref: '../../000-core/contracts/api-comun.openapi.yaml#/components/schemas/Problema' }
+    NoAutenticado:
+      description: NO_AUTENTICADO.
+      content:
+        application/problem+json:
+          schema: { $ref: '../../000-core/contracts/api-comun.openapi.yaml#/components/schemas/Problema' }
+    RolNoPermitido:
+      description: ROL_NO_PERMITIDO (personal de centro o técnico de concejalía).
+      content:
+        application/problem+json:
+          schema: { $ref: '../../000-core/contracts/api-comun.openapi.yaml#/components/schemas/Problema' }
+    NoEncontradoInstalacion:
+      description: NO_ENCONTRADO (la instalación no existe).
+      content:
+        application/problem+json:
+          schema: { $ref: '../../000-core/contracts/api-comun.openapi.yaml#/components/schemas/Problema' }
+    NoEncontradoReserva:
+      description: NO_ENCONTRADO (la reserva no existe o es de otra persona; no se revela cuál de los dos).
+      content:
+        application/problem+json:
+          schema: { $ref: '../../000-core/contracts/api-comun.openapi.yaml#/components/schemas/Problema' }
+    FranjaOcupada:
+      description: FRANJA_OCUPADA (la franja tiene una reserva confirmada o pendiente de pago vigente).
+      content:
+        application/problem+json:
+          schema: { $ref: '../../000-core/contracts/api-comun.openapi.yaml#/components/schemas/Problema' }
+    FranjaNoDisponible:
+      description: >
+        El primer motivo de RF-011 de 000-core, en su orden: FUERA_DE_ANTELACION, FRANJA_YA_EMPEZADA,
+        INSTALACION_NO_RESERVABLE, INSTALACION_CERRADA o FRANJA_BLOQUEADA_CLUB.
+      content:
+        application/problem+json:
+          schema: { $ref: '../../000-core/contracts/api-comun.openapi.yaml#/components/schemas/Problema' }
+  schemas:
+    EstadoReserva:
+      type: string
+      enum: [pendiente_pago, confirmada, caducada, cancelada]
+    PeticionReserva:
+      type: object
+      required: [instalacionId, inicioUtc, importeMostrado]
+      properties:
+        instalacionId: { type: integer }
+        inicioUtc: { type: string, format: date-time }
+        importeMostrado:
+          type: number
+          exclusiveMinimum: 0
+          description: Importe del resumen, en euros con dos decimales. Si difiere del actual → PRECIO_CAMBIADO.
+    PeticionPago:
+      type: object
+      required: [numeroTarjeta]
+      properties:
+        numeroTarjeta:
+          type: string
+          description: Tarjeta ficticia de 16 dígitos (se admiten espacios). No se guarda ni se registra.
+          examples: ['4000 0000 0000 0001']
+    ResumenReserva:
+      type: object
+      required: [instalacionId, pista, centro, fecha, horaInicio, horaFin, inicioUtc, importe]
+      properties:
+        instalacionId: { type: integer }
+        pista: { type: string }
+        centro: { type: string }
+        fecha: { type: string, format: date, description: Fecha de Madrid. }
+        horaInicio: { type: string, examples: ['18:00'], description: Hora de pared de Madrid. }
+        horaFin: { type: string, examples: ['19:00'], description: Hora de pared de Madrid. }
+        inicioUtc: { type: string, format: date-time }
+        importe: { type: number, examples: [6.00], description: Euros, dos decimales, tarifa del usuario. }
+    Reserva:
+      type: object
+      required: [id, instalacionId, pista, centro, fecha, horaInicio, horaFin, inicioUtc, finUtc, importe, estado, limitePagoUtc, horaLimitePago, codigoAcceso]
+      properties:
+        id: { type: integer, format: int64 }
+        instalacionId: { type: integer }
+        pista: { type: string }
+        centro: { type: string }
+        fecha: { type: string, format: date, description: Fecha de Madrid. }
+        horaInicio: { type: string, examples: ['18:00'] }
+        horaFin: { type: string, examples: ['19:00'] }
+        inicioUtc: { type: string, format: date-time }
+        finUtc: { type: string, format: date-time }
+        importe: { type: number, examples: [6.00] }
+        estado:
+          $ref: '#/components/schemas/EstadoReserva'
+          description: Estado efectivo; una pendiente_pago no vigente se devuelve como caducada.
+        limitePagoUtc:
+          type: [string, 'null']
+          format: date-time
+          description: creadaEnUtc + 10 min. Solo si estado = pendiente_pago.
+        horaLimitePago:
+          type: [string, 'null']
+          examples: ['18:42']
+          description: limitePagoUtc en hora de Madrid, truncada al minuto. Solo si estado = pendiente_pago.
+        codigoAcceso:
+          type: [string, 'null']
+          description: Código opaco de 22 caracteres (R14) para el QR. Solo si estado = confirmada.
