@@ -203,14 +203,17 @@ public sealed class ServicioSolicitudesFranjasFijas(
 
     /// <summary>
     /// Único cálculo de conflictos, para mostrarlos y para decidir al aprobar (research.md F4): reservas activas de
-    /// la instalación entre ahora y el fin de la temporada que la solicitud cubre (de cualquier titular, sin datos
+    /// la instalación entre ahora (o el inicio de la temporada, si es posterior) y su fin que la solicitud cubre (de cualquier titular, sin datos
     /// personales), y solicitudes aprobadas que se solapan.
     /// </summary>
     private async Task<(IReadOnlyList<ReservaEnConflictoDto> Reservas, IReadOnlyList<SolicitudSolapadaDto> Solapadas)> Conflictos(
         SolicitudFranjasFijas solicitud, CancellationToken ct)
     {
         var temporada = await db.Temporadas.AsNoTracking().SingleAsync(t => t.Id == solicitud.TemporadaId, ct);
-        var desde = Ahora;
+        // Solo reservas de la temporada y de ahora en adelante: si la temporada aún no ha empezado, las de antes no
+        // cuentan (RF-008; T030).
+        var inicioTemporada = HorarioMadrid.AUtc(temporada.FechaInicio, TimeOnly.MinValue);
+        var desde = Ahora > inicioTemporada ? Ahora : inicioTemporada;
         var hasta = HorarioMadrid.AUtc(temporada.FechaFin.AddDays(1), TimeOnly.MinValue);
 
         var enConflicto = new List<ReservaEnConflictoDto>();
