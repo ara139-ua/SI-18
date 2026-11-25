@@ -703,6 +703,11 @@ responsable.
   - Lighthouse ≥ 95 y axe sin infracciones graves ni críticas.
 
   Anotar el resultado en el PR (principio I).
+
+  **Avance (2026-11-25, Artur)**: el recorrido con teclado de spec-001 y spec-005 encontró dos fallos comunes,
+  ya corregidos en `app.css` y `MainLayout.razor`: el foco no se veía en los botones y enlaces de MudBlazor (sus reglas
+  `button:focus` y `a:focus-visible` anulaban la de `:focus-visible`; ni en las casillas ni en la barra azul) y la
+  barra superior se cortaba a 320 px («Cerrar sesión» quedaba fuera). Falta la revisión conjunta y Lighthouse/axe.
 - [ ] T074 [Ambos] Ejecutar quickstart.md §2–§5 de principio a fin en las dos máquinas, con .NET 10:
   docker compose, `dotnet ef database update`, siembra, V1–V10 manuales y `dotnet test SI18.slnx`
   en verde.

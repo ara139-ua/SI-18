@@ -105,10 +105,30 @@ code {
     top: 0.5rem;
 }
 
-/* Foco siempre visible (quickstart.md §6). */
+/* Foco siempre visible (quickstart.md §6; WCAG 2.4.7). */
 :focus-visible {
     outline: 3px solid #0B4F8A;
     outline-offset: 2px;
+}
+
+/* MudBlazor quita el contorno con `button:focus` y `a:focus-visible` (0,1,1), que ganan a `:focus-visible` (0,1,0).
+   Esta regla (0,2,0) lo recupera en los controles. Deja fuera los tabindex="-1" (<main>, el <h1>, las listas), que
+   reciben el foco desde código y no son controles. */
+:is(a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])):focus-visible {
+    outline: 3px solid #0B4F8A;
+    outline-offset: 2px;
+}
+
+/* La casilla real de MudCheckBox es un <input> con opacity: 0: el contorno se pinta en su botón visible. */
+.mud-checkbox .mud-icon-button:has(> .mud-checkbox-input:focus-visible) {
+    outline: 3px solid #0B4F8A;
+    outline-offset: 0;
+}
+
+/* En la barra superior (fondo #0B4F8A) el contorno azul no se vería: blanco. Misma lista que la regla anterior para
+   ganarle en especificidad (:is() toma la de su argumento más fuerte). */
+.mud-appbar :is(a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])):focus-visible {
+    outline-color: #FFFFFF;
 }
 
 /* <main> y el <h1> reciben el foco desde código («Ir al contenido» y FocusOnNavigate) para que el lector de
@@ -121,8 +141,32 @@ main:focus {
 /* Menú principal (T056): botones en línea con el nombre del usuario. */
 .menu-principal {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 0.5rem;
+}
+
+/* Barra superior que cabe a 320 px (WCAG 1.4.10): MainLayout la saca del modo fijo (Fixed="false"), así que el
+   contenido ya no necesita el hueco que le reserva MudMainContent, y la barra crece en altura en lugar de cortar el
+   título o dejar «Cerrar sesión» fuera de la pantalla. */
+.mud-appbar .mud-toolbar-appbar {
+    flex-wrap: wrap;
+    height: auto;
+    min-height: calc(var(--mud-appbar-height) - var(--mud-appbar-height) / 8);
+    padding-block: 0.25rem;
+    row-gap: 0.25rem;
+}
+
+.mud-main-content {
+    padding-top: 0;
+}
+
+/* En pantallas anchas la barra se queda arriba al desplazarse; en las estrechas no, para no tapar el contenido. */
+@media (min-width: 600px) {
+    .mud-appbar {
+        position: sticky;
+        top: 0;
+    }
 }
 
 /* «Mis avisos» (T067): el no leído se marca con texto («No leído») y, además, con un borde. */
