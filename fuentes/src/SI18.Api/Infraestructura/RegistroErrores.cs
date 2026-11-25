@@ -35,6 +35,8 @@ public static class RegistroErrores
         // La API serializa igual que el cliente: camelCase y enumerados en snake_case (contracts).
         services.Configure<JsonOptions>(opciones => OpcionesJson.Aplicar(opciones.SerializerOptions));
 
+        services.AddPasarela();
+
         return services;
     }
 
