@@ -180,7 +180,7 @@ contra PostgreSQL.
   Los límites de tiempo se prueban con `DatosDisponibilidad.ConServicio(ahoraUtc, …)`, que usa un reloj propio:
   `FakeTimeProvider` no retrocede y el reloj de `FabricaApi` lo comparten todas las pruebas, así que no se
   cambia. Depende de T010.
-- [ ] T012 [US1] Crear `src/SI18.Cliente/Disponibilidad/BuscarPistas.razor` (ruta `/buscar-pistas`;
+- [X] T012 [US1] Crear `src/SI18.Cliente/Disponibilidad/BuscarPistas.razor` (ruta `/buscar-pistas`;
   research.md D7):
   - **acceso** (spec, «Casos límite» y aclaración 2; RF-001): en `OnInitializedAsync`, antes de cargar
     los filtros, se lee el `AuthenticationState` de `EstadoSesion`:
@@ -249,7 +249,7 @@ la misma disponibilidad y el mismo precio por `IConsultaDisponibilidad`.
   - el pabellón da `INSTALACION_NO_RESERVABLE`.
 
   Depende de T015.
-- [ ] T017 [US2] En `src/SI18.Cliente/Disponibilidad/BuscarPistas.razor`, añadir a cada franja el
+- [X] T017 [US2] En `src/SI18.Cliente/Disponibilidad/BuscarPistas.razor`, añadir a cada franja el
   precio con `FormatoEs.Importe(franja.Precio)`: «18:00–19:00 · 6,00 €» (RF-008). Depende de T012.
 
 **Punto de control**: los tres precios por tarifa son correctos y HU-02 ya puede usar `IConsultaDisponibilidad`.
@@ -275,7 +275,7 @@ deporte y cuando la fecha está fuera de plazo.
   Los límites de tiempo se prueban con `DatosDisponibilidad.ConServicio(ahoraUtc, …)`, que usa un reloj propio:
   `FakeTimeProvider` no retrocede y el reloj de `FabricaApi` lo comparten todas las pruebas, así que no se
   cambia. Depende de T010.
-- [ ] T019 [US3] En `src/SI18.Cliente/Disponibilidad/BuscarPistas.razor`, mostrar con
+- [X] T019 [US3] En `src/SI18.Cliente/Disponibilidad/BuscarPistas.razor`, mostrar con
   `MensajeAccesible` (RF-011):
   - con `TotalPistas == 0`: «{centro} no tiene pistas de {deporte}.» (`Severity.Info`);
   - con `Pistas` vacía: «No hay pistas libres de {deporte} en {centro} el {fecha dd/MM/yyyy}. Prueba
@@ -294,7 +294,7 @@ deporte y cuando la fecha está fuera de plazo.
 
 **Prueba independiente**: quickstart.md §5.
 
-- [ ] T020 [US4] Completar la accesibilidad de `src/SI18.Cliente/Disponibilidad/BuscarPistas.razor`
+- [X] T020 [US4] Completar la accesibilidad de `src/SI18.Cliente/Disponibilidad/BuscarPistas.razor`
   (RF-015; research.md D7, D8):
   - **fecha**: hoy en Madrid por defecto, con `MinDate`/`MaxDate` entre hoy y hoy + 7, calculados
     con `TimeZoneInfo.FindSystemTimeZoneById("Europe/Madrid")` (solo ayuda: la regla la aplica la API);

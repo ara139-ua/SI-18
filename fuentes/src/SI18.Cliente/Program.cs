@@ -15,6 +15,9 @@ builder.Services.AddMudServices();
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddScoped<ClienteApi>();
 
+// La hora sale siempre de TimeProvider, también en el cliente (constitución, principio II; BannedSymbols.txt).
+builder.Services.AddSingleton(TimeProvider.System);
+
 // Estado de sesión (T056): AuthorizeView y el menú por rol lo leen en cascada.
 builder.Services.AddAuthorizationCore();
 builder.Services.AddCascadingAuthenticationState();
