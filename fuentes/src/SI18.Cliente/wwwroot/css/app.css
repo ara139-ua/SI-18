@@ -137,3 +137,32 @@ main:focus {
 .contenedor-avisos:focus {
     outline: none;
 }
+
+/* Buscar pistas (spec-001 T012, T020). */
+.filtros-busqueda {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: 1rem;
+    align-items: start;
+    max-width: 60rem;
+    margin-bottom: 1.5rem;
+}
+
+.pista-libre {
+    margin-bottom: 1.5rem;
+}
+
+.lista-franjas {
+    list-style: none;
+    padding: 0;
+    margin: 0.5rem 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.lista-franjas li {
+    border: 1px solid #6E6A73;
+    border-radius: 4px;
+    padding: 0.25rem 0.75rem;
+}
