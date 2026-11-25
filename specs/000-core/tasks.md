@@ -637,7 +637,7 @@ responsable.
   - `Modulos/Cancelaciones/IConsultaCierres.cs`.
 
   Las implementaciones son de las specs 001–008.
-- [ ] T066 [US4] [Ambos · sugerido: Artur] Crear `fuentes/src/SI18.Api/Modulos/Comun/ServicioAvisos.cs`:
+- [X] T066 [US4] [Ambos · sugerido: Artur] Crear `fuentes/src/SI18.Api/Modulos/Comun/ServicioAvisos.cs`:
   `Avisar(usuarioId, texto)` añade una `Notificacion` con `FechaUtc` tomada de `TimeProvider` y
   `Leida=false`, **sin** `SaveChanges`, para que se guarde en la transacción del llamador (R18).
   Crear también `EndpointsAvisos.cs`:
@@ -646,7 +646,7 @@ responsable.
     `NO_ENCONTRADO`.
 
   Registrar ambos en `RegistroComun.cs`. Depende de T052 y T065.
-- [ ] T067 [P] [US4] [Artur] Crear `fuentes/src/SI18.Cliente/Comun/MisAvisos.razor` (ruta
+- [X] T067 [P] [US4] [Artur] Crear `fuentes/src/SI18.Cliente/Comun/MisAvisos.razor` (ruta
   `/mis-avisos`):
   - lista accesible con `MudList`, donde cada aviso muestra la fecha con `FormatoEs.FechaHora` y el
     estado «No leído» en texto (no solo con color);
@@ -664,7 +664,7 @@ responsable.
 
   `EjecutarUnaVez` es público para las pruebas. Registrarlo en `RegistroInfraestructura.cs`.
   Depende de T060.
-- [ ] T069 [P] [US4] [Ambos · sugerido: Artur] Crear `fuentes/tests/SI18.Api.Tests/Comun/AvisosTests.cs`:
+- [X] T069 [P] [US4] [Ambos · sugerido: Artur] Crear `fuentes/tests/SI18.Api.Tests/Comun/AvisosTests.cs`:
   - un usuario solo ve sus avisos;
   - marcar como leído dos veces → 204 las dos veces;
   - marcar el aviso de otra persona → 404 `NO_ENCONTRADO`.

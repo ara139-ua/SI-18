@@ -34,6 +34,7 @@ public static class RegistroComun
         services.AddHttpContextAccessor();
         services.AddScoped<IUsuarioActual, UsuarioActual>();
         services.AddSingleton<IPasswordHasher<Usuario>, PasswordHasher<Usuario>>();
+        services.AddScoped<IServicioAvisos, ServicioAvisos>();
 
         return services;
     }
@@ -41,6 +42,7 @@ public static class RegistroComun
     public static WebApplication MapComun(this WebApplication app)
     {
         app.MapSesion();
+        app.MapAvisos();
         return app;
     }
 

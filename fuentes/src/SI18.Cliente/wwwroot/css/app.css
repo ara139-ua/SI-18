@@ -124,3 +124,16 @@ main:focus {
     align-items: center;
     gap: 0.5rem;
 }
+
+/* «Mis avisos» (T067): el no leído se marca con texto («No leído») y, además, con un borde. */
+.lista-avisos .aviso {
+    border-bottom: 1px solid #E0E0E0;
+}
+
+.lista-avisos .aviso-no-leido {
+    border-left: 4px solid #0B4F8A;
+}
+
+.contenedor-avisos:focus {
+    outline: none;
+}
