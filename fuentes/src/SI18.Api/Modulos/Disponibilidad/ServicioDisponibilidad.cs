@@ -79,6 +79,12 @@ public sealed class ServicioDisponibilidad(
     /// <paramref name="inicioUtc"/> no es el inicio de una franja.</exception>
     public async Task<string?> MotivoNoDisponible(int instalacionId, DateTime inicioUtc, CancellationToken ct)
     {
+        // Un instante que no es UTC es una petición mal formada, no un error interno (T027).
+        if (inicioUtc.Kind != DateTimeKind.Utc)
+        {
+            throw CodigosError.Error(CodigosError.PeticionInvalida);
+        }
+
         var pista = await BuscarInstalacion(instalacionId, ct);
         var (fecha, _) = HorarioMadrid.ALocal(inicioUtc);
 

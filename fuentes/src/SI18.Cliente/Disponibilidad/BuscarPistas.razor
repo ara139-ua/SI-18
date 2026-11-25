@@ -18,7 +18,8 @@
 @if (_puedeBuscar)
 {
     <form @onsubmit="Buscar" novalidate class="filtros-busqueda">
-        <MudSelect T="int?" @bind-Value="_deporteId" Label="Deporte" Required="true"
+        @* Tras elegir, MudBlazor deja el foco en <body>: se devuelve al desplegable (T026; RF-015). *@
+        <MudSelect T="int?" @ref="_selectDeporte" Value="_deporteId" ValueChanged="ElegirDeporte" Label="Deporte" Required="true"
                    RequiredError="Elige un deporte." Variant="Variant.Outlined" AnchorOrigin="Origin.BottomLeft">
             @foreach (var deporte in _deportes)
             {
@@ -26,7 +27,7 @@
             }
         </MudSelect>
 
-        <MudSelect T="int?" @bind-Value="_centroId" Label="Centro" Required="true"
+        <MudSelect T="int?" @ref="_selectCentro" Value="_centroId" ValueChanged="ElegirCentro" Label="Centro" Required="true"
                    RequiredError="Elige un centro." Variant="Variant.Outlined" AnchorOrigin="Origin.BottomLeft">
             @foreach (var centro in _centros)
             {
@@ -69,6 +70,8 @@
     private const int AntelacionMaximaDias = 7;
 
     private MensajeAccesible _mensaje = null!;
+    private MudSelect<int?> _selectDeporte = null!;
+    private MudSelect<int?> _selectCentro = null!;
     private bool _puedeBuscar;
     private bool _sinPermiso;
     private bool _buscando;
@@ -134,6 +137,28 @@
             _mensajePendiente = null;
             _mensaje.Mostrar(pendiente.Texto, pendiente.Tipo);
         }
+    }
+
+    private async Task ElegirDeporte(int? deporteId)
+    {
+        _deporteId = deporteId;
+        await DevolverFoco(_selectDeporte);
+    }
+
+    private async Task ElegirCentro(int? centroId)
+    {
+        _centroId = centroId;
+        await DevolverFoco(_selectCentro);
+    }
+
+    /// <summary>
+    /// MudBlazor cierra la lista de opciones y deja el foco en &lt;body&gt;. Se espera a que termine de cerrarla y
+    /// se devuelve el foco al desplegable, para que siempre se vea dónde está (RF-015; T026).
+    /// </summary>
+    private static async Task DevolverFoco(MudSelect<int?> select)
+    {
+        await Task.Yield();
+        await select.FocusAsync();
     }
 
     private async Task Buscar()

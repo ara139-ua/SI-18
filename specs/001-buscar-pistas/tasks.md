@@ -315,11 +315,13 @@ deporte y cuando la fecha está fuera de plazo.
 
 ## Fase 7: Pulido y cierre
 
-- [ ] T022 Ejecutar quickstart.md §2–§4 de principio a fin: `dotnet test SI18.slnx` en verde
+- [X] T022 Ejecutar quickstart.md §2–§4 de principio a fin: `dotnet test SI18.slnx` en verde
   (también con `--filter-trait "Categoria=Limites"`), los escenarios B1–B10 contra la API y los pasos
   de la pantalla. Medir el tiempo de B1 con la API local (por ejemplo, 10 peticiones con
   `Measure-Command`) y anotar en el PR el peor valor: debe ser < 2 s (CE-002) y, como objetivo,
   < 500 ms (research.md D10).
+  **Resultado (2026-11-25)**: 240/240 pruebas (101 de límites); B1–B10 como se esperaba; B1 entre 30 y 44 ms
+  en 10 peticiones locales.
 - [ ] T023 [P] Avisar al grupo de las consultas provisionales (constitución, «Acuerdos de
   colaboración»): mensaje a Saul (`IConsultaReservas`, spec-002) y a C (`IConsultaCierres`, spec-007)
   con la ruta del fichero provisional y su prueba en `ConsultasProvisionalesTests`, para que las
@@ -327,10 +329,12 @@ deporte y cuando la fecha está fuera de plazo.
   aún no existen, pedir a cada dueño que, al crearla con `/speckit-specify`, anote en su sección de
   dependencias la provisional que sustituye (constitución: «la dependencia se anota en las dos
   specs»). Para la 005, que es tuya, hacerlo tú.
-- [ ] T024 Abrir el PR de `feature/001-buscar-pistas` a `develop`, con la propuesta de convención de
+- [X] T024 Abrir el PR de `feature/001-buscar-pistas` a `develop`, con la propuesta de convención de
   `Program.cs` (dos líneas por módulo, research.md D6), la lista de los principios I–IX revisados y la
   comprobación de accesibilidad de T021. Lo aprueba otra persona del grupo.
-- [ ] T025 Después de fusionar, ejecutar `/speckit-converge` para la spec 001.
+  **Hecho en dos PR**: #23 (API, T001–T011, T013–T016, T018) y #24 (pantalla, T012, T017, T019, T020).
+  La convención de `Program.cs` entró antes, en el #18 de 000-core.
+- [X] T025 Después de fusionar, ejecutar `/speckit-converge` para la spec 001.
 
 ---
 
@@ -392,3 +396,10 @@ T054, se puede abrir antes un PR solo con la API (Fases 1–2, T009–T011, T014
 - Ninguna tarea crea tablas, migraciones, entidades, estados ni códigos de error: todo es de 000-core
   (principio VII). Si durante la implementación hiciera falta alguno, se propone primero en 000-core.
 - Las provisionales (T003–T005) se borran en el PR del dueño de cada interfaz, no en esta spec.
+
+---
+
+## Fase 8: Convergencia
+
+- [X] T026 Devolver el foco al `MudSelect` de deporte y al de centro después de elegir una opción en `src/SI18.Cliente/Disponibilidad/BuscarPistas.razor` (por ejemplo, con `ValueChanged` + `FocusAsync()` en una referencia `@ref` a cada uno), para que el foco nunca quede en `<body>`, y volver a comprobar con el teclado el recorrido Deporte → Centro → Fecha → «Buscar pistas» per RF-015, US4/AC1 (partial)
+- [X] T027 Hacer que `ServicioDisponibilidad.MotivoNoDisponible` en `src/SI18.Api/Modulos/Disponibilidad/ServicioDisponibilidad.cs` lance `CodigosError.Error(PeticionInvalida)` cuando `inicioUtc.Kind != DateTimeKind.Utc`, en lugar de dejar que `HorarioMadrid.ALocal` lance `ArgumentException` (que acaba en 500 `ERROR_INTERNO`), y añadir el caso a `tests/SI18.Api.Tests/Disponibilidad/ConsultaDisponibilidadTests.cs` per contracts/modulos.md, RF-013 (partial)
