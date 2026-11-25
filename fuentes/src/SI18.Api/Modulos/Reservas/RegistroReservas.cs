@@ -11,6 +11,9 @@ public static class RegistroReservas
         // Consulta de reservas activas para Disponibilidad y CursosInformes (RF-018, RF-019).
         services.AddScoped<IConsultaReservas, ConsultaReservas>();
 
+        // Cambios de estado que piden Cancelaciones en HU-03 y HU-07, en la transacción de quien llama (RF-019a).
+        services.AddScoped<IServicioReservas, ServicioReservas>();
+
         // Casos de uso de los endpoints de /api/reservas (research.md E2–E6).
         services.AddScoped<ServicioReservar>();
 

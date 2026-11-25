@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SI18.Api.Infraestructura;
+using SI18.Api.Modulos.Reservas;
 using SI18.Api.Tests.Infraestructura;
 using SI18.Contratos.Comun;
 using SI18.Contratos.Disponibilidad;
@@ -317,5 +318,36 @@ public class PagarReservaTests(FabricaApi fabrica)
         var guardada = await _datos.Leer(id);
         Assert.Equal(EstadoReservaDominio.PendientePago, guardada.Estado);
         Assert.Equal(EstadoPago.Pendiente, guardada.Pago!.Estado);
+    }
+
+    // ── Fase 9: cierre posterior ─────────────────────────────────────────────────
+
+    [Fact]
+    [Trait("Categoria", "Limites")]
+    public async Task Una_pendiente_vigente_caducada_por_un_cierre_responde_TRANSICION_NO_PERMITIDA_sin_cobro()
+    {
+        var pista = await Tenis1();
+        var inicio = Utc(Dia22, 17);
+        var id = await _datos.Pendiente(Ana, pista, inicio, _datos.Ahora - TimeSpan.FromMinutes(1));
+        using (var ambito = fabrica.Services.CreateScope())
+        {
+            // Como lo hará HU-07: la transacción la abre y la confirma quien llama.
+            var db = ambito.ServiceProvider.GetRequiredService<Si18DbContext>();
+            await using var transaccion = await db.Database.BeginTransactionAsync(Ct);
+            await ambito.ServiceProvider.GetRequiredService<IServicioReservas>()
+                .AplicarCierre(pista, inicio, inicio + ValoresNegocio.DuracionFranja, Ct);
+            await db.SaveChangesAsync(Ct);
+            await transaccion.CommitAsync(Ct);
+        }
+
+        var antes = await _datos.Leer(id);
+
+        var respuesta = await Pagar(Ana, id);
+
+        await AssertProblema(respuesta, HttpStatusCode.Conflict, CodigosError.TransicionNoPermitida);
+        var despues = await _datos.Leer(id);
+        Assert.Equal(EstadoReservaDominio.Caducada, despues.Estado);
+        Assert.Null(despues.CodigoAcceso);
+        Assert.Equal(antes.Pago!.ResueltoEnUtc, despues.Pago!.ResueltoEnUtc);
     }
 }

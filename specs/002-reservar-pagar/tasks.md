@@ -567,7 +567,7 @@ efectivo y el QR solo en las confirmadas.
 **Propósito**: que C pueda cancelar por el usuario y aplicar un cierre sin escribir en `reservas` ni
 `pagos`, dentro de su propia transacción (aclaración 1; research.md E8).
 
-- [ ] T044 Crear `src/SI18.Api/Modulos/Reservas/ServicioReservas.cs`, que implementa
+- [X] T044 Crear `src/SI18.Api/Modulos/Reservas/ServicioReservas.cs`, que implementa
   `IServicioReservas` **sin cambiar su firma** (contracts/modulos.md), con
   `CancelarPorUsuario(reservaId, usuarioId, ct)`:
   - `CargaReservas.CargarParaModificar(db, reservaId, usuarioId)` (que exige la transacción abierta:
@@ -578,7 +578,7 @@ efectivo y el QR solo en las confirmadas.
   - **no** llama a `SaveChanges` ni abre o confirma transacciones.
 
   Registrarlo con `AddScoped<IServicioReservas, ServicioReservas>()` en `AddReservas()`. Depende de T004.
-- [ ] T045 Añadir a `ServicioReservas` `AplicarCierre(instalacionId, inicioUtc, finUtc, ct)`
+- [X] T045 Añadir a `ServicioReservas` `AplicarCierre(instalacionId, inicioUtc, finUtc, ct)`
   (data-model.md § 2.5):
   - exige la transacción abierta (si no, `InvalidOperationException`);
   - carga con `FOR UPDATE` las reservas de la instalación con estado guardado `confirmada` o
@@ -586,7 +586,7 @@ efectivo y el QR solo en las confirmadas.
   - confirmadas → `Cancelar(MotivoCancelacion.CierreMantenimiento, ahora)` → `Canceladas`;
     pendientes, vigentes o no → `Caducar(ahora)` → `Caducadas`;
   - las dos listas ordenadas por `InicioUtc`; sin `SaveChanges`. Depende de T044.
-- [ ] T046 Crear `tests/SI18.Api.Tests/Reservas/ServicioReservasTests.cs`
+- [X] T046 Crear `tests/SI18.Api.Tests/Reservas/ServicioReservasTests.cs`
   (`[Collection(ColeccionApi.Nombre)]`, Polideportivo Norte, «Pista de tenis 1» y «Pista de tenis 2»,
   enero de 2027), con un llamador de prueba que abre la transacción, llama, hace `SaveChanges` y
   `Commit`, como harán HU-03 y HU-07:
@@ -602,7 +602,7 @@ efectivo y el QR solo en las confirmadas.
     de `Commit`, no cambia nada en la base.
 
   Depende de T045.
-- [ ] T047 Añadir a `tests/SI18.Api.Tests/Reservas/PagarReservaTests.cs` el caso límite «cierre
+- [X] T047 Añadir a `tests/SI18.Api.Tests/Reservas/PagarReservaTests.cs` el caso límite «cierre
   posterior» (spec, «Casos límite»): una pendiente **vigente** caducada por `AplicarCierre` →
   el pago responde 409 `TRANSICION_NO_PERMITIDA` (no `RESERVA_CADUCADA`: se caducó antes del límite),
   sin cobro. Depende de T045 y T033.
