@@ -434,7 +434,7 @@ sin cambios.
 
 **Prueba independiente**: quickstart.md R10–R13.
 
-- [ ] T036 [P] [US4] Crear `tests/SI18.Api.Tests/Reservas/MotivosRechazoTests.cs`
+- [X] T036 [P] [US4] Crear `tests/SI18.Api.Tests/Reservas/MotivosRechazoTests.cs`
   (`[Collection(ColeccionApi.Nombre)]`, Polideportivo Sur, «Pista de tenis 1» y «Pista de tenis 2»,
   22–28/12/2026); en todos, además del código, **no se crea ninguna reserva** (HU4 esc. 6: `detail` en
   español y sin detalles técnicos):
