@@ -84,11 +84,18 @@ public sealed class DatosDisponibilidad(FabricaApi fabrica)
             new CierreMantenimiento(pistaId, inicioUtc, finUtc, "Mantenimiento de prueba", personalId, Ahora)));
     }
 
-    /// <summary>Inserta una solicitud de franjas fijas de temporada en el estado pedido (aprobada por defecto).</summary>
-    public async Task FranjaFija(int pistaId, short[] diasSemana, int horaInicio, int horaFin, EstadoSolicitud estado = EstadoSolicitud.Aprobada)
+    /// <summary>
+    /// Inserta una solicitud de franjas fijas de temporada en el estado pedido (aprobada por defecto) y devuelve su
+    /// identificador. Sin <paramref name="club"/>, la pide el primer club de la siembra.
+    /// </summary>
+    public async Task<int> FranjaFija(
+        int pistaId, short[] diasSemana, int horaInicio, int horaFin,
+        EstadoSolicitud estado = EstadoSolicitud.Aprobada, string? club = null)
     {
         var (clubId, temporadaId) = await Consultar(async db => (
-            await db.Clubes.OrderBy(c => c.Id).Select(c => c.Id).FirstAsync(Ct),
+            club is null
+                ? await db.Clubes.OrderBy(c => c.Id).Select(c => c.Id).FirstAsync(Ct)
+                : await db.Clubes.Where(c => c.Nombre == club).Select(c => c.Id).SingleAsync(Ct),
             await db.Temporadas.Where(t => t.Nombre == "2026-2027").Select(t => t.Id).SingleAsync(Ct)));
 
         var solicitud = new SolicitudFranjasFijas(clubId, pistaId, temporadaId, diasSemana,
@@ -104,6 +111,30 @@ public sealed class DatosDisponibilidad(FabricaApi fabrica)
         }
 
         await Guardar(db => db.SolicitudesFranjasFijas.Add(solicitud));
+        return solicitud.Id;
+    }
+
+    /// <summary>Identificador de una temporada de la siembra.</summary>
+    public async Task<int> Temporada(string nombre) =>
+        await Consultar(db => db.Temporadas.Where(t => t.Nombre == nombre).Select(t => t.Id).SingleAsync(Ct));
+
+    /// <summary>
+    /// Como <see cref="ConServicio{T}"/>, pero con <see cref="ServicioSolicitudesFranjasFijas"/> y su propio reloj. Sirve
+    /// para probar fechas sin tocar el reloj compartido y sin insertar temporadas ni usuarios:
+    /// <c>InicializadorDatosTests</c> exige <c>Temporadas: 1</c> y <c>Usuarios: 10</c> en la base compartida.
+    /// </summary>
+    public async Task<T> ConServicioSolicitudes<T>(DateTime ahoraUtc, Func<ServicioSolicitudesFranjasFijas, Task<T>> accion)
+    {
+        using var ambito = fabrica.Services.CreateScope();
+        var db = ambito.ServiceProvider.GetRequiredService<Si18DbContext>();
+        var reloj = new FakeTimeProvider(new DateTimeOffset(ahoraUtc, TimeSpan.Zero));
+        var servicio = new ServicioSolicitudesFranjasFijas(
+            db,
+            reloj,
+            new ConsultaReservasProvisional(db, reloj),
+            ambito.ServiceProvider.GetRequiredService<SI18.Api.Modulos.Comun.IServicioAvisos>());
+
+        return await accion(servicio);
     }
 
     /// <summary>

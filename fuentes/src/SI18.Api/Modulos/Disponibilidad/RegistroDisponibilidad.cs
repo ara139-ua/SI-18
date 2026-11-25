@@ -25,12 +25,16 @@ public static class RegistroDisponibilidad
         // HU-02 pregunta aquí si una franja está libre y su precio: el mismo cálculo que la búsqueda (RF-013).
         services.AddScoped<IConsultaDisponibilidad>(sp => sp.GetRequiredService<ServicioDisponibilidad>());
 
+        // Solicitudes de franjas fijas (spec-005, HU-05).
+        services.AddScoped<ServicioSolicitudesFranjasFijas>();
+
         return services;
     }
 
     public static WebApplication MapDisponibilidad(this WebApplication app)
     {
         app.MapEndpointsDisponibilidad();
+        app.MapEndpointsSolicitudesFranjasFijas();
         return app;
     }
 }

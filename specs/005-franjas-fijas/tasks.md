@@ -43,7 +43,7 @@ reloj propio (`ConServicioSolicitudes`, T006).
 
 ## Fase 1: Setup (contratos)
 
-- [ ] T001 [P] Crear en `src/SI18.Contratos/Disponibilidad/` los DTO de [data-model.md § 3](./data-model.md),
+- [X] T001 [P] Crear en `src/SI18.Contratos/Disponibilidad/` los DTO de [data-model.md § 3](./data-model.md),
   uno por fichero salvo los anidados:
   - `PeticionSolicitudFranjasFijas(int InstalacionId, int TemporadaId, IReadOnlyList<int> DiasSemana, string HoraInicio, string HoraFin)`,
     con «`diasSemana` ≥ 1, valores 1–7 (ISO), sin repetir» y horas `"HH:mm"`;
@@ -56,7 +56,7 @@ reloj propio (`ConServicioSolicitudes`, T006).
   - `TemporadaDto(int Id, string Nombre, DateOnly FechaInicio, DateOnly FechaFin)`;
   - `EnumeracionesFranjasFijas.cs` con `EstadoSolicitud { Pendiente, Aprobada, Rechazada }` y
     `EstadoReservaEnConflicto { Confirmada, PendientePago }`.
-- [ ] T002 [P] Añadir a `tests/SI18.Api.Tests/Comun/EnumeracionesEspejoTests.cs` la comprobación de que
+- [X] T002 [P] Añadir a `tests/SI18.Api.Tests/Comun/EnumeracionesEspejoTests.cs` la comprobación de que
   `SI18.Contratos.Disponibilidad.EstadoSolicitud` tiene los mismos nombres que
   `SI18.Dominio.Comun.EstadoSolicitud` y que en JSON viaja con el texto de `ConversorEnumSnakeCase`.
   Depende de T001.
@@ -69,7 +69,7 @@ reloj propio (`ConServicioSolicitudes`, T006).
 
 **⚠️ CRÍTICO**: ninguna historia puede empezar sin esta fase.
 
-- [ ] T003 [P] Crear `src/SI18.Dominio/Disponibilidad/ReglaFranjasFijas.cs` (clase estática; research.md F3):
+- [X] T003 [P] Crear `src/SI18.Dominio/Disponibilidad/ReglaFranjasFijas.cs` (clase estática; research.md F3):
   - `bool SeSolapan(SolicitudFranjasFijas a, SolicitudFranjasFijas b)` = misma `InstalacionId` ∧ misma
     `TemporadaId` ∧ «`a.dias_semana ∩ b.dias_semana ≠ ∅`» ∧ «`a.hora_inicio < b.hora_fin` ∧
     `b.hora_inicio < a.hora_fin`» (y `a.Id != b.Id` cuando los dos tienen identificador);
@@ -79,7 +79,7 @@ reloj propio (`ConServicioSolicitudes`, T006).
     = para cada fecha de `[desde, hasta] ∩ [t.FechaInicio, t.FechaFin]`, las franjas de
     `CalculadoraFranjas.FranjasDelDia(s.InstalacionId, fecha)` con `Cubre(s, fecha, franja.HoraInicio)`,
     ordenadas por `InicioUtc`.
-- [ ] T004 Crear `tests/SI18.Dominio.Tests/Disponibilidad/ReglaFranjasFijasTests.cs`
+- [X] T004 Crear `tests/SI18.Dominio.Tests/Disponibilidad/ReglaFranjasFijasTests.cs`
   (`[Trait("Categoria","Limites")]`):
   - **solapes**: martes 19–21 con martes 20–22 → sí; martes 19–20 con martes 20–21 → no; martes 19–21
     con miércoles 19–21 → no; otra instalación u otra temporada → no;
@@ -89,7 +89,7 @@ reloj propio (`ConServicioSolicitudes`, T006).
     domingo 08–10 dan las franjas de 08:00 y 09:00 en hora de Madrid, cada una de 1 h real.
 
   Depende de T003.
-- [ ] T005 Crear `src/SI18.Api/Modulos/Disponibilidad/ServicioSolicitudesFranjasFijas.cs` (`sealed`,
+- [X] T005 Crear `src/SI18.Api/Modulos/Disponibilidad/ServicioSolicitudesFranjasFijas.cs` (`sealed`,
   scoped; dependencias: `Si18DbContext`, `TimeProvider`, `IConsultaReservas`, `IServicioAvisos`) con lo
   común a todas las historias:
   - `private Task<SolicitudFranjasFijasDto> ADto(SolicitudFranjasFijas s, CancellationToken ct)` y una
@@ -109,7 +109,7 @@ reloj propio (`ConServicioSolicitudes`, T006).
   `src/SI18.Api/Modulos/Disponibilidad/EndpointsSolicitudesFranjasFijas.cs` con
   `MapEndpointsSolicitudesFranjasFijas()` vacío, llamado desde `MapDisponibilidad()`. Depende de T001
   y T003.
-- [ ] T006 [P] Ampliar `tests/SI18.Api.Tests/Disponibilidad/DatosDisponibilidad.cs`:
+- [X] T006 [P] Ampliar `tests/SI18.Api.Tests/Disponibilidad/DatosDisponibilidad.cs`:
   - `FranjaFija(...)` devuelve el `Id` de la solicitud creada y admite el club por nombre (por defecto
     el primero, como ahora);
   - `Instalacion(string centro, string nombre)` ya existe como `Pista`: se reutiliza para pabellones,
