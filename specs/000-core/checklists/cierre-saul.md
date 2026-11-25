@@ -111,8 +111,11 @@ Comprobaciones automáticas complementarias:
 
 ### Comprobaciones manuales pendientes (quickstart.md §6)
 
-- [ ] Solo con teclado en `/iniciar-sesion`, `/` y `/mis-avisos`: el primer Tab muestra «Ir al contenido»,
-  el orden es lógico, el foco se ve siempre (también en el enlace de salto) y no hay trampas de foco.
+- [ ] ❌ **(1) FALLA** · Solo con teclado en `/iniciar-sesion`, `/` y `/mis-avisos`: el primer Tab muestra
+  «Ir al contenido», el orden es lógico, el foco se ve siempre (también en el enlace de salto) y no hay
+  trampas de foco. **Resultado manual (Saul, 2026-11-25)**: el foco **no se ve en ningún elemento
+  interactivo de ninguna pantalla**, no solo en «Ir al contenido». Causa y propuesta: hallazgo 5 de
+  «Para /speckit-converge».
 - [ ] Intro en «Ir al contenido»: el siguiente Tab sigue desde el contenido principal, no desde la cabecera.
 - [ ] Credenciales incorrectas con NVDA (o Narrador): el error se anuncia una vez, sin mover el ratón, y
   no se transmite solo con color (hay texto e icono).
@@ -121,7 +124,9 @@ Comprobaciones automáticas complementarias:
 - [ ] `/mis-avisos`: el lector anuncia «No leído» (no basta el borde), y marcar como leído se anuncia.
 - [ ] Contraste de los nodos que axe deja «para revisar» (texto sobre la barra superior y botones
   deshabilitados): con axe DevTools o el selector de color de DevTools, ≥ 4,5:1.
-- [ ] Zoom al 200 % y ancho de 320 px: sin desplazamiento horizontal ni texto cortado.
+- [ ] ❌ **(8) FALLA** · Zoom al 200 % y ancho de 320 px: sin desplazamiento horizontal ni texto cortado.
+  **Resultado manual (Saul, 2026-11-25)**: hay desplazamiento horizontal en `/mis-avisos` y
+  `/buscar-pistas`. Causa y propuesta: hallazgo 6 de «Para /speckit-converge».
 
 ## Para /speckit-converge (T076)
 
@@ -139,4 +144,94 @@ Hallazgos de esta validación. No se han corregido aquí: no se ha cambiado quic
 4. **Foco de «Ir al contenido» sin recuadro** (`MainLayout`, Artur): con foco de teclado
    (`:focus-visible` = true), el enlace `.salto-contenido` calcula `outline: none`. Probablemente una regla
    de MudBlazor pisa el `:focus-visible` de `app.css`. Se ve gracias a su borde, pero no lleva el recuadro
-   de foco común.
+   de foco común. **Ampliado y confirmado en el hallazgo 5.**
+5. **❌ El foco no se ve en ningún control** (T073, comprobación manual 1; WCAG 2.4.7; principio I).
+   Código de Artur: **no se ha corregido**, se decide con él.
+   - **Fichero y regla**: `fuentes/src/SI18.Cliente/wwwroot/css/app.css`, líneas 109–112:
+     `:focus-visible { outline: 3px solid #0B4F8A; outline-offset: 2px; }`. Su especificidad es (0,1,0) y
+     `MudBlazor.min.css` (que se carga antes, `index.html`) tiene reglas más específicas que la anulan.
+     Comprobado en el CSS que sirve la API (`/_content/MudBlazor/MudBlazor.min.css`):
+
+     | Regla de MudBlazor | Especificidad | Qué elementos pierden el recuadro |
+     | ------------------ | ------------- | --------------------------------- |
+     | `a:focus-visible{outline:none}` | (0,1,1) | Enlaces: «Ir al contenido», el título de la barra y los `MudButton` con `Href` («Buscar pistas», «Mis avisos») |
+     | `button:focus{outline:none}` | (0,1,1) | Todos los `MudButton` y `MudIconButton`: «Cerrar sesión», «Iniciar sesión», «Buscar pistas», «Marcar como leído», el icono del calendario |
+     | `.mud-input>input.mud-input-root:focus{…outline:none}` y `div.mud-input-slot.mud-input-root:focus{…}` | (0,3,1) y (0,3,1) | Campos de texto (correo, contraseña, fecha) y `MudSelect` (deporte, centro) |
+
+     En el navegador, con el primer Tab sobre «Ir al contenido», el estilo calculado es `outline: none`
+     aunque `:focus-visible` es verdadero (ver hallazgo 4). MudBlazor solo cambia el **fondo** de algunos
+     botones con foco (`.mud-button:focus-visible`), con un contraste muy bajo; en los botones de la barra
+     (texto blanco sobre `#0B4F8A`) apenas se nota.
+   - **Problema añadido**: aunque se arregle la especificidad, el recuadro es `#0B4F8A`, el mismo color que
+     el fondo de la barra superior (`Tema.cs`, `AppbarBackground`). En los botones del menú y en «Ir al
+     contenido» (cuyo recuadro, con `outline-offset: 2px`, cae sobre la barra) seguiría sin verse.
+   - **Cambio mínimo propuesto** (solo `app.css`):
+
+     ```css
+     /* Foco siempre visible (quickstart.md §6): !important para ganar a MudBlazor
+        (a:focus-visible, button:focus, .mud-input-root:focus). */
+     :focus-visible {
+         outline: 3px solid #0B4F8A !important;
+         outline-offset: 2px !important;
+     }
+
+     /* Sobre la barra superior (#0B4F8A) el recuadro va en blanco (contraste 8,3:1). */
+     .mud-appbar :focus-visible,
+     .salto-contenido:focus-visible {
+         outline-color: #FFFFFF !important;
+     }
+
+     h1:focus,
+     main:focus,
+     .contenedor-avisos:focus {
+         outline: none !important;   /* se mantiene la excepción actual: (0,1,1) > (0,1,0) */
+     }
+     ```
+
+     Las dos últimas reglas ya existen (líneas 116–119 y 137–139); solo se les añade `!important` para
+     que la excepción siga ganando a la nueva regla. Después, repetir la comprobación manual 1 en todas
+     las pantallas.
+6. **❌ La barra superior se sale de la pantalla a 320 px** (T073, comprobación manual 8; WCAG 1.4.10).
+   Código de Artur (`MainLayout.razor` y `app.css`): **no se ha corregido**, se decide con él.
+   - **Qué se ha medido** (Chrome, iframes de 320 y 640 px de ancho con sesión de
+     `ciudadana.empadronada@si18.test`):
+     - a **320 px**, en `/mis-avisos` y `/buscar-pistas`, `nav.menu-principal` mide 338 px y su borde
+       derecho queda en 459 px: «Ana Ciudadana…» y «Cerrar sesión» quedan fuera de la pantalla y el título
+       «SI-18 · Reservas deportivas» se parte en tres líneas recortadas por la altura de la barra;
+     - el contenido de `<main>` cabe en los dos anchos: ningún elemento pasa del borde derecho;
+     - a **640 px** (200 % sobre 1280 px) no se desborda nada en ninguna de las dos pantallas.
+   - **Fichero y regla**:
+     - `MainLayout.razor`: `MudAppBar` (fija, `position: fixed`, con la altura fija de `.mud-toolbar`)
+       contiene en una sola fila el `MudLink` del título (`Typo.h6`) y `<nav class="menu-principal">`
+       con tres botones, el nombre y «Cerrar sesión»;
+     - `app.css`, líneas 122–126: `.menu-principal { display: flex; align-items: center; gap: 0.5rem; }`,
+       **sin `flex-wrap`**, así que la fila no se parte y desborda la barra.
+   - **Nota**: en la medición, como la barra es `position: fixed`, el documento no llega a desplazarse
+     (`scrollWidth = clientWidth`): lo que desborda queda cortado e inalcanzable, que también incumple
+     1.4.10. Si en la prueba manual se ve una barra de desplazamiento horizontal, conviene anotar en qué
+     estado de la pantalla aparece (por ejemplo, con resultados de búsqueda o con el calendario abierto),
+     porque en el estado inicial de las dos pantallas no se ha reproducido.
+   - **Cambio mínimo propuesto** (a validar con Artur en el navegador, porque toca la altura de la barra):
+
+     ```css
+     /* Menú principal (T056): en pantallas estrechas, la barra crece y el menú pasa a otra línea (WCAG 1.4.10). */
+     .menu-principal {
+         display: flex;
+         flex-wrap: wrap;
+         justify-content: flex-end;
+         align-items: center;
+         gap: 0.5rem;
+     }
+
+     @media (max-width: 40em) {
+         .mud-appbar { position: static; }               /* deja de tapar el contenido al crecer */
+         .mud-appbar .mud-toolbar { height: auto; flex-wrap: wrap; padding-block: 0.5rem; }
+         .mud-main-content { padding-top: 0; }           /* el hueco de la barra fija ya no hace falta */
+     }
+     ```
+
+     `.mud-main-content` siempre reserva arriba la altura de la barra (`padding-top` en
+     `MudBlazor.min.css`), por eso se anula en la media query. Alternativa en `MainLayout.razor`:
+     `<MudAppBar Fixed="false">` (barra no fija en todos los anchos), con las mismas reglas de `flex-wrap`,
+     `height: auto` y `padding-top: 0`. En los dos casos, repetir la comprobación manual 8 a 320 px y con
+     zoom al 200 %.
