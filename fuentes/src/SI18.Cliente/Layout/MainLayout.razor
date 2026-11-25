@@ -13,7 +13,9 @@
 <a class="salto-contenido" href="#contenido" @onclick="IrAlContenido" @onclick:preventDefault>Ir al contenido</a>
 
 <MudLayout>
-    <MudAppBar Elevation="1">
+    @* Fixed="false": la barra va en el flujo y puede crecer a varias líneas en pantallas estrechas (WCAG 1.4.10);
+       en app.css se queda pegada arriba (sticky) a partir de 600 px. *@
+    <MudAppBar Elevation="1" Fixed="false">
         <MudLink Href="/" Color="Color.Inherit" Typo="Typo.h6" Underline="Underline.None" Class="ml-2">
             SI-18 · Reservas deportivas
         </MudLink>
