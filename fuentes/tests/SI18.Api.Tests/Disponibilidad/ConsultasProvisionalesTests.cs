@@ -28,40 +28,6 @@ public class ConsultasProvisionalesTests(FabricaApi fabrica)
         return await accion(ambito.ServiceProvider.GetRequiredService<Si18DbContext>());
     }
 
-    // ── IConsultaReservas ────────────────────────────────────────────────────────
-
-    [Fact]
-    public async Task Una_pendiente_bloquea_hasta_los_10_minutos_y_no_despues()
-    {
-        var pista = await _datos.Pista(Centro, "Pista de tenis 1");
-        var ahora = _datos.Ahora;
-        var hace959 = Utc(Martes, 9);
-        var hace10 = Utc(Martes, 10);
-        await _datos.Reserva(pista, hace959, EstadoPrueba.PendienteVigente, ahora - TimeSpan.FromSeconds(599));
-        await _datos.Reserva(pista, hace10, EstadoPrueba.PendienteVigente, ahora - ValoresNegocio.TiempoBloqueoPago);
-
-        var activas = await ConContexto(db =>
-            new ConsultaReservasProvisional(db, fabrica.Reloj).Activas(pista, Utc(Martes, 0), Utc(Martes.AddDays(1), 0), Ct));
-
-        Assert.Contains(activas, r => r.InicioUtc == hace959);
-        Assert.DoesNotContain(activas, r => r.InicioUtc == hace10);
-    }
-
-    [Fact]
-    public async Task Solo_cuentan_confirmadas_y_pendientes_vigentes_dentro_del_rango()
-    {
-        var pista = await _datos.Pista(Centro, "Pista de tenis 2");
-        await _datos.Reserva(pista, Utc(Martes, 11), EstadoPrueba.Confirmada);
-        await _datos.Reserva(pista, Utc(Martes, 12), EstadoPrueba.Caducada);
-        await _datos.Reserva(pista, Utc(Martes, 13), EstadoPrueba.Cancelada);
-        await _datos.Reserva(pista, Utc(Miercoles, 11), EstadoPrueba.Confirmada);
-
-        var activas = await ConContexto(db =>
-            new ConsultaReservasProvisional(db, fabrica.Reloj).Activas(pista, Utc(Martes, 0), Utc(Miercoles, 0), Ct));
-
-        Assert.Equal([Utc(Martes, 11)], activas.Select(r => r.InicioUtc));
-    }
-
     // ── IConsultaCierres ─────────────────────────────────────────────────────────
 
     [Fact]

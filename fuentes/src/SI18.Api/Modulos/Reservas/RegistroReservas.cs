@@ -8,6 +8,9 @@ public static class RegistroReservas
 {
     public static IServiceCollection AddReservas(this IServiceCollection services)
     {
+        // Consulta de reservas activas para Disponibilidad y CursosInformes (RF-018, RF-019).
+        services.AddScoped<IConsultaReservas, ConsultaReservas>();
+
         return services;
     }
 

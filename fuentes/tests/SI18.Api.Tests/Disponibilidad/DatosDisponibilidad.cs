@@ -4,6 +4,7 @@ using Microsoft.Extensions.Time.Testing;
 using SI18.Api.Infraestructura;
 using SI18.Api.Modulos.Disponibilidad;
 using SI18.Api.Modulos.Disponibilidad.Provisional;
+using SI18.Api.Modulos.Reservas;
 using SI18.Api.Tests.Infraestructura;
 using SI18.Dominio.Cancelaciones;
 using SI18.Dominio.Comun;
@@ -119,7 +120,7 @@ public sealed class DatosDisponibilidad(FabricaApi fabrica)
         var servicio = new ServicioDisponibilidad(
             db,
             reloj,
-            new ConsultaReservasProvisional(db, reloj),
+            new ConsultaReservas(db, reloj),
             new ConsultaCierresProvisional(db),
             new ConsultaFranjasFijasProvisional(db));
 

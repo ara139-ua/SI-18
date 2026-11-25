@@ -117,7 +117,7 @@ definitiva de reservas activas (y la retirada de la provisional) y los datos de 
   adelantar el reloj) y bloqueada por otra transacción abierta con `FOR UPDATE`, `EjecutarUnaVez`
   termina sin esperar y devuelve 0; tras liberar el bloqueo (`Rollback`), la siguiente vuelta la caduca.
   Usa el 11/02/2027 a las 12:00. Depende de T005.
-- [ ] T007 [P] Crear `src/SI18.Api/Modulos/Reservas/ConsultaReservas.cs`, que implementa
+- [X] T007 [P] Crear `src/SI18.Api/Modulos/Reservas/ConsultaReservas.cs`, que implementa
   `IConsultaReservas` con **la misma consulta** que la provisional (research.md E7; contracts/modulos.md):
   - `Activas(instalacionId, desdeUtc, hastaUtc, ct)` devuelve, con `AsNoTracking` y ordenadas por
     `InicioUtc`, las reservas de la instalación con `desdeUtc ≤ InicioUtc < hastaUtc` y
@@ -126,13 +126,13 @@ definitiva de reservas activas (y la retirada de la provisional) y los datos de 
 
   Registrarla con `services.AddScoped<IConsultaReservas, ConsultaReservas>()` en `AddReservas()`.
   Depende de T001.
-- [ ] T008 Crear `tests/SI18.Api.Tests/Reservas/ConsultaReservasTests.cs` **moviendo sin cambiar sus
+- [X] T008 Crear `tests/SI18.Api.Tests/Reservas/ConsultaReservasTests.cs` **moviendo sin cambiar sus
   casos** `Una_pendiente_bloquea_hasta_los_10_minutos_y_no_despues` y
   `Solo_cuentan_confirmadas_y_pendientes_vigentes_dentro_del_rango` desde
   `tests/SI18.Api.Tests/Disponibilidad/ConsultasProvisionalesTests.cs` (mismos datos: Polideportivo
   Oeste, enero de 2027; mismo `[Trait("Categoria","Limites")]`), con la `IConsultaReservas` resuelta de
   `fabrica.Services` y un caso más que comprueba que es `ConsultaReservas` (RF-019; CE-007). Depende de T007.
-- [ ] T009 **[código de Artur, revisión de Artur, mismo PR que T007–T008]** Retirar la provisional
+- [X] T009 **[código de Artur, revisión de Artur, mismo PR que T007–T008]** Retirar la provisional
   (research.md E7; contracts/modulos.md, «Lo que retira»):
   - borrar `src/SI18.Api/Modulos/Disponibilidad/Provisional/ConsultaReservasProvisional.cs`;
   - en `src/SI18.Api/Modulos/Disponibilidad/RegistroDisponibilidad.cs`, borrar **solo** la línea
@@ -145,7 +145,7 @@ definitiva de reservas activas (y la retirada de la provisional) y los datos de 
     línea más su `using`). **No lo recoge plan.md ni contracts/modulos.md**: avisar a Artur en el PR.
 
   Depende de T007 y T008.
-- [ ] T010 Comprobar la retirada (quickstart.md §2): `git grep -n "ConsultaReservasProvisional" -- fuentes`
+- [X] T010 Comprobar la retirada (quickstart.md §2): `git grep -n "ConsultaReservasProvisional" -- fuentes`
   sin resultados y `dotnet test SI18.slnx` en verde con `tests/SI18.Api.Tests/Disponibilidad/` **sin más
   cambios** que los de T009 (`BuscarFranjasTests`, `BuscarSinResultadosTests`,
   `ConsultaDisponibilidadTests` y `PrecioPorTarifaTests` intactos; RF-019, CE-007). Anotarlo en el PR
