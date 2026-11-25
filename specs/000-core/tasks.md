@@ -386,10 +386,10 @@ crea los datos indicados y ejecutarla dos veces no duplica nada.
 
 ### Pruebas de US1 (integración · Fase 2 del reparto)
 
-- [ ] T039 [P] [US1] [Ambos · sugerido: Saul] Crear `fuentes/tests/SI18.Api.Tests/Comun/MigracionesTests.cs`
+- [X] T039 [P] [US1] [Ambos · sugerido: Saul] Crear `fuentes/tests/SI18.Api.Tests/Comun/MigracionesTests.cs`
   con `FabricaApi`: consultando `information_schema` y `pg_indexes`, comprobar que existen las 17 tablas
   de data-model.md (sin contar `__EFMigrationsHistory`) y el índice `ux_reservas_activa` con su filtro.
-- [ ] T040 [P] [US1] [Ambos · sugerido: Saul] Crear `fuentes/tests/SI18.Api.Tests/Comun/InicializadorDatosTests.cs`:
+- [X] T040 [P] [US1] [Ambos · sugerido: Saul] Crear `fuentes/tests/SI18.Api.Tests/Comun/InicializadorDatosTests.cs`:
   - los recuentos son los de T038;
   - ejecutar el inicializador dos veces no cambia los recuentos;
   - `hash_contrasena` no contiene `clave-de-prueba` (quickstart V10).
