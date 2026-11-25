@@ -43,12 +43,12 @@ Cada centro sembrado tiene «Pista de tenis 1», «Pista de tenis 2», «Pista d
 
 **Propósito**: que el módulo `Disponibilidad` exista en la API con su registro y sus contratos.
 
-- [ ] T001 Crear `src/SI18.Api/Modulos/Disponibilidad/RegistroDisponibilidad.cs` con
+- [X] T001 Crear `src/SI18.Api/Modulos/Disponibilidad/RegistroDisponibilidad.cs` con
   `AddDisponibilidad(this IServiceCollection)` y `MapDisponibilidad(this WebApplication)`, de momento
   vacíos, y añadir en `src/SI18.Api/Program.cs` **solo dos líneas**: `builder.Services.AddDisponibilidad();`
   después de `AddComun()` y `app.MapDisponibilidad();` después de `MapComun()` (research.md D6;
   convención propuesta para 002–008).
-- [ ] T002 [P] Crear los DTO en `src/SI18.Contratos/Disponibilidad/`, uno por fichero, según
+- [X] T002 [P] Crear los DTO en `src/SI18.Contratos/Disponibilidad/`, uno por fichero, según
   [data-model.md § 4](./data-model.md) y [contracts/api-disponibilidad.openapi.yaml](./contracts/api-disponibilidad.openapi.yaml):
   - `ResultadoBusquedaDto(DateOnly Fecha, int CentroId, int DeporteId, int TotalPistas, IReadOnlyList<PistaLibreDto> Pistas)`;
   - `PistaLibreDto(int InstalacionId, string Nombre, TipoInstalacion Tipo, IReadOnlyList<FranjaLibreDto> Franjas)`,
@@ -67,19 +67,19 @@ qué franjas de una pista están libres.
 
 **⚠️ CRÍTICO**: ninguna historia puede empezar sin esta fase.
 
-- [ ] T003 [P] Crear `src/SI18.Api/Modulos/Disponibilidad/Provisional/ConsultaReservasProvisional.cs`,
+- [X] T003 [P] Crear `src/SI18.Api/Modulos/Disponibilidad/Provisional/ConsultaReservasProvisional.cs`,
   que implementa `IConsultaReservas` (research.md D5):
   - `Activas(instalacionId, desdeUtc, hastaUtc)` devuelve, con `AsNoTracking`, las reservas de la
     instalación con `desdeUtc ≤ InicioUtc < hastaUtc` y
     `Estado == Confirmada || (Estado == PendientePago && CreadaEnUtc > ahora − ValoresNegocio.TiempoBloqueoPago)`,
     con `ahora` tomado de `TimeProvider` (la misma vigencia que `Reserva.EstaVigente`), como `ReservaActiva`;
   - comentario de cabecera: «PROVISIONAL (spec-001, RF-014a): sustituir por la implementación de spec-002 (Saul) y borrar este fichero».
-- [ ] T004 [P] Crear `src/SI18.Api/Modulos/Disponibilidad/Provisional/ConsultaCierresProvisional.cs`,
+- [X] T004 [P] Crear `src/SI18.Api/Modulos/Disponibilidad/Provisional/ConsultaCierresProvisional.cs`,
   que implementa `IConsultaCierres`:
   - `Cierres(instalacionId, desdeUtc, hastaUtc)` devuelve, con `AsNoTracking`, los cierres de la
     instalación que se solapan con `[desdeUtc, hastaUtc)` (`InicioUtc < hastaUtc && desdeUtc < FinUtc`);
   - comentario «PROVISIONAL (spec-001, RF-014a): sustituir por la implementación de spec-007 (C) y borrar este fichero».
-- [ ] T005 [P] Crear `src/SI18.Api/Modulos/Disponibilidad/Provisional/ConsultaFranjasFijasProvisional.cs`,
+- [X] T005 [P] Crear `src/SI18.Api/Modulos/Disponibilidad/Provisional/ConsultaFranjasFijasProvisional.cs`,
   que implementa `IConsultaFranjasFijas`:
   - `FranjasBloqueadas(instalacionId, desde, hasta)`: para cada solicitud `Aprobada` de la
     instalación, y para cada fecha de `[desde, hasta]` que esté dentro de su temporada
@@ -89,11 +89,11 @@ qué franjas de una pista están libres.
   - `RepresentantesAfectados` lanza `NotImplementedException("Lo implementa spec-005 para HU-07")`;
   - comentario «PROVISIONAL (spec-001, RF-014a): sustituir por la implementación definitiva de spec-005 y borrar este fichero».
     No descuenta los cierres (research.md D5).
-- [ ] T006 Registrar las tres provisionales en `AddDisponibilidad()`
+- [X] T006 Registrar las tres provisionales en `AddDisponibilidad()`
   (`src/SI18.Api/Modulos/Disponibilidad/RegistroDisponibilidad.cs`) con `services.TryAddScoped<IConsultaReservas, ConsultaReservasProvisional>()`
   y lo mismo para las otras dos, con un comentario que explique por qué `TryAdd` (research.md D5).
   Depende de T001 y T003–T005.
-- [ ] T007 Crear `tests/SI18.Api.Tests/Disponibilidad/ConsultasProvisionalesTests.cs`
+- [X] T007 Crear `tests/SI18.Api.Tests/Disponibilidad/ConsultasProvisionalesTests.cs`
   (`[Collection(ColeccionApi.Nombre)]`, `[Trait("Categoria","Limites")]`, Polideportivo Oeste,
   fechas de enero de 2027):
   - **Reservas**: una pendiente creada hace 9:59 sigue activa, y una creada hace exactamente 10:00 ya
@@ -105,7 +105,7 @@ qué franjas de una pista están libres.
     solicitud pendiente o rechazada no da ninguna.
 
   Depende de T006.
-- [ ] T008 Crear `src/SI18.Api/Modulos/Disponibilidad/ServicioDisponibilidad.cs` (clase `sealed`,
+- [X] T008 Crear `src/SI18.Api/Modulos/Disponibilidad/ServicioDisponibilidad.cs` (clase `sealed`,
   scoped; dependencias: `Si18DbContext`, `TimeProvider`, `IConsultaReservas`, `IConsultaCierres` e
   `IConsultaFranjasFijas`) con un método **privado** único
   `Task<IReadOnlyList<(Franja Franja, string? Motivo)>> EvaluarPista(Instalacion pista, DateOnly fecha, CancellationToken ct)`:
@@ -130,7 +130,7 @@ qué franjas de una pista están libres.
 **Prueba independiente**: quickstart.md B1, B4 y B7–B10, más los escenarios 1–6 de la historia 1
 contra PostgreSQL.
 
-- [ ] T009 [US1] Añadir a `ServicioDisponibilidad` el método público
+- [X] T009 [US1] Añadir a `ServicioDisponibilidad` el método público
   `Task<ResultadoBusquedaDto> Buscar(int deporteId, int centroId, DateOnly fecha, TipoTarifa tarifa, CancellationToken ct)`:
   - si `fecha < HorarioMadrid.Hoy(ahora)` o `fecha > Hoy + ValoresNegocio.AntelacionMaximaDias`, lanza
     `CodigosError.Error(FueraDeAntelacion)` sin consultar nada;
@@ -145,7 +145,7 @@ contra PostgreSQL.
   - orden: pistas por `Nombre` y franjas por `InicioUtc` (RF-009).
 
   Depende de T002 y T008.
-- [ ] T010 [US1] Crear `src/SI18.Api/Modulos/Disponibilidad/EndpointsDisponibilidad.cs` con
+- [X] T010 [US1] Crear `src/SI18.Api/Modulos/Disponibilidad/EndpointsDisponibilidad.cs` con
   `GET /api/disponibilidad/franjas` (`.RequireAuthorization(Politicas.EsCiudadanoORepresentante)`):
   - parámetros `int? deporteId`, `int? centroId` y `string? fecha`; si falta alguno o `fecha` no es
     `yyyy-MM-dd`, responde 400 `PETICION_INVALIDA` con `ManejadorErrores.CrearValidacion` y
@@ -155,7 +155,7 @@ contra PostgreSQL.
   - devuelve `Results.Ok(await servicio.Buscar(...))`.
 
   Mapearlo en `MapDisponibilidad()`. Depende de T009.
-- [ ] T011 [US1] Crear `tests/SI18.Api.Tests/Disponibilidad/BuscarFranjasTests.cs`
+- [X] T011 [US1] Crear `tests/SI18.Api.Tests/Disponibilidad/BuscarFranjasTests.cs`
   (`[Collection(ColeccionApi.Nombre)]`, Polideportivo Norte, «Pádel», fechas del 22 al 28/12/2026),
   con `fabrica.CrearClienteConSesion("ciudadana.empadronada@si18.test")`:
   - **esc. 1**: sin nada en la fecha, 2 pistas × 14 franjas de «08:00» a «21:00», `TotalPistas = 2`;
@@ -177,7 +177,9 @@ contra PostgreSQL.
   - **cambio de hora** (`[Trait("Categoria","Limites")]`): con `Reloj` el 20/10/2026, la búsqueda del
     25/10/2026 da 14 franjas por pista y la primera es `2026-10-25T07:00:00Z` con «08:00».
 
-  Restaurar `Reloj` a `FabricaApi.InicioReloj` al terminar cada prueba que lo cambie. Depende de T010.
+  Los límites de tiempo se prueban con `DatosDisponibilidad.ConServicio(ahoraUtc, …)`, que usa un reloj propio:
+  `FakeTimeProvider` no retrocede y el reloj de `FabricaApi` lo comparten todas las pruebas, así que no se
+  cambia. Depende de T010.
 - [ ] T012 [US1] Crear `src/SI18.Cliente/Disponibilidad/BuscarPistas.razor` (ruta `/buscar-pistas`;
   research.md D7):
   - **acceso** (spec, «Casos límite» y aclaración 2; RF-001): en `OnInitializedAsync`, antes de cargar
@@ -200,7 +202,7 @@ contra PostgreSQL.
     con el texto «{HoraInicio}–{HoraFin}».
 
   **Depende de T054 de 000-core** (`/api/centros`, `/api/deportes`, `/api/instalaciones`) y de T010.
-- [ ] T013 [P] [US1] Añadir la entrada «Buscar pistas» (`MudButton Href="/buscar-pistas"`) en el hueco
+- [X] T013 [P] [US1] Añadir la entrada «Buscar pistas» (`MudButton Href="/buscar-pistas"`) en el hueco
   `<AuthorizeView Roles="ciudadano,representante_club">` de `src/SI18.Cliente/Layout/MainLayout.razor`,
   quitando el comentario de ese hueco que se refiere a la búsqueda (RF-002).
 
@@ -215,11 +217,11 @@ la misma disponibilidad y el mismo precio por `IConsultaDisponibilidad`.
 
 **Prueba independiente**: quickstart.md B1–B3 y la coherencia búsqueda ↔ `IConsultaDisponibilidad`.
 
-- [ ] T014 [P] [US2] Crear `tests/SI18.Api.Tests/Disponibilidad/PrecioPorTarifaTests.cs`
+- [X] T014 [P] [US2] Crear `tests/SI18.Api.Tests/Disponibilidad/PrecioPorTarifaTests.cs`
   (`[Collection(ColeccionApi.Nombre)]`, Polideportivo Sur, «Tenis», 23/12/2026): la misma franja
   vale `6.00` para `ciudadana.empadronada@si18.test`, `10.00` para `ciudadano.noempadronado@si18.test`
   y `4.00` para `representante.padel@si18.test` (no empadronado, tarifa club). Depende de T010.
-- [ ] T015 [US2] Hacer que `ServicioDisponibilidad` implemente `IConsultaDisponibilidad`
+- [X] T015 [US2] Hacer que `ServicioDisponibilidad` implemente `IConsultaDisponibilidad`
   (contracts/modulos.md; research.md D4):
   - `MotivoNoDisponible(instalacionId, inicioUtc, ct)`:
     - si la instalación no existe, lanza `CodigosError.Error(NoEncontrado)`;
@@ -232,7 +234,7 @@ la misma disponibilidad y el mismo precio por `IConsultaDisponibilidad`.
 
   Registrar `services.AddScoped<IConsultaDisponibilidad>(sp => sp.GetRequiredService<ServicioDisponibilidad>())`
   en `AddDisponibilidad()`. Depende de T008.
-- [ ] T016 [US2] Crear `tests/SI18.Api.Tests/Disponibilidad/ConsultaDisponibilidadTests.cs`
+- [X] T016 [US2] Crear `tests/SI18.Api.Tests/Disponibilidad/ConsultaDisponibilidadTests.cs`
   (`[Collection(ColeccionApi.Nombre)]`, Polideportivo Este, «Pádel», 24/12/2026), con la
   `IConsultaDisponibilidad` resuelta de `fabrica.Services`:
   - para cada franja que la búsqueda devuelve libre, `MotivoNoDisponible` da `null` y `Precio` da el
@@ -261,7 +263,7 @@ deporte y cuando la fecha está fuera de plazo.
 
 **Prueba independiente**: quickstart.md B5, B6 y el paso 4 de §4.
 
-- [ ] T018 [P] [US3] Crear `tests/SI18.Api.Tests/Disponibilidad/BuscarSinResultadosTests.cs`
+- [X] T018 [P] [US3] Crear `tests/SI18.Api.Tests/Disponibilidad/BuscarSinResultadosTests.cs`
   (`[Collection(ColeccionApi.Nombre)]`, `[Trait("Categoria","Limites")]`, Polideportivo Norte):
   - **«Baloncesto»** → 200 con `TotalPistas = 0` y `Pistas` vacía;
   - **hoy + 7** (28/12/2026) → 200 con franjas; **hoy + 8** (29/12/2026) → 422 `FUERA_DE_ANTELACION`
@@ -270,7 +272,9 @@ deporte y cuando la fecha está fuera de plazo.
   - **orden de validación** (research.md D2): `centroId=999999` con fecha hoy + 8 → 422 (la fecha se
     valida antes que la existencia del centro).
 
-  Restaurar `Reloj` a `FabricaApi.InicioReloj` al terminar cada prueba que lo cambie. Depende de T010.
+  Los límites de tiempo se prueban con `DatosDisponibilidad.ConServicio(ahoraUtc, …)`, que usa un reloj propio:
+  `FakeTimeProvider` no retrocede y el reloj de `FabricaApi` lo comparten todas las pruebas, así que no se
+  cambia. Depende de T010.
 - [ ] T019 [US3] En `src/SI18.Cliente/Disponibilidad/BuscarPistas.razor`, mostrar con
   `MensajeAccesible` (RF-011):
   - con `TotalPistas == 0`: «{centro} no tiene pistas de {deporte}.» (`Severity.Info`);

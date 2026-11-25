@@ -22,7 +22,8 @@
             <AuthorizeView>
                 <Authorized>
                     <AuthorizeView Roles="ciudadano,representante_club" Context="reserva">
-                        @* Hueco de Disponibilidad y Reservas (spec-001, 002, 003): buscar pistas, mis reservas. *@
+                        <MudButton Href="/buscar-pistas" Color="Color.Inherit" Variant="Variant.Text">Buscar pistas</MudButton>
+                        @* Hueco de Reservas (spec-002, 003): mis reservas. *@
                         @* Hueco de CursosInformes (spec-004): cursos. *@
                     </AuthorizeView>
                     <AuthorizeView Roles="representante_club" Context="club">
