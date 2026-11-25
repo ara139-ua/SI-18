@@ -150,7 +150,7 @@ definitiva de reservas activas (y la retirada de la provisional) y los datos de 
   cambios** que los de T009 (`BuscarFranjasTests`, `BuscarSinResultadosTests`,
   `ConsultaDisponibilidadTests` y `PrecioPorTarifaTests` intactos; RF-019, CE-007). Anotarlo en el PR
   para la revisión de Artur. Depende de T009.
-- [ ] T011 [P] Crear `tests/SI18.Api.Tests/Reservas/DatosReservas.cs` (sobre `DatosDisponibilidad`, sin
+- [X] T011 [P] Crear `tests/SI18.Api.Tests/Reservas/DatosReservas.cs` (sobre `DatosDisponibilidad`, sin
   cambiarlo) con:
   - `Task<long> Pendiente(string correo, int pistaId, DateTime inicioUtc, DateTime creadaEnUtc)`;
   - `Task<long> Confirmada(…)`, `Task<long> CaducadaPorTiempo(…)` (pago resuelto en
@@ -179,7 +179,7 @@ una tarjeta aceptada y ver la reserva confirmada con su QR.
 
 **Prueba independiente**: quickstart.md R1, R2, R5, R14 y los pasos 1–5 de §4.
 
-- [ ] T012 [P] [US1] Crear `src/SI18.Api/Modulos/Reservas/ServicioReservar.cs` (clase `sealed`,
+- [X] T012 [P] [US1] Crear `src/SI18.Api/Modulos/Reservas/ServicioReservar.cs` (clase `sealed`,
   scoped; dependencias: `Si18DbContext`, `TimeProvider`, `IConsultaDisponibilidad`, `IPasarelaPago`,
   `IUsuarioActual`) con un método privado `ReservaDto ADto(Reserva r, Instalacion i, Centro c, DateTime ahora)`
   (data-model.md § 3):
@@ -190,7 +190,7 @@ una tarjeta aceptada y ver la reserva confirmada con su QR.
   - `CodigoAcceso` solo si es `Confirmada` (RF-016).
 
   Registrarlo con `AddScoped<ServicioReservar>()` en `AddReservas()`. Depende de T002.
-- [ ] T013 [US1] Añadir a `ServicioReservar`
+- [X] T013 [US1] Añadir a `ServicioReservar`
   `Task<ResumenReservaDto> Resumen(int instalacionId, DateTime inicioUtc, CancellationToken ct)` (research.md E2):
   - `MotivoNoDisponible(instalacionId, inicioUtc)`: sus excepciones (`PETICION_INVALIDA`,
     `NO_ENCONTRADO`) se dejan pasar; si devuelve un motivo, `throw CodigosError.Error(motivo)`;
@@ -198,7 +198,7 @@ una tarjeta aceptada y ver la reserva confirmada con su QR.
   - `Importe = IConsultaDisponibilidad.Precio(instalacionId, IUsuarioActual.TipoTarifa)`.
 
   No escribe nada. Depende de T012.
-- [ ] T014 [US1] Añadir a `ServicioReservar`
+- [X] T014 [US1] Añadir a `ServicioReservar`
   `Task<ReservaDto> Crear(PeticionReserva peticion, CancellationToken ct)`, pasos 1–3 y 5 de research.md E3:
   - `ahora` se lee **una sola vez** al principio;
   - mismas comprobaciones que `Resumen` y, si `Precio ≠ ImporteMostrado`, `PRECIO_CAMBIADO`;
@@ -206,7 +206,7 @@ una tarjeta aceptada y ver la reserva confirmada con su QR.
     (crea su pago pendiente), `SaveChanges` y `Commit`.
 
   La caducidad al reservar y el `23505` los añade T015 (US2). Depende de T013.
-- [ ] T015 [US1] Añadir a `ServicioReservar` `Task<ReservaDto> Pagar(long id, string numeroTarjeta, CancellationToken ct)`
+- [X] T015 [US1] Añadir a `ServicioReservar` `Task<ReservaDto> Pagar(long id, string numeroTarjeta, CancellationToken ct)`
   con el camino feliz de research.md E4 (pasos 2 y 5 con `true`):
   - transacción; `CargaReservas.CargarParaModificar(db, id, IUsuarioActual.Id)`; si es nula →
     `NO_ENCONTRADO` (RF-013);
@@ -216,10 +216,10 @@ una tarjeta aceptada y ver la reserva confirmada con su QR.
 
   El número de tarjeta no se pasa a ningún `ILogger` ni se guarda (R9). Los demás estados los añaden
   T027 (US2) y T033 (US3). Depende de T004 y T012.
-- [ ] T016 [US1] Añadir a `ServicioReservar` `Task<ReservaDto> Ver(long id, CancellationToken ct)`:
+- [X] T016 [US1] Añadir a `ServicioReservar` `Task<ReservaDto> Ver(long id, CancellationToken ct)`:
   la reserva **del usuario de la sesión** (`AsNoTracking`, con instalación y centro), o `NO_ENCONTRADO`
   (RF-013). Depende de T012.
-- [ ] T017 [US1] Crear `src/SI18.Api/Modulos/Reservas/EndpointsReservas.cs` con el grupo
+- [X] T017 [US1] Crear `src/SI18.Api/Modulos/Reservas/EndpointsReservas.cs` con el grupo
   `/api/reservas` (`.RequireAuthorization(Politicas.EsCiudadanoORepresentante)`) y mapearlo en
   `MapReservas()` (contracts/api-reservas.openapi.yaml):
   - `GET /resumen?instalacionId&inicioUtc`: si falta alguno o `inicioUtc` no es un instante UTC ISO
@@ -233,7 +233,7 @@ una tarjeta aceptada y ver la reserva confirmada con su QR.
   - `GET /{id}`: `Ver`.
 
   Ningún endpoint registra el cuerpo de la petición. Depende de T013–T016.
-- [ ] T018 [US1] Crear `tests/SI18.Api.Tests/Reservas/CrearReservaTests.cs`
+- [X] T018 [US1] Crear `tests/SI18.Api.Tests/Reservas/CrearReservaTests.cs`
   (`[Collection(ColeccionApi.Nombre)]`, Polideportivo Sur, «Pista de pádel 1» y «Pista de pádel 2»,
   22–28/12/2026):
   - **HU1 esc. 1**: el resumen de una franja libre, con `ciudadana.empadronada@si18.test`, trae pista,
@@ -248,13 +248,13 @@ una tarjeta aceptada y ver la reserva confirmada con su QR.
     `instalacionId = 999999` → 404 `NO_ENCONTRADO`; las 10:30 de Madrid → 400 `PETICION_INVALIDA`.
 
   Depende de T017 y T011.
-- [ ] T019 [P] [US1] Crear `tests/SI18.Api.Tests/Reservas/PagarReservaTests.cs`
+- [X] T019 [P] [US1] Crear `tests/SI18.Api.Tests/Reservas/PagarReservaTests.cs`
   (`[Collection(ColeccionApi.Nombre)]`, Polideportivo Este, «Pista de tenis 1» y «Pista de tenis 2»,
   22–28/12/2026) con el camino feliz (**HU1 esc. 3**): una pendiente creada hace 1 min, pagada con
   `4000 0000 0000 0001` (con espacios) → 200, `estado = confirmada`, `codigoAcceso` de 22 caracteres;
   en la base, reserva confirmada con ese código y pago `completado` con `resuelto_en_utc`; `GET /{id}`
   devuelve el mismo código. Esta clase crece en T030, T031, T034, T047 y T048. Depende de T017 y T011.
-- [ ] T020 [P] [US1] Crear `tests/SI18.Api.Tests/Reservas/ReservarComoEnLaBusquedaTests.cs`
+- [X] T020 [P] [US1] Crear `tests/SI18.Api.Tests/Reservas/ReservarComoEnLaBusquedaTests.cs`
   (`[Collection(ColeccionApi.Nombre)]`, Polideportivo Norte, «Tenis», 26 y 27/12/2026; CE-005,
   HU1 esc. 5): para tres franjas de la búsqueda y con las tres tarifas (`ciudadana.empadronada`,
   `ciudadano.noempadronado`, `representante.padel`), `precio` de `GET /api/disponibilidad/franjas`

@@ -11,11 +11,15 @@ public static class RegistroReservas
         // Consulta de reservas activas para Disponibilidad y CursosInformes (RF-018, RF-019).
         services.AddScoped<IConsultaReservas, ConsultaReservas>();
 
+        // Casos de uso de los endpoints de /api/reservas (research.md E2–E6).
+        services.AddScoped<ServicioReservar>();
+
         return services;
     }
 
     public static WebApplication MapReservas(this WebApplication app)
     {
+        app.MapEndpointsReservas();
         return app;
     }
 }
