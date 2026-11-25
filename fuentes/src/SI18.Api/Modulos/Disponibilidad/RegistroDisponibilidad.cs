@@ -1,3 +1,8 @@
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using SI18.Api.Modulos.Cancelaciones;
+using SI18.Api.Modulos.Disponibilidad.Provisional;
+using SI18.Api.Modulos.Reservas;
+
 namespace SI18.Api.Modulos.Disponibilidad;
 
 /// <summary>
@@ -8,11 +13,24 @@ public static class RegistroDisponibilidad
 {
     public static IServiceCollection AddDisponibilidad(this IServiceCollection services)
     {
+        // Consultas provisionales de solo lectura (spec-001, RF-014a; research.md D5). Con TryAdd, si el dueño ya
+        // registró la suya, la provisional no se añade; si la registra después, la suya gana (el contenedor resuelve
+        // el último registro). Cada dueño borra la provisional en el PR que publica la definitiva.
+        services.TryAddScoped<IConsultaReservas, ConsultaReservasProvisional>();
+        services.TryAddScoped<IConsultaCierres, ConsultaCierresProvisional>();
+        services.TryAddScoped<IConsultaFranjasFijas, ConsultaFranjasFijasProvisional>();
+
+        services.AddScoped<ServicioDisponibilidad>();
+
+        // HU-02 pregunta aquí si una franja está libre y su precio: el mismo cálculo que la búsqueda (RF-013).
+        services.AddScoped<IConsultaDisponibilidad>(sp => sp.GetRequiredService<ServicioDisponibilidad>());
+
         return services;
     }
 
     public static WebApplication MapDisponibilidad(this WebApplication app)
     {
+        app.MapEndpointsDisponibilidad();
         return app;
     }
 }
