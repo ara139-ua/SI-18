@@ -1,7 +1,11 @@
+using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Http.Json;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using SI18.Api.Infraestructura;
 using SI18.Api.Modulos.Reservas;
 using SI18.Api.Tests.Infraestructura;
@@ -349,5 +353,51 @@ public class PagarReservaTests(FabricaApi fabrica)
         Assert.Equal(EstadoReservaDominio.Caducada, despues.Estado);
         Assert.Null(despues.CodigoAcceso);
         Assert.Equal(antes.Pago!.ResueltoEnUtc, despues.Pago!.ResueltoEnUtc);
+    }
+
+    // ── Pulido: la tarjeta no se registra (R9) ───────────────────────────────────
+
+    [Fact]
+    public async Task El_numero_de_tarjeta_no_aparece_en_ningun_registro()
+    {
+        var id = await _datos.Pendiente(Ana, await Tenis1(), Utc(Dia22, 18), _datos.Ahora - TimeSpan.FromMinutes(1));
+        var registro = new RegistroDePrueba();
+
+        // La misma API y la misma base, con todos los registros (también Debug y Trace) capturados.
+        await using var api = fabrica.WithWebHostBuilder(b => b.ConfigureTestServices(s =>
+            s.AddLogging(l => l.AddProvider(registro).SetMinimumLevel(LogLevel.Trace))));
+        using var cliente = api.CreateClient(new WebApplicationFactoryClientOptions { BaseAddress = new Uri("https://localhost") });
+        var sesion = await cliente.PostAsJsonAsync("/api/sesion",
+            new PeticionInicioSesion { Correo = Ana, Contrasena = FabricaApi.ClaveDemo }, OpcionesJson.Predeterminadas, Ct);
+        Assert.True(sesion.IsSuccessStatusCode);
+
+        var respuesta = await PedirPago(cliente, id, TarjetaAceptada);
+
+        Assert.Equal(HttpStatusCode.OK, respuesta.StatusCode);
+        Assert.NotEmpty(registro.Mensajes);
+        Assert.DoesNotContain(registro.Mensajes, m => m.Contains(TarjetaAceptada, StringComparison.Ordinal));
+        Assert.DoesNotContain(registro.Mensajes, m => m.Contains("0001", StringComparison.Ordinal));
+    }
+
+    /// <summary>Guarda el texto de cada mensaje registrado, con su excepción si la hay.</summary>
+    private sealed class RegistroDePrueba : ILoggerProvider
+    {
+        public ConcurrentQueue<string> Mensajes { get; } = new();
+
+        public ILogger CreateLogger(string categoryName) => new Registrador(Mensajes);
+
+        public void Dispose()
+        {
+        }
+
+        private sealed class Registrador(ConcurrentQueue<string> mensajes) : ILogger
+        {
+            public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
+
+            public bool IsEnabled(LogLevel logLevel) => true;
+
+            public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter) =>
+                mensajes.Enqueue($"{formatter(state, exception)} {exception}");
+        }
     }
 }

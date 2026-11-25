@@ -613,7 +613,7 @@ efectivo y el QR solo en las confirmadas.
 
 ## Fase 10: Pulido y cierre
 
-- [ ] T048 Revisar que el número de tarjeta no aparece en ningún registro (R9; research.md E4):
+- [X] T048 Revisar que el número de tarjeta no aparece en ningún registro (R9; research.md E4):
   `git grep -n -i "numeroTarjeta" -- fuentes/src` solo en el DTO, el endpoint y el servicio, ninguno
   dentro de un `Log…`; y una prueba en `PagarReservaTests` que, con un `ILoggerProvider` de prueba,
   paga con `4000000000000001` y comprueba que ningún mensaje registrado contiene «4000000000000001» ni
