@@ -47,3 +47,17 @@ No consta si la segunda pasada encontró más hallazgos.
 - El texto de los informes, la tabla de cobertura y las métricas de las dos pasadas.
 - Los hallazgos L1–L7 y su contenido.
 - La gravedad de N1.
+
+## Informe final (26/11/2026)
+
+Registro de los hallazgos de [analyze-final-2026-11-26.md](./analyze-final-2026-11-26.md), una pasada real
+sobre la versión actual (no una reconstrucción).
+
+| ID | Historia / criterio | Gravedad | Evidencia (analyze final) | Decisión | Responsable | Revisor | Estado | Dónde se resuelve |
+|----|---------------------|----------|---------------------------|----------|-------------|---------|--------|-------------------|
+| D1 | RF-016, tabla de responsables, data-model `Confirmar` | CRITICAL | spec-002 RF-009a (aclaración del 26/11/2026) añade una causa de caducidad que 000-core no tiene (principio VII) | Añadir la causa en 000-core por PR revisado por Artur, antes de implementar RF-009a | Saul | Artur | Abierto: spec-002 T055, pendiente de aprobación | spec.md RF-016, data-model.md § Reserva |
+| I1 | spec.md L46, L49, L56, CE-007; tasks.md fase 3 y T011 | MEDIUM | «Las cuatro personas» y «persona C/D» frente a la constitución 1.2.x (dos personas) | Nota de alcance junto a CE-007, sin reescribir lo decidido | Saul | — | Abierto (documentación) | spec.md |
+| I2 | tasks.md T076 | LOW | «falta la 006», ya fusionada | Actualizar la nota | Saul | — | Abierto (documentación) | tasks.md T076 |
+| I3 | research.md L44–L45 | LOW | «Persona C/D» sin nota de alcance | Nota o referencia a plan.md | Saul | — | Abierto (documentación) | research.md |
+| U1 | tasks.md | LOW | Pocas tareas citan su RF; la cobertura es inferida | Sin cambios; la matriz de la memoria dirá que es inferida | Saul | — | Aceptado | — |
+| C1 | RF-025 | LOW | Sin tarea en 000-core (el plan lo deja a spec-008) | Base para trabajo futuro (HU-08 fuera del alcance comprometido) | Saul | — | Aceptado | — |
