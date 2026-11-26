@@ -78,7 +78,7 @@ Reglas (E13 de spec-002):
 
 **Propósito**: los DTO del endpoint y la certeza de que los datos de prueba siguen libres.
 
-- [ ] T001 [P] Crear los DTO en `src/SI18.Contratos/Reservas/`, uno por fichero, según
+- [X] T001 [P] Crear los DTO en `src/SI18.Contratos/Reservas/`, uno por fichero, según
   [data-model.md § 3](./data-model.md) y
   [contracts/api-validaciones-acceso.openapi.yaml](./contracts/api-validaciones-acceso.openapi.yaml):
   - `PeticionValidacionAcceso(string? Codigo)`: «Obligatorio; se quitan los espacios de los extremos;
@@ -87,7 +87,7 @@ Reglas (E13 de spec-002):
     horas «`HH:mm`» de Madrid;
   - `ReservaValidadaDto(string Instalacion, string Centro, DateOnly Fecha, string HoraInicio, string HoraFin)`:
     **sin campo de titular** («para que no se pueda devolver por error», CE-003).
-- [ ] T002 [P] Repetir el `git grep` de los datos propios (tabla «Datos de las pruebas de integración»)
+- [X] T002 [P] Repetir el `git grep` de los datos propios (tabla «Datos de las pruebas de integración»)
   antes de escribir ninguna prueba, y anotar el resultado debajo de esta tarea:
   ```powershell
   git grep -n -e "ciudadana2.empadronada" -e "personal.este" -- fuentes/tests
@@ -97,6 +97,12 @@ Reglas (E13 de spec-002):
   ```
   Si alguna otra prueba usa ya esa pista en esos días y horas, o a Carla o a `personal.este`, elegir
   otros datos libres y actualizar la tabla y research.md V11 **antes** de seguir (lección del #37).
+
+  **Resultado (2026-11-26)**: sin coincidencias de `ciudadana2.empadronada` ni `personal.este`; «Pista de
+  pádel 2» de Este solo en `ConsultaDisponibilidadTests.cs:83` y `RevisarFranjasFijasTests.cs:113`; sin
+  `DateOnly(2027, 1, 16–31)`. Las fechas 25/10/2026 y 28/03/2027 las usan `MotivosRechazoTests` y
+  `BuscarFranjasTests` en pistas de **Norte** (tenis 1 y pádel), y `ServicioReservasTests` usa 18–20/01/2027
+  en Norte tenis: ninguna choca con Este «Pista de pádel 2». Datos libres; la tabla no cambia.
 
 **Punto de control**: `dotnet build SI18.slnx` sin advertencias; datos de prueba confirmados libres.
 
