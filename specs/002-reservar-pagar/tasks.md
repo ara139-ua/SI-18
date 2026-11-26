@@ -629,7 +629,7 @@ efectivo y el QR solo en las confirmadas.
   pantalla. Cronometrar los pasos 2–4 de §4 (de pulsar «Reservar» a ver el QR) y anotar el tiempo:
   debe ser < 2 min (CE-001). Medir con la API local 10 veces `POST /api/reservas` y `POST /api/reservas/{id}/pago` y
   anotar en el PR el peor valor (objetivo < 500 ms, research.md E14).
-- [ ] T050 [P] Avisar al grupo (constitución, «Acuerdos de colaboración»; plan.md, «Puntos a coordinar»):
+- [X] T050 [P] Avisar al grupo (constitución, «Acuerdos de colaboración»; plan.md, «Puntos a coordinar»):
   - a **C** (C3, C4): `IServicioReservas` ya está implementada; enlace a contracts/modulos.md (abrir la
     transacción antes, no esperar `SaveChanges`, guardar devolución y aviso en la misma transacción) y a
     `ServicioReservasTests` como ejemplo; el hueco de «Cancelar» en `MisReservas.razor`;
