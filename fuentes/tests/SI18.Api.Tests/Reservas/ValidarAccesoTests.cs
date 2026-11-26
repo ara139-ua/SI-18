@@ -1,5 +1,8 @@
 using System.Net;
+using System.Net.Http.Json;
+using System.Text;
 using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 using SI18.Api.Tests.Infraestructura;
 using SI18.Contratos.Comun;
 using SI18.Contratos.Reservas;
@@ -148,6 +151,91 @@ public class ValidarAccesoTests(FabricaApi fabrica) : IAsyncLifetime
         var fila = await _datos.Leer(problema.ValidacionId);
         Assert.Equal(ValidacionAcceso.LongitudMaximaCodigo, fila.CodigoLeido.Length);
         Assert.Equal(largo[..ValidacionAcceso.LongitudMaximaCodigo], fila.CodigoLeido);
+    }
+
+    // ── Historia 3: registro de cada intento ─────────────────────────────────────
+
+    [Theory]
+    [InlineData("""{ "codigo": "   " }""")]
+    [InlineData("""{}""")]
+    public async Task HU3_RF004_un_codigo_vacio_es_un_400_con_errors_codigo_y_no_registra_nada(string cuerpo)
+    {
+        using var cliente = await fabrica.CrearClienteConSesion(PersonalEste);
+        var antes = await _datos.UltimoId(PersonalEste);
+
+        var respuesta = await cliente.PostAsync(
+            "/api/validaciones-acceso", new StringContent(cuerpo, Encoding.UTF8, "application/json"), Ct);
+
+        Assert.Equal(HttpStatusCode.BadRequest, respuesta.StatusCode);
+        var problema = await DatosReservas.Problema(respuesta);
+        Assert.Equal(CodigosError.PeticionInvalida, problema.Codigo);
+        Assert.Contains("codigo", problema.Errors!.Keys);
+        Assert.Equal(antes, await _datos.UltimoId(PersonalEste));
+    }
+
+    [Fact]
+    public async Task RF010_validar_no_cambia_la_reserva()
+    {
+        var antes = await _datos.Reservas.Leer(_compartida);
+        using var cliente = await fabrica.CrearClienteConSesion(PersonalEste);
+
+        var respuesta = await Validar(cliente, antes.CodigoAcceso);
+
+        Assert.Equal(HttpStatusCode.Created, respuesta.StatusCode);
+        var despues = await _datos.Reservas.Leer(_compartida);
+        Assert.Equal(antes.Estado, despues.Estado);
+        Assert.Equal(antes.CodigoAcceso, despues.CodigoAcceso);
+        Assert.Equal(antes.CanceladaEnUtc, despues.CanceladaEnUtc);
+    }
+
+    /// <summary>
+    /// RF-009 (análisis A2): si no se puede registrar el intento, no hay resultado. El fallo se provoca con una persona
+    /// del personal cuyo <c>id</c> no existe en <c>usuarios</c> (viola la FK de <c>personal_id</c>). El <c>INSERT</c>
+    /// fallido no deja filas: un solo <c>SaveChanges</c>, en su propia transacción.
+    /// </summary>
+    [Fact]
+    public async Task RF009_si_falla_el_registro_la_validacion_lanza_y_no_deja_ninguna_fila()
+    {
+        var reservaId = await _datos.ConfirmadaALasDiez(Dia25);
+        var codigo = (await _datos.Reservas.Leer(reservaId)).CodigoAcceso!;
+        var centro = await _datos.Reservas.Disponibilidad.Centro(Este);
+        var personalInexistente = new UsuarioPersonalPrueba(int.MaxValue, centro);
+
+        await Assert.ThrowsAsync<DbUpdateException>(() =>
+            _datos.ConServicio(DatosReservas.Utc(Dia25, 9, 50), personalInexistente, s => s.Validar(codigo, Ct)));
+
+        Assert.Empty(await _datos.DeLaReserva(reservaId));
+    }
+
+    // ── Historia 4: solo el personal de centro ───────────────────────────────────
+
+    [Fact]
+    public async Task HU4_esc1_sin_sesion_es_un_401_y_no_registra_nada()
+    {
+        var codigo = Guid.NewGuid().ToString("N");
+        using var cliente = fabrica.CreateClient();
+
+        var respuesta = await Validar(cliente, codigo);
+
+        Assert.Equal(HttpStatusCode.Unauthorized, respuesta.StatusCode);
+        Assert.Equal(CodigosError.NoAutenticado, (await DatosReservas.Problema(respuesta)).Codigo);
+        Assert.False(await _datos.HayValidacionConCodigo(codigo));
+    }
+
+    [Theory]
+    [InlineData("ciudadana2.empadronada@si18.test")]
+    [InlineData("representante.padel@si18.test")]
+    [InlineData("tecnico@si18.test")]
+    public async Task HU4_esc2_los_demas_roles_reciben_un_403_y_no_registran_nada(string correo)
+    {
+        var codigo = Guid.NewGuid().ToString("N");
+        using var cliente = await fabrica.CrearClienteConSesion(correo);
+
+        var respuesta = await Validar(cliente, codigo);
+
+        Assert.Equal(HttpStatusCode.Forbidden, respuesta.StatusCode);
+        Assert.Equal(CodigosError.RolNoPermitido, (await DatosReservas.Problema(respuesta)).Codigo);
+        Assert.False(await _datos.HayValidacionConCodigo(codigo));
     }
 
     // ── Internos ─────────────────────────────────────────────────────────────────

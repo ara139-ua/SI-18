@@ -322,11 +322,11 @@ Q1, Q6, Q7 y Q10 y §4 pasos 5 y 6.
 
 **Prueba independiente**: quickstart.md Q5 y las filas de Q1–Q7 en `validaciones_acceso`.
 
-- [ ] T018 [P] [US3] Añadir a `ValidarAccesoTests.cs`: `{ "codigo": "   " }` y `{}` → 400
+- [X] T018 [P] [US3] Añadir a `ValidarAccesoTests.cs`: `{ "codigo": "   " }` y `{}` → 400
   `PETICION_INVALIDA` con `errors.codigo` y **ningún** registro nuevo de `personal.este`
   (`DatosValidaciones.UltimoId` igual antes y después; RF-004, CE-004); y que una validación aceptada no
   cambia la reserva (`estado`, `codigo_acceso` y `cancelada_en_utc` iguales; RF-010). Depende de T006.
-- [ ] T018b [US3] Añadir a `tests/SI18.Api.Tests/Reservas/ValidarAccesoTests.cs` la prueba de RF-009
+- [X] T018b [US3] Añadir a `tests/SI18.Api.Tests/Reservas/ValidarAccesoTests.cs` la prueba de RF-009
   (análisis A2), **con el fallo provocado dentro de la propia prueba y sin dejar filas a medias en la
   base compartida**:
   - reserva confirmada de Carla el **25/01/2027** de 10:00 a 11:00 (idempotente);
@@ -340,7 +340,7 @@ Q1, Q6, Q7 y Q10 y §4 pasos 5 y 6.
     `Comun/ErroresTests.cs` de 000-core; no se duplica.
 
   Depende de T006.
-- [ ] T019 [US3] Comprobar que `ServicioValidarAcceso` hace un único `SaveChanges` y que T018b pasa
+- [X] T019 [US3] Comprobar que `ServicioValidarAcceso` hace un único `SaveChanges` y que T018b pasa
   (RF-009). Depende de T009, T018, T018b.
 
 **Punto de control**: CE-004 cubierto por las pruebas de T007, T013 y T018.
@@ -354,7 +354,7 @@ ve el personal.
 
 **Prueba independiente**: quickstart.md Q8, Q9 y el paso 7 de §4.
 
-- [ ] T020 [P] [US4] Añadir a `ValidarAccesoTests.cs`: sin sesión → 401 `NO_AUTENTICADO`; con
+- [X] T020 [P] [US4] Añadir a `ValidarAccesoTests.cs`: sin sesión → 401 `NO_AUTENTICADO`; con
   `ciudadana2.empadronada`, `representante.padel` y `tecnico` → 403 `ROL_NO_PERMITIDO`; en ninguno se
   registra nada: cada petición envía un `codigo_leido` único (un `Guid` nuevo) y
   `DatosValidaciones.HayValidacionConCodigo` devuelve `false` (esas peticiones no tienen `personal_id`;
@@ -420,7 +420,7 @@ ve el personal.
 
 ## Fase 8: Pulido y cierre
 
-- [ ] T027 [P] Comprobar que no se ha escrito la zona horaria a mano (research.md V8; lección de T078 de
+- [X] T027 [P] Comprobar que no se ha escrito la zona horaria a mano (research.md V8; lección de T078 de
   000-core): `git grep -n "Europe/Madrid" -- fuentes/src/SI18.Api/Modulos/Reservas fuentes/src/SI18.Cliente/Reservas fuentes/src/SI18.Contratos/Reservas`
   sin resultados.
 - [ ] T028 Ejecutar quickstart.md §2–§5 de principio a fin: `dotnet test SI18.slnx` en verde (también
