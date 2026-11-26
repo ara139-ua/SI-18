@@ -1,0 +1,34 @@
+@* Resumen de una reserva como lista de definiciones (research.md E11): lo usan /reservas/nueva y
+   /reservas/{id}/pago. A 320 px cada término queda encima de su valor (tasks.md T042). *@
+
+<dl class="resumen-reserva">
+    <div>
+        <dt>Pista</dt>
+        <dd>@Pista</dd>
+    </div>
+    <div>
+        <dt>Centro</dt>
+        <dd>@Centro</dd>
+    </div>
+    <div>
+        <dt>Fecha</dt>
+        <dd>@TextosReservas.Fecha(Fecha)</dd>
+    </div>
+    <div>
+        <dt>Hora</dt>
+        <dd>@TextosReservas.Horas(HoraInicio, HoraFin)</dd>
+    </div>
+    <div>
+        <dt>Importe</dt>
+        <dd>@FormatoEs.Importe(Importe)</dd>
+    </div>
+</dl>
+
+@code {
+    [Parameter, EditorRequired] public string Pista { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Centro { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public DateOnly Fecha { get; set; }
+    [Parameter, EditorRequired] public string HoraInicio { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string HoraFin { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public decimal Importe { get; set; }
+}

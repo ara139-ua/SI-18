@@ -1,0 +1,26 @@
+@using System.Globalization
+@using SI18.Contratos.Disponibilidad
+
+@* Botón «Reservar» de cada franja de /buscar-pistas (specs/002-reservar-pagar/research.md E10; tasks.md T021).
+   Es un enlace al resumen, no un formulario: reservar exige pasar por él (RF-003). El nombre accesible empieza
+   por el texto visible (WCAG 2.5.3) y dice pista, día y horas (HU6 esc. 1). *@
+
+<span class="enlace-reservar">
+    <MudButton Href="@Destino" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
+               aria-label="@NombreAccesible">
+        Reservar
+    </MudButton>
+</span>
+
+@code {
+    [Parameter, EditorRequired] public PistaLibreDto Pista { get; set; } = null!;
+    [Parameter, EditorRequired] public FranjaLibreDto Franja { get; set; } = null!;
+    [Parameter, EditorRequired] public DateOnly Fecha { get; set; }
+
+    private string Destino =>
+        $"/reservas/nueva?instalacionId={Pista.InstalacionId.ToString(CultureInfo.InvariantCulture)}" +
+        $"&inicioUtc={Uri.EscapeDataString(Franja.InicioUtc.ToUniversalTime().ToString("O", CultureInfo.InvariantCulture))}";
+
+    private string NombreAccesible =>
+        $"Reservar {Pista.Nombre}, {TextosReservas.DiaYFecha(Fecha)}, {TextosReservas.Horas(Franja.HoraInicio, Franja.HoraFin)}";
+}

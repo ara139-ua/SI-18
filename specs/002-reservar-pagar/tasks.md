@@ -259,7 +259,7 @@ una tarjeta aceptada y ver la reserva confirmada con su QR.
   HU1 esc. 5): para tres franjas de la búsqueda y con las tres tarifas (`ciudadana.empadronada`,
   `ciudadano.noempadronado`, `representante.padel`), `precio` de `GET /api/disponibilidad/franjas`
   = `importe` del resumen = `importe` de la reserva creada y pagada = `pagos.importe`. Depende de T017.
-- [ ] T021 [P] [US1] Crear `src/SI18.Cliente/Reservas/EnlaceReservar.razor` (research.md E10;
+- [X] T021 [P] [US1] Crear `src/SI18.Cliente/Reservas/EnlaceReservar.razor` (research.md E10;
   contracts/modulos.md, «Componente de cliente»):
   - parámetros `[EditorRequired]` `Pista` (`PistaLibreDto`), `Franja` (`FranjaLibreDto`) y `Fecha` (`DateOnly`);
   - un `MudButton` con `Href="/reservas/nueva?instalacionId={Pista.InstalacionId}&inicioUtc={Franja.InicioUtc:O}"`
@@ -268,18 +268,18 @@ una tarjeta aceptada y ver la reserva confirmada con su QR.
     accesible empieza por el texto visible (WCAG 2.5.3);
   - el estilo que separe el botón del texto de la franja va en el propio componente
     (`EnlaceReservar.razor.css`), no en `BuscarPistas.razor` ni en `app.css`.
-- [ ] T022 [US1] **[código de Artur, revisión de Artur]** En `src/SI18.Cliente/Disponibilidad/BuscarPistas.razor`
+- [X] T022 [US1] **[código de Artur, revisión de Artur]** En `src/SI18.Cliente/Disponibilidad/BuscarPistas.razor`
   añadir **solo** (research.md E10; aclaración de spec-001; confirmado por Artur):
   - `@using SI18.Cliente.Reservas` junto a los otros `@using`;
   - `<EnlaceReservar Pista="pista" Franja="franja" Fecha="_resultado.Fecha" />` **dentro** del
     `<li role="listitem">` de cada franja, después de `@FormatoEs.Importe(franja.Precio)`.
 
   Nada más de la pantalla cambia: ni DTO, ni endpoint, ni pruebas de spec-001. Depende de T021.
-- [ ] T023 [P] [US1] Crear `src/SI18.Cliente/Reservas/CodigoAcceso.razor` (research.md E11; RF-016):
+- [X] T023 [P] [US1] Crear `src/SI18.Cliente/Reservas/CodigoAcceso.razor` (research.md E11; RF-016):
   parámetros `Codigo` y `Descripcion`; dibuja el QR en SVG con QRCoder (`SvgQRCode`, ya referenciado
   en el cliente, R14) dentro de un `<figure role="img" aria-label="Código de acceso de {Descripcion}">`,
   con el SVG en `max-width: 100%` y, en un `<figcaption>`, el código en texto seleccionable.
-- [ ] T024 [US1] Crear `src/SI18.Cliente/Reservas/NuevaReserva.razor` (ruta `/reservas/nueva`; research.md E11):
+- [X] T024 [US1] Crear `src/SI18.Cliente/Reservas/NuevaReserva.razor` (ruta `/reservas/nueva`; research.md E11):
   - **acceso**, como `/buscar-pistas` (D7 de spec-001): sin sesión → `/iniciar-sesion`; con otro rol,
     aviso «Reservar pistas es para ciudadanos y representantes de club.» en `MensajeAccesible`
     (`Severity.Warning`), sin pedir nada a la API;
@@ -291,7 +291,7 @@ una tarjeta aceptada y ver la reserva confirmada con su QR.
     envía: `POST /api/reservas` con el importe del resumen y, con 201, navega a `/reservas/{id}/pago`.
 
   Los rechazos los completa T036 (US4). Depende de T017.
-- [ ] T025 [US1] Crear `src/SI18.Cliente/Reservas/PagarReserva.razor` (ruta `/reservas/{Id:long}/pago`;
+- [X] T025 [US1] Crear `src/SI18.Cliente/Reservas/PagarReserva.razor` (ruta `/reservas/{Id:long}/pago`;
   research.md E11):
   - mismo control de acceso que T024;
   - `GET /api/reservas/{id}`; muestra el resumen y el texto fijo «Paga antes de las {HoraLimitePago};
@@ -370,7 +370,7 @@ caducidad al reservar y al pagar, y la misma respuesta antes y después del barr
   `DatosReservas.ConServicio` y una `PasarelaContadora`, dos llamadas a `Pagar` en paralelo (cada una
   con su ámbito y su `Si18DbContext`) → una confirma y la otra recibe `TRANSICION_NO_PERMITIDA`; la
   pasarela se llama **una sola vez**. Depende de T027.
-- [ ] T032 [US2] En `src/SI18.Cliente/Reservas/PagarReserva.razor`, con 409 `RESERVA_CADUCADA`: el
+- [X] T032 [US2] En `src/SI18.Cliente/Reservas/PagarReserva.razor`, con 409 `RESERVA_CADUCADA`: el
   formulario desaparece, `<h2 tabindex="-1">La reserva ha caducado</h2>` recibe el foco y
   `MensajeAccesible` (`Severity.Warning`) anuncia el `Detalle` del catálogo, con el enlace «Volver a
   buscar pistas». Si `GET /api/reservas/{id}` ya la devuelve `caducada`, se muestra lo mismo sin
@@ -414,7 +414,7 @@ sin cambios.
   - **HU5 esc. 4**: pagar la reserva de otra persona → 404 `NO_ENCONTRADO` y la reserva no cambia.
 
   Depende de T033 y T017.
-- [ ] T035 [US3] En `src/SI18.Cliente/Reservas/PagarReserva.razor`, completar los resultados (research.md E11):
+- [X] T035 [US3] En `src/SI18.Cliente/Reservas/PagarReserva.razor`, completar los resultados (research.md E11):
   - 422 `PAGO_RECHAZADO` y 409 `TRANSICION_NO_PERMITIDA`: como T032, con `<h2 tabindex="-1">` «El pago no
     se ha completado» o «Esta reserva ya no se puede pagar», foco al encabezado, `MensajeAccesible`
     (`Severity.Error`) con el `Detalle` del catálogo y enlace «Volver a buscar pistas»;
@@ -452,7 +452,7 @@ sin cambios.
     `2027-03-28T06:00:00Z`, y reservar y pagar la de 08:00 da `finUtc − inicioUtc = 1 h`.
 
   Los estados y códigos HTTP son los del catálogo de 000-core (`contracts/errores.md`). Depende de T026.
-- [ ] T037 [US4] En `src/SI18.Cliente/Reservas/NuevaReserva.razor`, completar los rechazos (research.md E11):
+- [X] T037 [US4] En `src/SI18.Cliente/Reservas/NuevaReserva.razor`, completar los rechazos (research.md E11):
   - si el resumen o la creación responden un error, `MensajeAccesible` (`Severity.Error`) con su
     `Detalle`, sin resumen ni botón, y enlace «Volver a buscar pistas»;
   - con 409 `PRECIO_CAMBIADO`: se vuelve a pedir el resumen, se muestra el importe nuevo, se anuncia
@@ -494,7 +494,7 @@ efectivo y el QR solo en las confirmadas.
   - `personal.oeste@si18.test` → 403 `ROL_NO_PERMITIDO`.
 
   Depende de T038 y T011.
-- [ ] T040 [US5] Crear `src/SI18.Cliente/Reservas/MisReservas.razor` (ruta `/mis-reservas`; research.md E11):
+- [X] T040 [US5] Crear `src/SI18.Cliente/Reservas/MisReservas.razor` (ruta `/mis-reservas`; research.md E11):
   - mismo control de acceso que T024;
   - `<PageTitle>Mis reservas · SI-18</PageTitle>` y `<h1>` «Mis reservas»;
   - sin reservas: «Todavía no tienes reservas.» en `MensajeAccesible` (`Severity.Info`);
@@ -508,7 +508,7 @@ efectivo y el QR solo en las confirmadas.
     dentro del `<li>` (plan.md, C4).
 
   Depende de T038 y T023.
-- [ ] T041 [P] [US5] Añadir «Mis reservas» (`MudButton Href="/mis-reservas" Color="Color.Inherit" Variant="Variant.Text"`)
+- [X] T041 [P] [US5] Añadir «Mis reservas» (`MudButton Href="/mis-reservas" Color="Color.Inherit" Variant="Variant.Text"`)
   en el hueco `@* Hueco de Reservas (spec-002, 003): mis reservas. *@` de
   `src/SI18.Cliente/Layout/MainLayout.razor`, quitando la parte «mis reservas» del comentario (RF-002;
   T056 de 000-core). **Ojo**: añade un botón más a la barra superior, que ya se desborda a 320 px
@@ -524,7 +524,7 @@ efectivo y el QR solo en las confirmadas.
 
 **Prueba independiente**: quickstart.md §5 (que aplica el §6 de `000-core/quickstart.md`).
 
-- [ ] T042 [US6] Completar la accesibilidad de `NuevaReserva.razor`, `PagarReserva.razor` y
+- [X] T042 [US6] Completar la accesibilidad de `NuevaReserva.razor`, `PagarReserva.razor` y
   `MisReservas.razor` en `src/SI18.Cliente/Reservas/` (RF-021; research.md E11):
   - `<PageTitle>` y `<h1>` en cada una: «Confirmar la reserva», «Pagar la reserva», «Mis reservas»;
   - orden de tabulación: resumen → campo → botón → enlaces del resultado; sin trampas de foco;
@@ -536,7 +536,7 @@ efectivo y el QR solo en las confirmadas.
     líneas y el SVG del QR usa `max-width: 100%`. Los estilos van en los `.razor.css` de Reservas.
 
   Depende de T037, T035 y T040.
-- [ ] T043 [US6] Comprobar a mano quickstart.md §5 sobre el botón «Reservar» de `/buscar-pistas`,
+- [X] T043 [US6] Comprobar a mano quickstart.md §5 sobre el botón «Reservar» de `/buscar-pistas`,
   `/reservas/nueva`, `/reservas/{id}/pago` y `/mis-reservas`, **aplicando lo aprendido en T073 de
   000-core** (`specs/000-core/checklists/cierre-saul.md`, hallazgos 5 y 6):
   - **foco visible con MudBlazor**: Lighthouse y axe no lo detectan. Recorrer con el teclado y, en cada
