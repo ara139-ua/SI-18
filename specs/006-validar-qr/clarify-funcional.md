@@ -47,4 +47,4 @@ Relacionada con spec-002 (pregunta 3 de su pasada): en las reservas con tarifa c
 
 ## 4. Qué queda
 
-- RF-004 (mayúsculas) ya se cumple (`ServicioValidarAcceso.cs:31` compara exacto) y se ha comprobado a mano (tabla de arriba), pero **no tiene prueba automática**. En esta spec no se ha repetido analyze ni converge.
+- RF-004 (mayúsculas) ya se cumplía (`ServicioValidarAcceso.cs:31` compara exacto); se comprobó a mano (tabla de arriba) y después se añadió la prueba automática en T034 (`ValidarAccesoTests.RF004_el_codigo_con_una_letra_en_otra_caja_es_desconocido_y_se_registra_sin_reserva`), con analyze ([analyze-3.md](./analyze-3.md)) y converge ([converge-2026-11-26-3.md](./converge-2026-11-26-3.md)) repetidos en esta spec.
