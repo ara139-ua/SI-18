@@ -259,7 +259,7 @@ una tarjeta aceptada y ver la reserva confirmada con su QR.
   HU1 esc. 5): para tres franjas de la búsqueda y con las tres tarifas (`ciudadana.empadronada`,
   `ciudadano.noempadronado`, `representante.padel`), `precio` de `GET /api/disponibilidad/franjas`
   = `importe` del resumen = `importe` de la reserva creada y pagada = `pagos.importe`. Depende de T017.
-- [ ] T021 [P] [US1] Crear `src/SI18.Cliente/Reservas/EnlaceReservar.razor` (research.md E10;
+- [X] T021 [P] [US1] Crear `src/SI18.Cliente/Reservas/EnlaceReservar.razor` (research.md E10;
   contracts/modulos.md, «Componente de cliente»):
   - parámetros `[EditorRequired]` `Pista` (`PistaLibreDto`), `Franja` (`FranjaLibreDto`) y `Fecha` (`DateOnly`);
   - un `MudButton` con `Href="/reservas/nueva?instalacionId={Pista.InstalacionId}&inicioUtc={Franja.InicioUtc:O}"`
