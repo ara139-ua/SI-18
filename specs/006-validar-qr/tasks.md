@@ -440,7 +440,7 @@ ve el personal.
     el menú del personal.
 
   Anotarlo en la descripción del PR.
-- [ ] T030 Abrir los PR hacia `develop`, con la lista de los principios I–IX revisados, como en spec-002.
+- [X] T030 Abrir los PR hacia `develop`, con la lista de los principios I–IX revisados, como en spec-002.
   **Antes de abrir cada PR, revisar los secretos** (constitución, «Flujo de trabajo», principio V;
   análisis D1): `git grep -nE "Password=|SI18_CLAVE_DEMO=.+[^>]$" -- ":!*.example"` (quickstart §7 de
   000-core; solo deben salir las coincidencias ya justificadas en T075 de 000-core) y
