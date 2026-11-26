@@ -1,0 +1,250 @@
+@page "/validar-acceso"
+@using System.Text.Json
+@using SI18.Contratos.Comun
+@using SI18.Contratos.Reservas
+@inject ClienteApi Api
+@inject EstadoSesion Sesion
+@inject NavigationManager Navegacion
+
+@* Validación del código de acceso por el personal de centro (specs/006-validar-qr/research.md V10; tasks.md T012,
+   T017, T025). El resultado se muestra en la misma página, debajo del formulario. Se anuncia una sola vez con
+   MensajeAccesible (la única región viva) y el foco vuelve al campo para validar el siguiente código. *@
+
+<PageTitle>Validar acceso · SI-18</PageTitle>
+
+<MudText Typo="Typo.h4" HtmlTag="h1" GutterBottom="true">Validar acceso</MudText>
+
+<MensajeAccesible @ref="_mensaje" />
+
+@if (_puedeValidar)
+{
+    <form @onsubmit="Validar" novalidate class="formulario-validar">
+        <MudTextField T="string" @ref="_campoCodigo" @bind-Value="_codigo" Label="Código de acceso" Variant="Variant.Outlined"
+                      UserAttributes="AtributosCodigo" HelperText="El código que aparece bajo el QR"
+                      Error="_errorCodigo is not null" ErrorText="@_errorCodigo" />
+        @* MudBlazor 8 quita aria-describedby del campo cuando muestra el error y el texto del error no tiene id: se
+           asocia aquí con aria-errormessage, y role="alert" lo anuncia al aparecer sin sacar el foco (patrón de
+           PagarReserva.razor). *@
+        @if (_errorCodigo is not null)
+        {
+            <span id="error-codigo" role="alert" class="solo-lector">@_errorCodigo</span>
+        }
+
+        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Disabled="_enviando">
+            Validar
+        </MudButton>
+    </form>
+
+    @if (_aceptada is not null)
+    {
+        <section aria-labelledby="encabezado-resultado" class="resultado resultado-permitido">
+            <h2 id="encabezado-resultado" class="mud-typography mud-typography-h5 encabezado-resultado">
+                <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Class="icono-resultado" />
+                Acceso permitido
+            </h2>
+            <dl class="datos-resultado">
+                <dt>Titular</dt>
+                <dd>@_aceptada.Titular</dd>
+                <dt>Instalación</dt>
+                <dd>@_aceptada.Instalacion</dd>
+                <dt>Centro</dt>
+                <dd>@_aceptada.Centro</dd>
+                <dt>Fecha</dt>
+                <dd>@TextosReservas.DiaYFecha(_aceptada.Fecha)</dd>
+                <dt>Horario</dt>
+                <dd>@TextosReservas.Horas(_aceptada.HoraInicio, _aceptada.HoraFin)</dd>
+            </dl>
+            @if (_aceptada.ValidacionAnteriorHora is not null)
+            {
+                <p class="aviso-anterior">
+                    <MudIcon Icon="@Icons.Material.Filled.History" Class="icono-resultado" />
+                    @AvisoAnterior(_aceptada.ValidacionAnteriorHora)
+                </p>
+            }
+        </section>
+    }
+    else if (_rechazo is not null)
+    {
+        <section aria-labelledby="encabezado-resultado" class="resultado resultado-denegado">
+            <h2 id="encabezado-resultado" class="mud-typography mud-typography-h5 encabezado-resultado">
+                <MudIcon Icon="@Icons.Material.Filled.Block" Class="icono-resultado" />
+                Acceso denegado
+            </h2>
+            <p>@_rechazo.Detalle</p>
+            @if (_rechazo.Reserva is { } reserva)
+            {
+                @* Nunca el titular: la API no lo envía en un rechazo (RF-007). *@
+                <dl class="datos-resultado">
+                    <dt>Instalación</dt>
+                    <dd>@reserva.Instalacion</dd>
+                    <dt>Centro</dt>
+                    <dd>@reserva.Centro</dd>
+                    <dt>Fecha</dt>
+                    <dd>@TextosReservas.DiaYFecha(reserva.Fecha)</dd>
+                    <dt>Horario</dt>
+                    <dd>@TextosReservas.Horas(reserva.HoraInicio, reserva.HoraFin)</dd>
+                </dl>
+            }
+        </section>
+    }
+}
+
+@code {
+    private const string CodigoRolNoPermitido = "ROL_NO_PERMITIDO";
+    private const string TextoCampoVacio = "Escribe el código de acceso.";
+
+    private sealed record Rechazo(string Detalle, ReservaValidadaDto? Reserva);
+
+    private Dictionary<string, object> AtributosCodigo => _errorCodigo is null
+        ? new() { ["autocomplete"] = "off", ["autocapitalize"] = "none", ["spellcheck"] = "false" }
+        : new() { ["autocomplete"] = "off", ["autocapitalize"] = "none", ["spellcheck"] = "false", ["aria-errormessage"] = "error-codigo" };
+
+    private MensajeAccesible _mensaje = null!;
+    private MudTextField<string> _campoCodigo = null!;
+    private bool _puedeValidar;
+    private bool _enviando;
+    private bool _enfocarCampo;
+    private string? _codigo;
+    private string? _errorCodigo;
+    private ValidacionAccesoDto? _aceptada;
+    private Rechazo? _rechazo;
+    private (string Texto, Severity Tipo)? _mensajePendiente;
+
+    protected override async Task OnInitializedAsync()
+    {
+        switch (await AccesoReservas.ComprobarPersonal(Sesion))
+        {
+            case Acceso.SinSesion:
+                Navegacion.NavigateTo(ClienteApi.RutaInicioSesion);
+                return;
+            case Acceso.SinPermiso:
+                _mensajePendiente = (AccesoReservas.AvisoSinPermisoValidar, Severity.Warning);
+                return;
+        }
+
+        _puedeValidar = true;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // MensajeAccesible solo existe después del primer renderizado.
+        if (_mensajePendiente is { } pendiente)
+        {
+            _mensajePendiente = null;
+            _mensaje.Mostrar(pendiente.Texto, pendiente.Tipo);
+        }
+
+        // Tras cada intento el foco vuelve al campo, vacío, para validar el siguiente código (RF-014).
+        if (_enfocarCampo)
+        {
+            _enfocarCampo = false;
+            await _campoCodigo.FocusAsync();
+        }
+    }
+
+    private async Task Validar()
+    {
+        if (_enviando)
+        {
+            return;
+        }
+
+        _aceptada = null;
+        _rechazo = null;
+        _errorCodigo = null;
+        _mensaje.Limpiar();
+
+        // Campo vacío o solo espacios: no se envía nada y el error va en el propio campo.
+        if (string.IsNullOrWhiteSpace(_codigo))
+        {
+            _errorCodigo = TextoCampoVacio;
+            _enfocarCampo = true;
+            return;
+        }
+
+        _enviando = true;
+        try
+        {
+            var resultado = await Api.PostAsync<PeticionValidacionAcceso, ValidacionAccesoDto>(
+                "/api/validaciones-acceso", new PeticionValidacionAcceso(_codigo));
+            _aceptada = resultado;
+            _mensaje.Mostrar(FraseAceptada(resultado), Severity.Success);
+            Reiniciar();
+        }
+        catch (ErrorApi error) when (error.Codigo == CodigoRolNoPermitido)
+        {
+            // La sesión ha cambiado de rol: aviso sin formulario.
+            _puedeValidar = false;
+            _mensaje.Mostrar(AccesoReservas.AvisoSinPermisoValidar, Severity.Warning);
+        }
+        catch (ErrorApi error) when (error.Errores.ContainsKey("codigo"))
+        {
+            _errorCodigo = TextoCampoVacio;
+            _enfocarCampo = true;
+        }
+        catch (ErrorApi error) when (error.Codigo.StartsWith("QR_", StringComparison.Ordinal))
+        {
+            var rechazo = new Rechazo(error.Detalle, LeerReserva(error));
+            _rechazo = rechazo;
+            _mensaje.Mostrar(FraseRechazada(rechazo), Severity.Error);
+            Reiniciar();
+        }
+        catch (ErrorApi error)
+        {
+            _mensaje.Mostrar(error.Detalle, Severity.Error);
+            _enfocarCampo = true;
+        }
+        catch (HttpRequestException)
+        {
+            _mensaje.Mostrar("No se ha podido conectar con el servidor. Inténtalo de nuevo.", Severity.Error);
+            _enfocarCampo = true;
+        }
+        finally
+        {
+            _enviando = false;
+        }
+    }
+
+    private void Reiniciar()
+    {
+        _codigo = null;
+        _enfocarCampo = true;
+    }
+
+    // La extensión «reserva» solo viene en los rechazos que conocen la reserva (RF-007).
+    private static ReservaValidadaDto? LeerReserva(ErrorApi error)
+    {
+        if (!error.Extensiones.TryGetValue("reserva", out var elemento) || elemento.ValueKind != JsonValueKind.Object)
+        {
+            return null;
+        }
+
+        try
+        {
+            return elemento.Deserialize<ReservaValidadaDto>(OpcionesJson.Predeterminadas);
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
+    }
+
+    private static string AvisoAnterior(string hora) => $"Este código ya se validó hoy a las {hora}.";
+
+    private static string FraseAceptada(ValidacionAccesoDto r)
+    {
+        var frase = $"Acceso permitido. {r.Titular}, {r.Instalacion}, {r.Centro}, {TextosReservas.Horas(r.HoraInicio, r.HoraFin)}.";
+        return r.ValidacionAnteriorHora is null ? frase : $"{frase} {AvisoAnterior(r.ValidacionAnteriorHora)}";
+    }
+
+    private static string FraseRechazada(Rechazo r)
+    {
+        var frase = $"Acceso denegado. {r.Detalle}";
+        if (r.Reserva is { } reserva)
+        {
+            frase += $" {reserva.Instalacion}, {reserva.Centro}, {TextosReservas.DiaYFecha(reserva.Fecha)}, {TextosReservas.Horas(reserva.HoraInicio, reserva.HoraFin)}.";
+        }
+
+        return frase;
+    }
+}

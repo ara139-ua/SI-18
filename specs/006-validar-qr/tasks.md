@@ -230,7 +230,7 @@ franja; si ya se había aceptado, con el aviso de la hora anterior.
   `src/SI18.Cliente/Reservas/AccesoReservas.cs`, con el mismo patrón que `Comprobar`: sin sesión →
   `SinSesion`; rol `personal_centro` → `Permitido`; otro → `SinPermiso`; y la constante
   `AvisoSinPermisoValidar = "Validar códigos de acceso es para el personal de centro."`.
-- [ ] T012 [US1] Crear `src/SI18.Cliente/Reservas/ValidarAcceso.razor` (`@page "/validar-acceso"`) y
+- [X] T012 [US1] Crear `src/SI18.Cliente/Reservas/ValidarAcceso.razor` (`@page "/validar-acceso"`) y
   `ValidarAcceso.razor.css` (**sin tocar `app.css`**), con el resultado aceptado (research.md V10):
   - `<PageTitle>Validar acceso · SI-18</PageTitle>` y `<h1>` «Validar acceso»; acceso por URL con
     `ComprobarPersonal` (sin sesión → `/iniciar-sesion`; sin permiso → aviso sin formulario);
@@ -305,7 +305,7 @@ centro, con la instalación y la franja (nunca el titular).
   (`NavegacionDePrueba : NavigationManager`, que llama a `Initialize("http://localhost/", "http://localhost/")`
   y no navega; análisis U3).
   Anotar en el PR que es un cambio en código común (research.md V2; plan.md C2).
-- [ ] T017 [US2] Completar `ValidarAcceso.razor` con el resultado rechazado: `<h2>` «Acceso denegado» con
+- [X] T017 [US2] Completar `ValidarAcceso.razor` con el resultado rechazado: `<h2>` «Acceso denegado» con
   un icono distinto del de «permitido», el `Detalle` del catálogo y, si
   `ErrorApi.Extensiones["reserva"]` existe, instalación, centro, fecha y horas (nunca el titular); frase
   completa con `MensajeAccesible` y foco de vuelta al campo. Con `ROL_NO_PERMITIDO` (sesión cambiada),
@@ -361,7 +361,7 @@ ve el personal.
   análisis F1) (HU4 esc. 1 y 2; CE-004). Depende de T006.
 - ~~T021~~ **Retirada** (análisis A1): era condicional («si T020 no pasa»). La política se fija en T004 y
   T020 la prueba. Se conserva el número para no renumerar.
-- [ ] T022 [P] [US4] Comprobar en `ValidarAcceso.razor` el acceso por URL (T012): sin sesión →
+- [X] T022 [P] [US4] Comprobar en `ValidarAcceso.razor` el acceso por URL (T012): sin sesión →
   `/iniciar-sesion`; con un ciudadano → `AvisoSinPermisoValidar` y ningún formulario. Depende de T012.
 - [ ] T023 [US4] (sin código) Confirmar con @ara139-ua el texto «Validar acceso» y su posición en el hueco
   del personal, dejando sitio al enlace de cierres de spec-007 (plan.md C1).
@@ -382,7 +382,7 @@ ve el personal.
 
 **Prueba independiente**: quickstart.md §5 (que aplica el §6 de `000-core/quickstart.md`).
 
-- [ ] T025 [US5] Completar la accesibilidad de `ValidarAcceso.razor` y `ValidarAcceso.razor.css`
+- [X] T025 [US5] Completar la accesibilidad de `ValidarAcceso.razor` y `ValidarAcceso.razor.css`
   (RF-013–RF-015; research.md V10):
   - orden de tabulación: campo → «Validar»; sin trampas de foco; tras cada resultado el foco vuelve al
     campo;
