@@ -1,0 +1,24 @@
+/* QR de la reserva (tasks.md T023, T042): nunca más ancho que la pantalla (reflujo a 320 px). */
+.codigo-acceso {
+    margin: 1rem 0;
+    max-width: 100%;
+}
+
+.codigo-acceso-qr {
+    width: 14rem;
+    max-width: 100%;
+}
+
+.codigo-acceso-qr ::deep svg {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+}
+
+/* El código no tiene espacios: se parte en cualquier punto para no salirse a 320 px. */
+.codigo-acceso-texto {
+    overflow-wrap: anywhere;
+    word-break: break-all;
+    user-select: all;
+}

@@ -1,0 +1,38 @@
+@using QRCoder
+
+@* Código de acceso de una reserva confirmada (specs/002-reservar-pagar/research.md E11; RF-016; tasks.md T023):
+   el QR en SVG, dibujado con QRCoder en el navegador (R14 de 000-core), y debajo el código en texto
+   seleccionable. role="img" va en el contenedor del SVG y no en el <figure>: en el <figure> haría
+   presentacional también el <figcaption>, y el lector de pantalla no leería el código en texto (HU6 esc. 4). *@
+
+<figure class="codigo-acceso">
+    <div class="codigo-acceso-qr" role="img" aria-label="@($"Código de acceso de {Descripcion}")">
+        @_svg
+    </div>
+    <figcaption>
+        Código de acceso: <code class="codigo-acceso-texto">@Codigo</code>
+    </figcaption>
+</figure>
+
+@code {
+    [Parameter, EditorRequired] public string Codigo { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Descripcion { get; set; } = string.Empty;
+
+    private string? _codigoDibujado;
+    private MarkupString _svg;
+
+    protected override void OnParametersSet()
+    {
+        if (Codigo == _codigoDibujado)
+        {
+            return;
+        }
+
+        using var generador = new QRCodeGenerator();
+        using var datos = generador.CreateQrCode(Codigo, QRCodeGenerator.ECCLevel.M);
+        var svg = new SvgQRCode(datos).GetGraphic(8, "#000000", "#FFFFFF", drawQuietZones: true,
+            sizingMode: SvgQRCode.SizingMode.ViewBoxAttribute);
+        _svg = new MarkupString(svg);
+        _codigoDibujado = Codigo;
+    }
+}

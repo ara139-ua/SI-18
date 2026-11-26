@@ -275,7 +275,7 @@ una tarjeta aceptada y ver la reserva confirmada con su QR.
     `<li role="listitem">` de cada franja, después de `@FormatoEs.Importe(franja.Precio)`.
 
   Nada más de la pantalla cambia: ni DTO, ni endpoint, ni pruebas de spec-001. Depende de T021.
-- [ ] T023 [P] [US1] Crear `src/SI18.Cliente/Reservas/CodigoAcceso.razor` (research.md E11; RF-016):
+- [X] T023 [P] [US1] Crear `src/SI18.Cliente/Reservas/CodigoAcceso.razor` (research.md E11; RF-016):
   parámetros `Codigo` y `Descripcion`; dibuja el QR en SVG con QRCoder (`SvgQRCode`, ya referenciado
   en el cliente, R14) dentro de un `<figure role="img" aria-label="Código de acceso de {Descripcion}">`,
   con el SVG en `max-width: 100%` y, en un `<figcaption>`, el código en texto seleccionable.
