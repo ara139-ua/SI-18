@@ -824,5 +824,5 @@ Tareas añadidas por `/speckit-converge` el 2026-11-26 (informe en
 [converge-2026-11-26.md](./converge-2026-11-26.md)).
 
 - [X] T077 [Saul] Alinear `plan.md` (fila «V. Sin secretos» de la comprobación de la constitución) y `research.md` R17 con la decisión real: la cadena de conexión y la contraseña de demo llegan solo por variables de entorno (`.env`), sin `dotnet user-secrets` y sin añadir `UserSecretsId`; anotar que el cambio sale de la ejecución de T074 per plan: principio V, R17 (partial)
-- [ ] T078 [Saul] Crear en `fuentes/tests/SI18.Api.Tests/Comun/` una prueba que compruebe que `FormatoEs` usa la misma zona horaria que `ValoresNegocio.ZonaHoraria` per Constitution III, plan R6 (partial)
+- [X] T078 [Saul] Crear en `fuentes/tests/SI18.Api.Tests/Comun/` una prueba que compruebe que `FormatoEs` usa la misma zona horaria que `ValoresNegocio.ZonaHoraria` per Constitution III, plan R6 (partial)
 - [ ] T079 [Saul] Cambiar `0001_NucleoComun` por `20261104144623_NucleoComun` en `plan.md` y `quickstart.md` per plan: estructura y piezas transversales 3, quickstart §3 (partial)
