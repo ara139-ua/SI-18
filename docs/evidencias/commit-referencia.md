@@ -26,7 +26,9 @@ constitución 1.2.0 (#49), el alcance de dos personas (#50) y estas evidencias.
 | 002, converge (26/11/2026) | `develop` en `ba60464`, rama `feature/002-reservar-pagar-cierre` | PR #39 (`specs/002-reservar-pagar/converge-2026-11-26.md`) |
 | 006, converge (26/11/2026) | `develop` con #45 y #46, rama `feature/006-validar-qr-cierre` | `specs/006-validar-qr/converge-2026-11-26.md` |
 | 001 y 005, converge (25/11/2026) | No consta | Commits `3f3022e` y `11d4b36` |
-| Analyze de 000-core, 001, 002 y 005 | No consta (el padre de cada commit de correcciones es el estado analizado) | `analyze-registro.md` de cada spec |
+| 001 y 005, analyze y converge finales (26/11/2026) | `develop` en `ef5e9be` | `analyze-final.md` y `converge-2026-11-26.md` de cada spec |
+| Analyze inicial de 001 y 005 (25/11/2026) | El padre de cada commit de correcciones (`8c1c27f`, `13fc6dd`); el informe original se recuperó de la sesión | `analyze-registro.md` de cada spec |
+| Analyze de 000-core y 002 | No consta (el padre de cada commit de correcciones es el estado analizado) | `analyze-registro.md` de cada spec |
 
 ## Versión de la herramienta
 
