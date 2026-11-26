@@ -380,6 +380,10 @@ HU-06 no crea entidades nuevas ni cambia las de `000-core` (spec.md, «Entidades
 
 ### Puntos a coordinar
 
+> **Alcance (26/11/2026)**: HU-03 y HU-07 quedaron **fuera del alcance comprometido** por acuerdo con el
+> profesor (el grupo son dos personas; ver [docs/agrupamiento.md](../../docs/agrupamiento.md)). El punto «HU-03 y HU-07 (C)» ya no tiene destinatario. Se conserva
+> como base para trabajo futuro: no hay nadie asignado y no es trabajo pendiente.
+
 - **Menú común** (todo el grupo, `000-core`): el layout común ya reserva un hueco en el menú del
   personal de centro para los módulos Reservas y Cancelaciones (spec-006 y spec-007). Añadir ahí el
   enlace a la pantalla de validación toca un fichero común y va por PR revisado.

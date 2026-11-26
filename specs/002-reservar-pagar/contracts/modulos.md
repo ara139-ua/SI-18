@@ -21,6 +21,10 @@ Se registran con `AddScoped` en `RegistroReservas.AddReservas()` (research.md E9
 
 ### `IServicioReservas` — **lo usa C en HU-03 y HU-07** (RF-019a)
 
+> **Alcance (26/11/2026)**: HU-03 y HU-07 quedaron **fuera del alcance comprometido** por acuerdo con el
+> profesor (el grupo son dos personas; ver [docs/agrupamiento.md](../../../docs/agrupamiento.md)). `IServicioReservas` está implementado y probado (spec-002), pero hoy no lo llama nadie. Se conserva
+> como base para trabajo futuro: no hay nadie asignado y no es trabajo pendiente.
+
 Reglas comunes a los dos métodos (research.md E8):
 
 - **El llamador abre la transacción antes** (`await db.Database.BeginTransactionAsync(ct)`) sobre el

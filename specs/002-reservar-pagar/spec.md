@@ -455,6 +455,8 @@ HU-02 no crea entidades nuevas. Usa las de `000-core` (spec.md, «Entidades clav
   (contracts/modulos.md). También implementa las operaciones de cancelar por el usuario y aplicar un
   cierre que piden HU-03 y HU-07 (confirmado en «Clarifications», RF-019a), para que nadie más escriba
   en esas tablas; C (HU-03, HU-07) solo las usa y se le avisa de la dependencia.
+  **Alcance (26/11/2026)**: HU-03 y HU-07 quedaron fuera del alcance comprometido por acuerdo con el
+  profesor (`docs/agrupamiento.md`); estas operaciones se conservan como base para trabajo futuro.
 - **Dependencias**: necesita de HU-01 la comprobación de disponibilidad y precio y la pantalla «Buscar
   pistas», donde va el botón «Reservar»; las dos ya están en `develop`, igual que la consulta provisional
   que hay que retirar. HU-03 pondrá su acción «Cancelar» sobre la pantalla «Mis reservas» de esta
