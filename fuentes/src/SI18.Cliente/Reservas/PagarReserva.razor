@@ -23,7 +23,7 @@
         <p>Paga antes de las @_reserva.HoraLimitePago; después la reserva caduca.</p>
 
         <form @onsubmit="Pagar" novalidate class="formulario-pago">
-            <MudTextField T="string" @bind-Value="_numeroTarjeta" Label="Número de tarjeta" Variant="Variant.Outlined"
+            <MudTextField T="string" @ref="_campoTarjeta" @bind-Value="_numeroTarjeta" Label="Número de tarjeta" Variant="Variant.Outlined"
                           InputMode="InputMode.numeric" UserAttributes="_atributosTarjeta"
                           HelperText="16 dígitos; es una tarjeta ficticia"
                           Error="_errorTarjeta is not null" ErrorText="@_errorTarjeta" />
@@ -57,16 +57,19 @@
 @code {
     [Parameter] public long Id { get; set; }
 
-    private enum Resultado { Pendiente, Confirmada, Caducada }
+    private enum Resultado { Pendiente, Confirmada, Caducada, Rechazado, NoPagable }
 
     // Si la reserva ya llega caducada no hay respuesta de error de la que leer el detalle; puede haber caducado
     // por tiempo, por un pago rechazado o por un cierre, así que el texto no dice por qué.
     private const string TextoYaCaducada = "Esta reserva ha caducado sin pagarse. Si la franja sigue libre, haz una reserva nueva.";
+    private const string TextoYaCancelada = "Esta reserva está cancelada y no se puede pagar.";
 
     private static readonly Dictionary<string, object> _atributosTarjeta = new() { ["autocomplete"] = "cc-number" };
 
     private MensajeAccesible _mensaje = null!;
     private ElementReference _encabezado;
+    private MudTextField<string> _campoTarjeta = null!;
+    private bool _enfocarCampo;
     private ReservaDto? _reserva;
     private Resultado _resultado;
     private string? _numeroTarjeta;
@@ -94,13 +97,16 @@
             {
                 EstadoReserva.Confirmada => Resultado.Confirmada,
                 EstadoReserva.Caducada => Resultado.Caducada,
+                EstadoReserva.Cancelada => Resultado.NoPagable,
                 _ => Resultado.Pendiente,
             };
 
-            if (_resultado == Resultado.Caducada)
+            _mensajePendiente = _resultado switch
             {
-                _mensajePendiente = (TextoYaCaducada, Severity.Warning);
-            }
+                Resultado.Caducada => (TextoYaCaducada, Severity.Warning),
+                Resultado.NoPagable => (TextoYaCancelada, Severity.Error),
+                _ => null,
+            };
         }
         catch (ErrorApi error)
         {
@@ -123,6 +129,13 @@
             _enfocarResultado = false;
             await _encabezado.FocusAsync();
         }
+
+        // Error de formato de la tarjeta: el foco queda en el campo, donde está el error (T035).
+        if (_enfocarCampo)
+        {
+            _enfocarCampo = false;
+            await _campoTarjeta.FocusAsync();
+        }
     }
 
     private async Task Pagar()
@@ -140,17 +153,25 @@
         {
             _reserva = await Api.PostAsync<PeticionPago, ReservaDto>(
                 $"/api/reservas/{Id}/pago", new PeticionPago(_numeroTarjeta ?? string.Empty));
-            _numeroTarjeta = null;
             MostrarResultado(Resultado.Confirmada, "Reserva confirmada.", Severity.Success);
         }
         catch (ErrorApi error) when (error.Errores.TryGetValue("numeroTarjeta", out var errores))
         {
             // Formato de la tarjeta: el error va en el propio campo; el formulario se queda.
             _errorTarjeta = string.Join(' ', errores);
+            _enfocarCampo = true;
         }
         catch (ErrorApi error) when (error.Codigo == "RESERVA_CADUCADA")
         {
             MostrarResultado(Resultado.Caducada, error.Detalle, Severity.Warning);
+        }
+        catch (ErrorApi error) when (error.Codigo == "PAGO_RECHAZADO")
+        {
+            MostrarResultado(Resultado.Rechazado, error.Detalle, Severity.Error);
+        }
+        catch (ErrorApi error) when (error.Codigo == "TRANSICION_NO_PERMITIDA")
+        {
+            MostrarResultado(Resultado.NoPagable, error.Detalle, Severity.Error);
         }
         catch (ErrorApi error)
         {
@@ -165,11 +186,15 @@
     private static string Encabezado(Resultado resultado) => resultado switch
     {
         Resultado.Caducada => "La reserva ha caducado",
+        Resultado.Rechazado => "El pago no se ha completado",
+        Resultado.NoPagable => "Esta reserva ya no se puede pagar",
         _ => throw new ArgumentOutOfRangeException(nameof(resultado), resultado, null),
     };
 
+    // El resultado nunca se transmite solo con color: siempre hay encabezado y texto (T035).
     private void MostrarResultado(Resultado resultado, string texto, Severity tipo)
     {
+        _numeroTarjeta = null;
         _resultado = resultado;
         _enfocarResultado = true;
         _mensaje.Mostrar(texto, tipo);

@@ -414,7 +414,7 @@ sin cambios.
   - **HU5 esc. 4**: pagar la reserva de otra persona → 404 `NO_ENCONTRADO` y la reserva no cambia.
 
   Depende de T033 y T017.
-- [ ] T035 [US3] En `src/SI18.Cliente/Reservas/PagarReserva.razor`, completar los resultados (research.md E11):
+- [X] T035 [US3] En `src/SI18.Cliente/Reservas/PagarReserva.razor`, completar los resultados (research.md E11):
   - 422 `PAGO_RECHAZADO` y 409 `TRANSICION_NO_PERMITIDA`: como T032, con `<h2 tabindex="-1">` «El pago no
     se ha completado» o «Esta reserva ya no se puede pagar», foco al encabezado, `MensajeAccesible`
     (`Severity.Error`) con el `Detalle` del catálogo y enlace «Volver a buscar pistas»;
