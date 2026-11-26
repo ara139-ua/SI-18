@@ -748,3 +748,13 @@ rojo sobre el código anterior y en verde después (enunciado 5.3).
   **Hecho** (26/11/2026): `MotivosRechazoTests.HU4_esc3_el_representante_del_club_duenio_de_la_franja_fija_tampoco_puede_reservarla` (Sur «Pista de tenis 2», domingos de 10:00 a 11:00, «Club de Pádel Ejemplo» y `representante.padel`): en verde sin cambios de código, como preveía el analyze (C2).
 - [X] T060 [Saul · revisa Artur] Documentar el paso nuevo del pago: research.md E4 (después de la vigencia, comprobar `ahora < inicio`; `FRANJA_YA_EMPEZADA`; la hora límite es la más temprana de las dos), el «Flujo» de plan.md y un escenario R19 en quickstart.md §3 (pagar con la franja ya empezada → 422 `FRANJA_YA_EMPEZADA`, reserva caducada) per analyze-final C1, plan: «Flujo de una reserva y su caducidad» (partial)
   **Hecho** (26/11/2026): research.md E4 (paso 4b y hora límite), «Flujo» de plan.md y escenario R19 en quickstart.md §3. R19 no se ha ejecutado a mano (la API no se arrancó por la falta de memoria); lo cubren las pruebas de T056 y T057.
+
+---
+
+## Phase 13: Convergence
+
+Tarea añadida por `/speckit-converge` el 2026-11-26, pasada final (informe en
+[converge-2026-11-26-final.md](./converge-2026-11-26-final.md)), después de implementar T055–T060 en el #54.
+Responsable: Saul. Revisor: Artur.
+
+- [ ] T061 [Saul · revisa Artur] En `contracts/api-reservas.openapi.yaml`, operación `/api/reservas/{id}/pago`: añadir 422 `FRANJA_YA_EMPEZADA` (vigente pero con la franja ya empezada: queda caducada y el pago fallido, sin cobro), incluir «o por una franja ya empezada» en `TRANSICION_NO_PERMITIDA` y en la descripción de la operación; solo documentación per RF-009a, T060 (partial)
