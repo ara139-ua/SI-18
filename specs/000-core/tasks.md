@@ -711,8 +711,16 @@ responsable.
 - [ ] T074 [Ambos] Ejecutar quickstart.md §2–§5 de principio a fin en las dos máquinas, con .NET 10:
   docker compose, `dotnet ef database update`, siembra, V1–V10 manuales y `dotnet test SI18.slnx`
   en verde.
-- [ ] T075 [Ambos] Revisar los secretos según quickstart.md §7 (`git grep` sin resultados) y comprobar
+- [X] T075 [Ambos] Revisar los secretos según quickstart.md §7 (`git grep` sin resultados) y comprobar
   con `git ls-files fuentes/.env` que `.env` no está versionado.
+
+  **Hecho (2026-11-26, Saul)**: el `git grep` de §7 devuelve 5 coincidencias y ninguna es un secreto:
+  `ErroresTests.cs:18` (contraseña `no-importa` en una cadena falsa a `127.0.0.1:1` para provocar el 500),
+  `quickstart.md:29` y `tasks.md:95` (huecos `<la de .env>` y `<cambia-esto>`), `quickstart.md:119`
+  (la propia orden) y `tasks.md:213` (`clave-de-prueba` de `FabricaApi`). Se deja el patrón como está
+  y se justifican en el PR. `git ls-files fuentes/.env` no devuelve nada (lo excluye
+  `fuentes/.gitignore:15`), `fuentes/.env` no aparece en el historial de ninguna rama y las contraseñas
+  reales de `.env` no están en ningún fichero versionado.
 - [ ] T076 [Ambos] Abrir el PR final de `develop` → `main`, con la lista de los principios I–IX
   revisados (constitución, «Flujo de trabajo»). Después, ejecutar `/speckit-converge` para 000-core.
 
