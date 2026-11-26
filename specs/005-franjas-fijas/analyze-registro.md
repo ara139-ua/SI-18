@@ -27,7 +27,7 @@ aparece).
 |----|---------------------|----------|---------------------------|----------|-------------|---------|--------|-------------------|
 | I1 | RF-016, RF-017 · contracts/modulos.md | MEDIA | `RepresentantesAfectados` no tiene consumidor y los cierres se leen con la provisional: HU-07 está fuera del alcance comprometido (constitución 1.2.0) | Nota de alcance: se conserva como base para trabajo futuro | Saul | Artur (revisa el cambio de Saul) | Resuelto (por Saul, #50) | contracts/modulos.md «Coordinación», nota de alcance |
 | E1 | CE-001 | BAJA | Sin tarea que mida «menos de 2 minutos» | Se da por cumplido con el recorrido de T025 (solicitud completa con teclado en menos de un minuto) | Artur | — | Aceptado | tasks.md T025 |
-| E2 | Historia 3, escenario 1 | BAJA | «Aprobar» desactivado no se comprobó en pantalla; la regla sí está probada en el servidor | Repetir la revisión con una solicitud con conflictos | Artur | — | Pendiente (comprobación manual) | tasks.md T025 |
+| E2 | Historia 3, escenario 1 | BAJA | «Aprobar» desactivado no se comprobó en pantalla; la regla sí está probada en el servidor | Repetir la revisión con una solicitud con conflictos | Artur | — | Verificado (26/11/2026, grabación de la demo) | Demo de HU-05, escenario «La de Elena choca con una reserva confirmada…»: con la reserva del viernes en conflicto, «Aprobar» sale desactivado con el texto «No se puede aprobar: hay reservas o franjas fijas en conflicto.» y la solicitud se rechaza |
 | U1 | Cabecera de spec.md | BAJA | «Estado: Borrador» | Cambiar a «Implementada» | Saul | Artur (revisa el cambio de Saul) | Resuelto (por Saul, #51) | spec.md «Estado: Implementada» |
 
 ### Hallazgo del converge
