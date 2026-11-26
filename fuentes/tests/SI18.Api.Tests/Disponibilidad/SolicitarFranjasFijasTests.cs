@@ -47,12 +47,13 @@ public class SolicitarFranjasFijasTests(FabricaApi fabrica)
         var pista = await _datos.Pista(Sur, "Pista de pádel 1");
         await _api.Crear(pista, [2], 19, 21);
 
-        using var ciudadana = await fabrica.CrearClienteConSesion("ciudadana.empadronada@si18.test");
-        var busqueda = await ciudadana.GetFromJsonAsync<ResultadoBusquedaDto>(
-            $"/api/disponibilidad/franjas?deporteId={await _datos.Deporte("Pádel")}&centroId={await _datos.Centro(Sur)}&fecha=2026-12-22",
-            OpcionesJson.Predeterminadas, Ct);
+        // Martes 9/3/2027 con un reloj propio (lunes 8/3): spec-002 reserva Sur pádel del 22 al 28/12 en
+        // CrearReservaTests, y una reserva suya de las 20:00 del 22/12 hacía fallar esta prueba según el orden.
+        var martes = new DateOnly(2027, 3, 9);
+        var busqueda = await _datos.ConServicio(DatosDisponibilidad.Utc(martes.AddDays(-1), 10), async servicio =>
+            await servicio.Buscar(await _datos.Deporte("Pádel"), await _datos.Centro(Sur), martes, SI18.Dominio.Comun.TipoTarifa.Empadronado, Ct));
 
-        var horas = busqueda!.Pistas.Single(p => p.InstalacionId == pista).Franjas.Select(f => f.HoraInicio).ToList();
+        var horas = busqueda.Pistas.Single(p => p.InstalacionId == pista).Franjas.Select(f => f.HoraInicio).ToList();
         Assert.Contains("19:00", horas);
         Assert.Contains("20:00", horas);
     }

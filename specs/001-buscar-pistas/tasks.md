@@ -305,9 +305,14 @@ deporte y cuando la fecha está fuera de plazo.
   - **títulos**: `<PageTitle>Buscar pistas · SI-18</PageTitle>` y un `<h1>` «Buscar pistas».
 
   Depende de T019.
-- [ ] T021 [US4] Comprobar a mano quickstart.md §5 sobre `/buscar-pistas`: recorrido solo con teclado,
+- [X] T021 [US4] Comprobar a mano quickstart.md §5 sobre `/buscar-pistas`: recorrido solo con teclado,
   anuncio del resultado, información sin color, Lighthouse ≥ 95 y axe sin infracciones graves ni
   críticas. Anotar el resultado en la descripción del PR (principio I). Depende de T020.
+  **Resultado (2026-11-26)**: recorrido solo con teclado (desplegables, fecha y botón), resultado anunciado en
+  `role="status"` («Hay 28 franjas libres en 2 pistas.» y el caso sin resultados), pistas con `<h2>` y franjas en
+  listas, contraste ≥ 8:1 y reflujo a 320 px. El foco invisible de MudBlazor y la barra cortada a 320 px se
+  corrigieron en el PR #35. Lighthouse (Accesibilidad) 100 y axe sin infracciones graves ni críticas, pasados
+  por Artur en Chrome.
 
 **Punto de control**: CE-006 cumplido.
 

@@ -385,8 +385,13 @@ provisional de spec-001 retirada.
   - `<PageTitle>` y `<h1>` en las dos pantallas.
 
   Depende de T009, T020.
-- [ ] T025 [US6] Comprobar a mano quickstart.md §5 en `/franjas-fijas` y `/franjas-fijas/revision`
+- [X] T025 [US6] Comprobar a mano quickstart.md §5 en `/franjas-fijas` y `/franjas-fijas/revision`
   (teclado, lector de pantalla, Lighthouse ≥ 95 y axe) y anotarlo en el PR (principio I). Depende de T024.
+  **Resultado (2026-11-26)**: solicitud y revisión completas solo con teclado; días en `<fieldset>` con la
+  leyenda «Días de la semana» y error enlazado con `aria-describedby`; envío, error y rechazo anunciados en
+  `role="status"`; estados en texto; «Ver conflictos» con `aria-expanded`; el foco vuelve a la lista tras
+  resolver. Foco visible y barra a 320 px corregidos en el PR #35. Lighthouse (Accesibilidad) ≥ 95 y axe sin
+  infracciones graves ni críticas, pasados por Artur en Chrome. Sin probar: «Aprobar» desactivado con conflictos.
 
 ---
 
