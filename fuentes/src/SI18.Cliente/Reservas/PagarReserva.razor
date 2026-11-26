@@ -24,9 +24,16 @@
 
         <form @onsubmit="Pagar" novalidate class="formulario-pago">
             <MudTextField T="string" @ref="_campoTarjeta" @bind-Value="_numeroTarjeta" Label="Número de tarjeta" Variant="Variant.Outlined"
-                          InputMode="InputMode.numeric" UserAttributes="_atributosTarjeta"
+                          InputMode="InputMode.numeric" UserAttributes="AtributosTarjeta"
                           HelperText="16 dígitos; es una tarjeta ficticia"
                           Error="_errorTarjeta is not null" ErrorText="@_errorTarjeta" />
+            @* MudBlazor 8 quita aria-describedby del campo cuando muestra el error (y no deja poner otro), y el texto
+               del error no tiene id: sin esto, el lector de pantalla diría «no válido» pero no el motivo (T042, T043).
+               role="alert" lo anuncia al aparecer sin sacar el foco del campo; aria-errormessage lo asocia al campo. *@
+            @if (_errorTarjeta is not null)
+            {
+                <span id="error-tarjeta" role="alert" class="solo-lector">@_errorTarjeta</span>
+            }
 
             <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Disabled="_enviando">
                 Pagar @FormatoEs.Importe(_reserva.Importe)
@@ -35,7 +42,7 @@
     }
     else if (_resultado == Resultado.Confirmada)
     {
-        <section aria-labelledby="encabezado-resultado">
+        <section aria-labelledby="encabezado-resultado" class="resultado-pago">
             <h2 id="encabezado-resultado" tabindex="-1" @ref="_encabezado" class="mud-typography mud-typography-h5 encabezado-resultado">
                 Reserva confirmada
             </h2>
@@ -45,7 +52,7 @@
     }
     else
     {
-        <section aria-labelledby="encabezado-resultado">
+        <section aria-labelledby="encabezado-resultado" class="resultado-pago">
             <h2 id="encabezado-resultado" tabindex="-1" @ref="_encabezado" class="mud-typography mud-typography-h5 encabezado-resultado">
                 @Encabezado(_resultado)
             </h2>
@@ -64,7 +71,9 @@
     private const string TextoYaCaducada = "Esta reserva ha caducado sin pagarse. Si la franja sigue libre, haz una reserva nueva.";
     private const string TextoYaCancelada = "Esta reserva está cancelada y no se puede pagar.";
 
-    private static readonly Dictionary<string, object> _atributosTarjeta = new() { ["autocomplete"] = "cc-number" };
+    private Dictionary<string, object> AtributosTarjeta => _errorTarjeta is null
+        ? new() { ["autocomplete"] = "cc-number" }
+        : new() { ["autocomplete"] = "cc-number", ["aria-errormessage"] = "error-tarjeta" };
 
     private MensajeAccesible _mensaje = null!;
     private ElementReference _encabezado;

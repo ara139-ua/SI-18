@@ -524,7 +524,7 @@ efectivo y el QR solo en las confirmadas.
 
 **Prueba independiente**: quickstart.md §5 (que aplica el §6 de `000-core/quickstart.md`).
 
-- [ ] T042 [US6] Completar la accesibilidad de `NuevaReserva.razor`, `PagarReserva.razor` y
+- [X] T042 [US6] Completar la accesibilidad de `NuevaReserva.razor`, `PagarReserva.razor` y
   `MisReservas.razor` en `src/SI18.Cliente/Reservas/` (RF-021; research.md E11):
   - `<PageTitle>` y `<h1>` en cada una: «Confirmar la reserva», «Pagar la reserva», «Mis reservas»;
   - orden de tabulación: resumen → campo → botón → enlaces del resultado; sin trampas de foco;

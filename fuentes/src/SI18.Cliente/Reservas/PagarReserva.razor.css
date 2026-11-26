@@ -20,3 +20,24 @@
 .encabezado-resultado:focus {
     outline: none;
 }
+
+/* Reflujo a 320 px (tasks.md T042): el botón no pasa del borde y su texto se parte en varias líneas. */
+.formulario-pago ::deep .mud-button-root,
+.resultado-pago ::deep .mud-button-root {
+    max-width: 100%;
+    white-space: normal;
+    text-align: start;
+}
+
+/* Texto solo para lectores de pantalla: el error de la tarjeta ya se ve debajo del campo. */
+.solo-lector {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}

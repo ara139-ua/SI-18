@@ -19,7 +19,7 @@
     <ResumenReserva Pista="@_resumen.Pista" Centro="@_resumen.Centro" Fecha="_resumen.Fecha"
                     HoraInicio="@_resumen.HoraInicio" HoraFin="@_resumen.HoraFin" Importe="_resumen.Importe" />
 
-    <form @onsubmit="Confirmar" novalidate>
+    <form @onsubmit="Confirmar" novalidate class="acciones-reserva">
         <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Disabled="_enviando">
             Confirmar reserva
         </MudButton>
@@ -27,7 +27,9 @@
 }
 else if (_rechazada)
 {
-    <MudButton Href="/buscar-pistas" Variant="Variant.Text" Color="Color.Primary">Volver a buscar pistas</MudButton>
+    <div class="acciones-reserva">
+        <MudButton Href="/buscar-pistas" Variant="Variant.Text" Color="Color.Primary">Volver a buscar pistas</MudButton>
+    </div>
 }
 
 @code {

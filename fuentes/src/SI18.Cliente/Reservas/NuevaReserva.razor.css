@@ -1,0 +1,8 @@
+/* Confirmar la reserva (tasks.md T024, T042). */
+
+/* Reflujo a 320 px (tasks.md T042): el botón no pasa del borde y su texto se parte en varias líneas. */
+.acciones-reserva ::deep .mud-button-root {
+    max-width: 100%;
+    white-space: normal;
+    text-align: start;
+}
