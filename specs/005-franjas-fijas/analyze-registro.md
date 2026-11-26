@@ -34,7 +34,7 @@ aparece).
 
 | ID | Origen | Gravedad | Evidencia | Decisión | Responsable | Revisor | Estado | Dónde se resuelve |
 |----|--------|----------|-----------|----------|-------------|---------|--------|-------------------|
-| F1 | RF-008, CE-003 | MEDIA | Los conflictos empezaban en «ahora» aunque la temporada no hubiera empezado | Empezar en `max(ahora, inicio de la temporada)` | Artur | Sin revisión registrada (#34) | Verificado (converge, pasada 2) | T030 · PR #34 · `ConflictosFranjasFijasTests.Antes_de_empezar_la_temporada_solo_cuentan_las_reservas_de_dentro_de_ella` |
+| F1 | RF-008, CE-003 | MEDIA | Los conflictos empezaban en «ahora» aunque la temporada no hubiera empezado | Empezar en `max(ahora, inicio de la temporada)` | Artur | Sin revisión registrada (#34) | Verificado (converge, pasada 2; antes: 1 de 1 en rojo con el código anterior, después: en verde, [t030-antes-despues.md](../../docs/evidencias/t030-antes-despues.md)) | T030 · PR #34 · `ConflictosFranjasFijasTests.Antes_de_empezar_la_temporada_solo_cuentan_las_reservas_de_dentro_de_ella` |
 
 ## 2. Matriz de trazabilidad de HU-05
 

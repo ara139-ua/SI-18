@@ -60,7 +60,7 @@ Todo es igual que en [000-core/plan.md](../000-core/plan.md#contexto-técnico); 
 | VIII. Cero alcance fantasma | Un endpoint y una pantalla. Sin caché, sin «todos los centros», sin botón «Reservar» (lo añade spec-002). Las provisionales tienen una justificación explícita (aclaración 1) y se retiran | ✅ | ✅ |
 | IX. Idioma, moneda y zona | Textos en español; `horaInicio` y `horaFin` calculadas en Madrid por la API; precio con `FormatoEs.Importe`; «hoy» en Madrid | ✅ | ✅ |
 | Pila y seguridad | La pila de 000-core, sin cambios; política `EsCiudadanoORepresentante` en el endpoint | ✅ | ✅ |
-| Colaboración | Solo escribe en `*/Disponibilidad`. Las provisionales están en la carpeta de Disponibilidad y se avisan en las specs 002, 005 y 007. Las dos líneas de `Program.cs` se proponen como convención en el PR (D6) | ✅ | ✅ |
+| Colaboración | Solo escribe en `*/Disponibilidad`. Las provisionales están en la carpeta de Disponibilidad y se avisan en las specs 002, 005 y 007. Las dos líneas de `Program.cs` se proponen como convención en el PR (D6; entraron en el #18 de 000-core, ver «Dependencias y riesgos») | ✅ | ✅ |
 
 **Resultado**: se supera sin infracciones. «Seguimiento de la complejidad» queda vacío. Las dos
 líneas en `Program.cs` (D6) no infringen la constitución: la regla de no tocarlo era una tarea de
@@ -85,6 +85,11 @@ specs/001-buscar-pistas/
 ```
 
 ### Código fuente (solo las carpetas de Disponibilidad, más dos líneas en `Program.cs` y una entrada de menú)
+
+> **Nota (26/11/2026, analyze final I2)**: el árbol es el del plan original. `ConsultaReservasProvisional` y
+> `ConsultaFranjasFijasProvisional` ya no existen: se retiraron al fusionar la consulta definitiva de cada dueño
+> (#31 de spec-002 y #33 de spec-005), como prevé RF-014a. Solo queda `ConsultaCierresProvisional`, que pasa a ser
+> la implementación de `IConsultaCierres` porque HU-07 está fuera del alcance comprometido.
 
 ```text
 fuentes/
@@ -145,7 +150,7 @@ HU-02 ──► IConsultaDisponibilidad.MotivoNoDisponible / Precio ──► mi
 | Dependencia o riesgo | Mitigación |
 | -------------------- | ---------- |
 | Los filtros necesitan `/api/centros`, `/api/deportes` e `/api/instalaciones` (T054 de 000-core, de Saul), que aún no están en `develop` | La API de HU-01 no depende de T054 y se construye y prueba antes. La pantalla se termina cuando T054 esté fusionado; si se retrasa, se avisa a Saul o se acuerda que Artur la haga |
-| `Program.cs` no tiene punto de entrada para los módulos | Dos líneas (`AddDisponibilidad`, `MapDisponibilidad`) propuestas como convención para 002–008 en el PR; revisa Saul (T072) (D6) |
+| `Program.cs` no tiene punto de entrada para los módulos | Dos líneas (`AddDisponibilidad`, `MapDisponibilidad`) propuestas como convención para 002–008 en el PR; revisa Saul (T072) (D6). **Nota (26/11/2026, analyze final I3)**: la convención entró antes, en el #18 de 000-core, y no en el PR de HU-01 (hallazgo G1 del analyze inicial; tasks.md T024) |
 | Las consultas provisionales se quedan para siempre o divergen de las definitivas | Comentario «PROVISIONAL» y pruebas de integración que fijan su comportamiento (D9). Aviso en las specs 002, 005 y 007. `/speckit-converge` las detecta si siguen ahí |
 | Divergencia entre lo que muestra la búsqueda y lo que cobra HU-02 | Un único código para la búsqueda y para `IConsultaDisponibilidad` (D4), y `ConsultaDisponibilidadTests` que lo comprueba (CE-004) |
 | Cambio de hora | `HorarioMadrid` para el día de Madrid y las horas de pared; prueba del 25/10/2026 (D9) |
