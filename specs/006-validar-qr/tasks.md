@@ -142,7 +142,7 @@ Reglas (E13 de spec-002):
   Depende de T003.
 - ~~T005~~ **Retirada** (análisis A1): no tenía entregable propio. La política va en T004 y la prueba en
   T020. Se conserva el número para no renumerar.
-- [ ] T006 Crear `tests/SI18.Api.Tests/Reservas/DatosValidaciones.cs` (se apoya en `DatosReservas` sin
+- [X] T006 Crear `tests/SI18.Api.Tests/Reservas/DatosValidaciones.cs` (se apoya en `DatosReservas` sin
   cambiarlo):
   - constantes de la tabla «Datos de las pruebas de integración» (`Carla`, `PersonalEste`,
     `PersonalOeste`, `Este`, `"Pista de pádel 2"`, las fechas);
