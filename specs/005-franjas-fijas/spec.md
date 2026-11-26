@@ -4,7 +4,7 @@
 
 **Creada**: 2026-11-25
 
-**Estado**: Borrador
+**Estado**: Implementada (todas las tareas de `tasks.md` cerradas; estado actualizado el 26/11/2026)
 
 **Responsable**: Artur (módulo `Disponibilidad`, `docs/agrupamiento.md`)
 
