@@ -1,5 +1,18 @@
 <!--
 Sync Impact Report
+- Versión: 1.1.0 → 1.2.0 (2026-11-26)
+- Motivo: el grupo son dos personas (Saul y Artur), con dos historias cada una; el alcance
+  comprometido (HU-01, HU-02, HU-05 y HU-06) está acordado con el profesor. HU-03, HU-04, HU-07 y
+  HU-08 quedan fuera del alcance comprometido (docs/agrupamiento.md).
+- Cambios: «Acuerdos de colaboración» (el equipo pasa de cuatro a dos personas y se nombra el alcance
+  comprometido) y el motivo del principio VII. No cambia ningún principio ni ninguna regla.
+- Impacto: docs/agrupamiento.md se reescribe; en las specs, los «Puntos a coordinar» y los contratos
+  dirigidos a «C» llevan una nota de alcance y se conservan como base para trabajo futuro. Sin
+  cambios en el código ni en las plantillas.
+- Versión menor (no de parche) porque cambia un acuerdo de colaboración con efecto en el alcance; no
+  mayor, porque no se quita ni se redefine ningún principio.
+---
+Informe anterior (1.1.0, 2026-10-21):
 - Versión: 1.0.0 → 1.1.0 (2026-10-21)
 - Idioma: el documento pasa de inglés a español (sin cambiar el sentido de I, II, IV, V y VI).
 - Principio modificado: III. Las reglas viven en el backend. Se quita la lista parcial de reglas
@@ -81,8 +94,9 @@ datos (`specs/000-core/data-model.md`) de la spec `000-core`. No los repiten ni 
 referencian. Si una spec necesita una entidad, un estado o un valor de negocio nuevo o distinto,
 el cambio se propone primero en `000-core` y solo después se usa en la spec. Si una spec
 contradice a `000-core`, manda `000-core`.
-Motivo: cuatro personas trabajan en paralelo sobre las mismas entidades (reserva, pago,
-instalación, franja, curso); sin un modelo común la integración falla.
+Motivo: varias personas trabajan en paralelo sobre las mismas entidades (reserva, pago,
+instalación, franja, curso), y la base debe servir también a las historias que quedan fuera del
+alcance comprometido; sin un modelo común la integración falla.
 
 ### VIII. Cero alcance fantasma
 No se implementa ninguna funcionalidad que no esté escrita en una especificación. Si surge una
@@ -129,8 +143,10 @@ de hora decide si se devuelve o no el dinero.
 
 ## Acuerdos de colaboración
 
-- El equipo son cuatro personas y cada una es responsable de dos historias; el reparto está en
-  `docs/agrupamiento.md` y no cambia sin acuerdo del grupo.
+- El equipo son dos personas (Saul y Artur) y cada una es responsable de dos historias; el alcance
+  comprometido (HU-01, HU-02, HU-05 y HU-06) está acordado con el profesor, y HU-03, HU-04, HU-07 y
+  HU-08 quedan fuera de él. El reparto está en `docs/agrupamiento.md` y no cambia sin acuerdo del
+  grupo.
 - Cada spec se trabaja en su propia rama (`spec-001` a `spec-008`); la base común (`000-core`, la
   constitución y la estructura del proyecto) se trabaja en `develop` y se lleva a `main` por pull
   request.
@@ -157,4 +173,4 @@ El cumplimiento se revisa en cada pull request y en la fase de planificación de
 explícitamente antes de fusionar. La guía de uso para quien contribuye está en
 [README.md](../../README.md).
 
-**Versión**: 1.1.0 | **Ratificada**: 2026-10-21 | **Última modificación**: 2026-10-21
+**Versión**: 1.2.0 | **Ratificada**: 2026-10-21 | **Última modificación**: 2026-11-26
