@@ -453,9 +453,25 @@ La demostración en vídeo la prepara Artur (`DemoSSD_G18.zip`, formato `.mp4`, 
 
 | Dato | Valor |
 | ---- | ----- |
-| Enlace | **Pendiente de Artur** |
-| Tamaño del fichero `DemoSSD_G18.zip` | **Pendiente de Artur** |
-| Qué muestra | Pendiente de Artur |
+| Enlace | Sin enlace externo: el vídeo va dentro de `DemoSSD_G18.zip`, que se sube junto con `ProyectoSSD_G18.zip`. Se abre `demo/index.html` |
+| Tamaño del fichero `DemoSSD_G18.zip` | 19,1 MB (20 009 931 bytes) |
+| Qué muestra | Las cuatro historias comprometidas y la base común, con todos sus escenarios: 5 vídeos `.mp4` (1280×720) y uno completo de 14:23 |
+
+Contenido del zip:
+
+- `demo/index.html` y `demo/datos.js`: página de acceso. Permite ver el vídeo completo o una historia cada vez, saltar a cada escenario desde la lista lateral y ver la historia de usuario y el escenario que se está reproduciendo.
+- `demo/video/`: un `.mp4` y una portada `.jpg` por historia, más `demo-completa.mp4`.
+
+| Vídeo | Historia | Duración | Escenarios |
+| ----- | -------- | -------- | ---------- |
+| `00-acceso.mp4` | 000 · Base común: acceso y menú por rol | 1:37 | 8 |
+| `01-buscar.mp4` | HU-01 · Buscar pistas disponibles | 2:34 | 11 |
+| `02-reservar.mp4` | HU-02 · Reservar una pista y pagarla | 4:00 | 13 |
+| `05-franjas.mp4` | HU-05 · Franjas fijas para clubes | 3:54 | 14 |
+| `06-validar.mp4` | HU-06 · Validar el QR en el acceso | 2:18 | 10 |
+| `demo-completa.mp4` | Las cinco seguidas | 14:23 | 56 |
+
+**Cómo se grabó**: con Playwright (Microsoft Edge) sobre la aplicación en local (`develop` del 26/11/2026), con una base propia para la demo (`si18_demo`) y los usuarios ficticios de la siembra de datos. Cada escena lleva un rótulo con el escenario y un cursor visible, y el ritmo es pausado para que se pueda seguir cada paso. Los datos de partida de cada escena (reservas, cierres, franjas fijas) se preparan antes de grabar, y la base se reinicia al empezar. HU-06 se grabó entre las 08:00 y las 22:00, porque el acceso permitido necesita una reserva en la franja en curso. La demo también sirvió de verificación: en ella se comprobó E2 del analyze final de la 005 (el botón «Aprobar» desactivado con su explicación).
 
 El enunciado limita a 100 MB el tamaño de subida de los dos ficheros zip entre los dos.
 
