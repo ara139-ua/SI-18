@@ -435,7 +435,7 @@ ve el personal.
     < 15 s (CE-005);
   - 20 llamadas a `POST /api/validaciones-acceso` con la API local (aceptadas y rechazadas): p95
     < 300 ms (000-core; research.md V12).
-- [ ] T029 [P] Avisar al grupo (constitución, «Acuerdos de colaboración»; plan.md, «Puntos a coordinar»):
+- [X] T029 [P] Avisar al grupo (constitución, «Acuerdos de colaboración»; plan.md, «Puntos a coordinar»):
   - a **C** (C4): HU-03 y HU-07 **no tienen que hacer nada** para invalidar un código; una reserva
     cancelada por `IServicioReservas` se rechaza sola con `QR_RESERVA_NO_CONFIRMADA`; enlace a
     contracts/modulos.md;
@@ -443,6 +443,8 @@ ve el personal.
     el menú del personal.
 
   Anotarlo en la descripción del PR.
+  **Hecho** (26/11/2026): aviso a C en https://github.com/ara139-ua/SI-18/issues/40#issuecomment-7198377510 y a
+  @ara139-ua en https://github.com/ara139-ua/SI-18/pull/46#issuecomment-7198378318.
 - [X] T030 Abrir los PR hacia `develop`, con la lista de los principios I–IX revisados, como en spec-002.
   **Antes de abrir cada PR, revisar los secretos** (constitución, «Flujo de trabajo», principio V;
   análisis D1): `git grep -nE "Password=|SI18_CLAVE_DEMO=.+[^>]$" -- ":!*.example"` (quickstart §7 de
