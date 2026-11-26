@@ -1,0 +1,12 @@
+/* Separa el botón del texto de la franja (tasks.md T021). Aquí y no en BuscarPistas.razor ni en app.css.
+   A 320 px no pasa del borde de la franja y su texto se puede partir (tasks.md T042). */
+.enlace-reservar {
+    display: inline-block;
+    max-width: 100%;
+    margin-left: 0.75rem;
+}
+
+.enlace-reservar ::deep .mud-button-root {
+    max-width: 100%;
+    white-space: normal;
+}

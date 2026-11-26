@@ -1,0 +1,168 @@
+openapi: 3.1.0
+info:
+  title: SI-18 · Validaciones de acceso (HU-06, validar el código QR)
+  version: 0.1.0
+  description: >
+    Validación del código de acceso de una reserva por el personal de centro. Convenciones HTTP, errores y
+    sesión según specs/000-core/contracts (README.md y errores.md). El esquema Problema y la cookie de
+    sesión son los de api-comun.openapi.yaml de 000-core. Exige sesión con rol personal_centro (política
+    EsPersonal): sin sesión → 401 NO_AUTENTICADO; con otro rol → 403 ROL_NO_PERMITIDO. En esos dos casos y
+    con el código vacío (400) no se registra ninguna validación. En todos los demás casos, aceptada o
+    rechazada, se registra una ValidacionAcceso antes de responder (research.md V4).
+security:
+  - cookieSesion: []
+paths:
+  /api/validaciones-acceso:
+    post:
+      summary: Validar un código de acceso y registrar el intento
+      description: >
+        Orden de RF-005 (research.md V3): QR_DESCONOCIDO → QR_OTRO_CENTRO → QR_RESERVA_NO_CONFIRMADA →
+        QR_FUERA_DE_VENTANA → aceptada. La ventana es la de ReglaAcceso de 000-core (desde 15 minutos antes
+        del inicio hasta el fin, ambos incluidos). La reserva no se modifica.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PeticionValidacionAcceso' }
+            examples:
+              codigo:
+                value: { codigo: 'q3Jx0vT9bA2mKcLw8ZpY1g' }
+      responses:
+        '201':
+          description: >
+            Código aceptado. validacionAnteriorUtc y validacionAnteriorHora solo vienen si la reserva ya tenía
+            otra validación aceptada (la más reciente; RF-006a).
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ValidacionAcceso' }
+              examples:
+                primera:
+                  value:
+                    validacionId: 41
+                    titular: Carla Vecina
+                    instalacion: Pista de pádel 2
+                    centro: Polideportivo Este
+                    fecha: '2027-01-19'
+                    horaInicio: '10:00'
+                    horaFin: '11:00'
+                    validacionAnteriorUtc: null
+                    validacionAnteriorHora: null
+                repetida:
+                  value:
+                    validacionId: 42
+                    titular: Carla Vecina
+                    instalacion: Pista de pádel 2
+                    centro: Polideportivo Este
+                    fecha: '2027-01-19'
+                    horaInicio: '10:00'
+                    horaFin: '11:00'
+                    validacionAnteriorUtc: '2027-01-19T08:50:00Z'
+                    validacionAnteriorHora: '09:50'
+        '400':
+          description: PETICION_INVALIDA con errors.codigo (falta el código o solo tiene espacios). No se registra.
+          content:
+            application/problem+json:
+              schema: { $ref: '../../000-core/contracts/api-comun.openapi.yaml#/components/schemas/Problema' }
+        '401':
+          description: NO_AUTENTICADO. No se registra.
+          content:
+            application/problem+json:
+              schema: { $ref: '../../000-core/contracts/api-comun.openapi.yaml#/components/schemas/Problema' }
+        '403':
+          description: >
+            ROL_NO_PERMITIDO (ciudadano, representante o técnico; no se registra) o QR_OTRO_CENTRO (la reserva es
+            de otro centro; se registra, con validacionId y sin la extensión reserva). El cliente los distingue
+            por codigo.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/RechazoValidacion' }
+              examples:
+                otroCentro:
+                  value:
+                    type: https://si18.test/errores/qr-otro-centro
+                    title: Código de otro centro
+                    status: 403
+                    detail: Este código pertenece a una reserva de otro centro.
+                    codigo: QR_OTRO_CENTRO
+                    traceId: 00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01
+                    validacionId: 43
+        '422':
+          description: >
+            QR_DESCONOCIDO (sin la extensión reserva), QR_RESERVA_NO_CONFIRMADA o QR_FUERA_DE_VENTANA (con la
+            extensión reserva: instalación, centro, fecha y horas, sin titular; RF-007). Siempre se registra.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/RechazoValidacion' }
+              examples:
+                fueraDeVentana:
+                  value:
+                    type: https://si18.test/errores/qr-fuera-de-ventana
+                    title: Código fuera de horario
+                    status: 422
+                    detail: El código solo es válido desde 15 minutos antes del inicio hasta el final de la reserva.
+                    codigo: QR_FUERA_DE_VENTANA
+                    traceId: 00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01
+                    validacionId: 44
+                    reserva:
+                      instalacion: Pista de pádel 2
+                      centro: Polideportivo Este
+                      fecha: '2027-01-19'
+                      horaInicio: '10:00'
+                      horaFin: '11:00'
+                desconocido:
+                  value:
+                    type: https://si18.test/errores/qr-desconocido
+                    title: Código no válido
+                    status: 422
+                    detail: Código no válido.
+                    codigo: QR_DESCONOCIDO
+                    traceId: 00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01
+                    validacionId: 45
+components:
+  securitySchemes:
+    cookieSesion:
+      type: apiKey
+      in: cookie
+      name: si18.sesion
+  schemas:
+    PeticionValidacionAcceso:
+      type: object
+      required: [codigo]
+      properties:
+        codigo:
+          type: string
+          description: El código que aparece bajo el QR (22 caracteres Base64url). Se quitan los espacios de los extremos.
+    ValidacionAcceso:
+      type: object
+      required: [validacionId, titular, instalacion, centro, fecha, horaInicio, horaFin]
+      properties:
+        validacionId: { type: integer, format: int64 }
+        titular: { type: string }
+        instalacion: { type: string }
+        centro: { type: string }
+        fecha: { type: string, format: date, description: Fecha de Madrid }
+        horaInicio: { type: string, pattern: '^[0-2][0-9]:[0-5][0-9]$', description: Hora de Madrid }
+        horaFin: { type: string, pattern: '^[0-2][0-9]:[0-5][0-9]$', description: Hora de Madrid }
+        validacionAnteriorUtc: { type: [string, 'null'], format: date-time }
+        validacionAnteriorHora: { type: [string, 'null'], pattern: '^[0-2][0-9]:[0-5][0-9]$', description: Hora de Madrid }
+    ReservaValidada:
+      type: object
+      description: Datos de la reserva en un rechazo QR_RESERVA_NO_CONFIRMADA o QR_FUERA_DE_VENTANA. Nunca el titular.
+      required: [instalacion, centro, fecha, horaInicio, horaFin]
+      properties:
+        instalacion: { type: string }
+        centro: { type: string }
+        fecha: { type: string, format: date }
+        horaInicio: { type: string }
+        horaFin: { type: string }
+    RechazoValidacion:
+      description: Problema de 000-core con las extensiones de HU-06 (research.md V2).
+      allOf:
+        - $ref: '../../000-core/contracts/api-comun.openapi.yaml#/components/schemas/Problema'
+        - type: object
+          properties:
+            validacionId:
+              type: integer
+              format: int64
+              description: La validación registrada. No viene con ROL_NO_PERMITIDO (no se registra).
+            reserva: { $ref: '#/components/schemas/ReservaValidada' }

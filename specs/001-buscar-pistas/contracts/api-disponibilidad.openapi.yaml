@@ -1,0 +1,123 @@
+openapi: 3.1.0
+info:
+  title: SI-18 · Disponibilidad (HU-01, buscar pistas libres)
+  version: 0.1.0
+  description: >
+    Búsqueda de franjas libres. Convenciones HTTP, errores y sesión según specs/000-core/contracts
+    (README.md y errores.md). Los esquemas Problema, TipoInstalacion y la cookie de sesión son los de
+    api-comun.openapi.yaml de 000-core.
+paths:
+  /api/disponibilidad/franjas:
+    get:
+      summary: Franjas libres de un deporte en un centro y una fecha, con el precio de la tarifa del usuario
+      description: >
+        Requiere sesión con rol ciudadano o representante_club (política EsCiudadanoORepresentante).
+        Solo devuelve franjas libres según RF-011 de 000-core, evaluadas en el momento de la petición.
+      security:
+        - cookieSesion: []
+      parameters:
+        - name: deporteId
+          in: query
+          required: true
+          schema: { type: integer }
+        - name: centroId
+          in: query
+          required: true
+          schema: { type: integer }
+        - name: fecha
+          in: query
+          required: true
+          description: Fecha de Madrid; entre hoy y hoy + 7 días naturales.
+          schema: { type: string, format: date, examples: ['2026-12-26'] }
+      responses:
+        '200':
+          description: >
+            Resultado de la búsqueda. Con totalPistas = 0, el centro no tiene pistas reservables del
+            deporte. Con totalPistas > 0 y pistas vacía, no quedan franjas libres.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ResultadoBusqueda' }
+              examples:
+                conFranjas:
+                  value:
+                    fecha: '2026-12-26'
+                    centroId: 1
+                    deporteId: 2
+                    totalPistas: 2
+                    pistas:
+                      - instalacionId: 3
+                        nombre: Pista de pádel 1
+                        tipo: pista_padel
+                        franjas:
+                          - inicioUtc: '2026-12-26T17:00:00Z'
+                            finUtc: '2026-12-26T18:00:00Z'
+                            horaInicio: '18:00'
+                            horaFin: '19:00'
+                            precio: 6.00
+        '400':
+          description: PETICION_INVALIDA (falta un parámetro o tiene un formato incorrecto), con errors por campo.
+          content:
+            application/problem+json:
+              schema: { $ref: '../../000-core/contracts/api-comun.openapi.yaml#/components/schemas/Problema' }
+        '401':
+          description: NO_AUTENTICADO.
+          content:
+            application/problem+json:
+              schema: { $ref: '../../000-core/contracts/api-comun.openapi.yaml#/components/schemas/Problema' }
+        '403':
+          description: ROL_NO_PERMITIDO (personal de centro o técnico de concejalía).
+          content:
+            application/problem+json:
+              schema: { $ref: '../../000-core/contracts/api-comun.openapi.yaml#/components/schemas/Problema' }
+        '404':
+          description: NO_ENCONTRADO (el deporte o el centro no existen).
+          content:
+            application/problem+json:
+              schema: { $ref: '../../000-core/contracts/api-comun.openapi.yaml#/components/schemas/Problema' }
+        '422':
+          description: FUERA_DE_ANTELACION (fecha anterior a hoy o posterior a hoy + 7, en Madrid).
+          content:
+            application/problem+json:
+              schema: { $ref: '../../000-core/contracts/api-comun.openapi.yaml#/components/schemas/Problema' }
+components:
+  securitySchemes:
+    cookieSesion:
+      type: apiKey
+      in: cookie
+      name: si18.sesion
+  schemas:
+    ResultadoBusqueda:
+      type: object
+      required: [fecha, centroId, deporteId, totalPistas, pistas]
+      properties:
+        fecha: { type: string, format: date }
+        centroId: { type: integer }
+        deporteId: { type: integer }
+        totalPistas: { type: integer, minimum: 0 }
+        pistas:
+          type: array
+          description: Solo pistas con al menos una franja libre, ordenadas por nombre.
+          items: { $ref: '#/components/schemas/PistaLibre' }
+    PistaLibre:
+      type: object
+      required: [instalacionId, nombre, tipo, franjas]
+      properties:
+        instalacionId: { type: integer }
+        nombre: { type: string }
+        tipo:
+          type: string
+          enum: [pista_tenis, pista_padel]
+        franjas:
+          type: array
+          minItems: 1
+          description: Ordenadas por inicioUtc.
+          items: { $ref: '#/components/schemas/FranjaLibre' }
+    FranjaLibre:
+      type: object
+      required: [inicioUtc, finUtc, horaInicio, horaFin, precio]
+      properties:
+        inicioUtc: { type: string, format: date-time }
+        finUtc: { type: string, format: date-time }
+        horaInicio: { type: string, examples: ['18:00'], description: Hora de pared de Madrid. }
+        horaFin: { type: string, examples: ['19:00'], description: Hora de pared de Madrid. }
+        precio: { type: number, examples: [6.00], description: Euros, dos decimales, tarifa de quien busca. }

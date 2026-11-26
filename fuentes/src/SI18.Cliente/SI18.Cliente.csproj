@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" />
+    <!-- AuthenticationStateProvider y AuthorizeView para el estado de sesión (T056). -->
+    <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" PrivateAssets="all" />
+    <PackageReference Include="MudBlazor" />
+    <PackageReference Include="QRCoder" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SI18.Contratos\SI18.Contratos.csproj" />
+  </ItemGroup>
+
+</Project>

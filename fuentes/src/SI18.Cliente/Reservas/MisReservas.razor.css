@@ -1,0 +1,24 @@
+/* «Mis reservas» (tasks.md T040, T042). */
+.lista-reservas {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-width: 48rem;
+}
+
+.reserva {
+    border-bottom: 1px solid #E0E0E0;
+    padding: 1rem 0;
+    overflow-wrap: anywhere;
+}
+
+.reserva p {
+    margin: 0.25rem 0;
+}
+
+/* Reflujo a 320 px (tasks.md T042): el botón no pasa del borde y su texto se parte en varias líneas. */
+.reserva ::deep .mud-button-root {
+    max-width: 100%;
+    white-space: normal;
+    text-align: start;
+}

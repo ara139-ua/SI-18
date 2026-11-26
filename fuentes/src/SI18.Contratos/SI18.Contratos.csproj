@@ -1,0 +1,5 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- DTO compartidos entre la API y el cliente (contracts/README.md). Sin dependencias. -->
+
+</Project>

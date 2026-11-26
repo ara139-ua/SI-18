@@ -1,0 +1,244 @@
+@page "/buscar-pistas"
+@using System.Globalization
+@using SI18.Contratos.Disponibilidad
+@using SI18.Cliente.Reservas
+@inject ClienteApi Api
+@inject EstadoSesion Sesion
+@inject NavigationManager Navegacion
+@inject TimeProvider Reloj
+
+@* Buscar pistas libres (spec-001 HU-01; research.md D7 y D8; tasks.md T012, T017, T019, T020).
+   La regla vive en la API: la pantalla solo pide los filtros, muestra el resultado y lo anuncia. *@
+
+<PageTitle>Buscar pistas · SI-18</PageTitle>
+
+<MudText Typo="Typo.h4" HtmlTag="h1" GutterBottom="true">Buscar pistas</MudText>
+
+<MensajeAccesible @ref="_mensaje" />
+
+@if (_puedeBuscar)
+{
+    <form @onsubmit="Buscar" novalidate class="filtros-busqueda">
+        @* Tras elegir, MudBlazor deja el foco en <body>: se devuelve al desplegable (T026; RF-015). *@
+        <MudSelect T="int?" @ref="_selectDeporte" Value="_deporteId" ValueChanged="ElegirDeporte" Label="Deporte" Required="true"
+                   RequiredError="Elige un deporte." Variant="Variant.Outlined" AnchorOrigin="Origin.BottomLeft">
+            @foreach (var deporte in _deportes)
+            {
+                <MudSelectItem T="int?" Value="@deporte.Id">@deporte.Nombre</MudSelectItem>
+            }
+        </MudSelect>
+
+        <MudSelect T="int?" @ref="_selectCentro" Value="_centroId" ValueChanged="ElegirCentro" Label="Centro" Required="true"
+                   RequiredError="Elige un centro." Variant="Variant.Outlined" AnchorOrigin="Origin.BottomLeft">
+            @foreach (var centro in _centros)
+            {
+                <MudSelectItem T="int?" Value="@centro.Id">@centro.Nombre</MudSelectItem>
+            }
+        </MudSelect>
+
+        <MudDatePicker @bind-Date="_fecha" Label="Fecha" Required="true" RequiredError="Elige una fecha."
+                       MinDate="_hoy" MaxDate="_hoy.AddDays(AntelacionMaximaDias)" Editable="true"
+                       DateFormat="dd/MM/yyyy" Culture="_cultura" Variant="Variant.Outlined"
+                       HelperText="Desde hoy hasta dentro de 7 días (dd/mm/aaaa)." />
+
+        @* No se desactiva mientras busca: un botón desactivado pierde el foco y quien usa el teclado acabaría en <body>. *@
+        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">
+            Buscar pistas
+        </MudButton>
+    </form>
+
+    @if (_resultado is { Pistas.Count: > 0 })
+    {
+        <div class="resultado-busqueda">
+            @foreach (var pista in _resultado.Pistas)
+            {
+                <section aria-labelledby="@($"pista-{pista.InstalacionId}")" class="pista-libre">
+                    <MudText Typo="Typo.h6" HtmlTag="h2" id="@($"pista-{pista.InstalacionId}")">@pista.Nombre</MudText>
+                    <ul role="list" class="lista-franjas">
+                        @foreach (var franja in pista.Franjas)
+                        {
+                            <li role="listitem">@franja.HoraInicio–@franja.HoraFin · @FormatoEs.Importe(franja.Precio)
+                                <EnlaceReservar Pista="pista" Franja="franja" Fecha="_resultado.Fecha" /></li>
+                        }
+                    </ul>
+                </section>
+            }
+        </div>
+    }
+}
+
+@code {
+    // Solo una ayuda para el selector: la regla de antelación la aplica la API (research.md D8).
+    private const int AntelacionMaximaDias = 7;
+
+    private MensajeAccesible _mensaje = null!;
+    private MudSelect<int?> _selectDeporte = null!;
+    private MudSelect<int?> _selectCentro = null!;
+    private bool _puedeBuscar;
+    private bool _sinPermiso;
+    private bool _buscando;
+
+    private List<DeporteDto> _deportes = [];
+    private List<CentroDto> _centros = [];
+    private int? _deporteId;
+    private int? _centroId;
+    private DateTime _hoy;
+    private DateTime? _fecha;
+    private ResultadoBusquedaDto? _resultado;
+
+    private readonly CultureInfo _cultura = CulturaEspanola();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Acceso directo por URL (RF-001; tasks.md T012): sin sesión, a iniciar sesión; con otro rol, sin formulario.
+        var estado = await Sesion.GetAuthenticationStateAsync();
+        if (estado.User.Identity?.IsAuthenticated != true)
+        {
+            Navegacion.NavigateTo(ClienteApi.RutaInicioSesion);
+            return;
+        }
+
+        if (!estado.User.IsInRole("ciudadano") && !estado.User.IsInRole("representante_club"))
+        {
+            _sinPermiso = true;
+            return;
+        }
+
+        _hoy = HoyEnMadrid();
+        _fecha = _hoy;
+
+        try
+        {
+            var deportes = await Api.GetAsync<List<DeporteDto>>("/api/deportes");
+            var pistas = await Api.GetAsync<List<InstalacionDto>>("/api/instalaciones?reservablePorFranjas=true");
+            _centros = await Api.GetAsync<List<CentroDto>>("/api/centros");
+
+            // Solo los deportes que tienen alguna pista reservable por franjas (RF-004).
+            var conPistas = pistas.SelectMany(p => p.DeporteIds).ToHashSet();
+            _deportes = deportes.Where(d => conPistas.Contains(d.Id)).ToList();
+            _puedeBuscar = true;
+        }
+        catch (ErrorApi error)
+        {
+            _mensajePendiente = (error.Detalle, Severity.Error);
+        }
+    }
+
+    private (string Texto, Severity Tipo)? _mensajePendiente;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        // MensajeAccesible solo existe después del primer renderizado.
+        if (_sinPermiso)
+        {
+            _sinPermiso = false;
+            _mensaje.Mostrar("La búsqueda de pistas es para ciudadanos y representantes de club.", Severity.Warning);
+        }
+        else if (_mensajePendiente is { } pendiente)
+        {
+            _mensajePendiente = null;
+            _mensaje.Mostrar(pendiente.Texto, pendiente.Tipo);
+        }
+    }
+
+    private async Task ElegirDeporte(int? deporteId)
+    {
+        _deporteId = deporteId;
+        await DevolverFoco(_selectDeporte);
+    }
+
+    private async Task ElegirCentro(int? centroId)
+    {
+        _centroId = centroId;
+        await DevolverFoco(_selectCentro);
+    }
+
+    /// <summary>
+    /// MudBlazor cierra la lista de opciones y deja el foco en &lt;body&gt;. Se espera a que termine de cerrarla y
+    /// se devuelve el foco al desplegable, para que siempre se vea dónde está (RF-015; T026).
+    /// </summary>
+    private static async Task DevolverFoco(MudSelect<int?> select)
+    {
+        await Task.Yield();
+        await select.FocusAsync();
+    }
+
+    private async Task Buscar()
+    {
+        if (_buscando)
+        {
+            return;
+        }
+
+        if (_deporteId is null || _centroId is null || _fecha is null)
+        {
+            _mensaje.Mostrar("Elige un deporte, un centro y una fecha.", Severity.Warning);
+            return;
+        }
+
+        _buscando = true;
+        _resultado = null;
+        _mensaje.Limpiar();
+
+        try
+        {
+            var fecha = DateOnly.FromDateTime(_fecha.Value);
+            var ruta = $"/api/disponibilidad/franjas?deporteId={_deporteId}&centroId={_centroId}&fecha={fecha.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}";
+            _resultado = await Api.GetAsync<ResultadoBusquedaDto>(ruta);
+            AnunciarResultado(_resultado, fecha);
+        }
+        catch (ErrorApi error)
+        {
+            _mensaje.Mostrar(error.Detalle, Severity.Error);
+        }
+        finally
+        {
+            _buscando = false;
+        }
+    }
+
+    /// <summary>Mensaje anunciado tras buscar, sin mover el foco (RF-011, RF-015).</summary>
+    private void AnunciarResultado(ResultadoBusquedaDto resultado, DateOnly fecha)
+    {
+        var deporte = _deportes.Single(d => d.Id == resultado.DeporteId).Nombre.ToLower(_cultura);
+        var centro = _centros.Single(c => c.Id == resultado.CentroId).Nombre;
+
+        if (resultado.TotalPistas == 0)
+        {
+            _mensaje.Mostrar($"{centro} no tiene pistas de {deporte}.", Severity.Info);
+            return;
+        }
+
+        if (resultado.Pistas.Count == 0)
+        {
+            _mensaje.Mostrar(
+                $"No hay pistas libres de {deporte} en {centro} el {fecha.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture)}. Prueba otra fecha u otro centro.",
+                Severity.Info);
+            return;
+        }
+
+        var franjas = resultado.Pistas.Sum(p => p.Franjas.Count);
+        var pistas = resultado.Pistas.Count;
+        _mensaje.Mostrar(
+            $"Hay {franjas} {(franjas == 1 ? "franja libre" : "franjas libres")} en {pistas} {(pistas == 1 ? "pista" : "pistas")}.",
+            Severity.Success);
+    }
+
+    private DateTime HoyEnMadrid()
+    {
+        var madrid = TimeZoneInfo.FindSystemTimeZoneById("Europe/Madrid");
+        return TimeZoneInfo.ConvertTime(Reloj.GetUtcNow(), madrid).Date;
+    }
+
+    private static CultureInfo CulturaEspanola()
+    {
+        try
+        {
+            return CultureInfo.GetCultureInfo("es-ES");
+        }
+        catch (CultureNotFoundException)
+        {
+            return CultureInfo.InvariantCulture;
+        }
+    }
+}

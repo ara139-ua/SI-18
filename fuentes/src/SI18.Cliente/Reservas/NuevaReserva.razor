@@ -1,0 +1,157 @@
+@page "/reservas/nueva"
+@using SI18.Contratos.Reservas
+@inject ClienteApi Api
+@inject EstadoSesion Sesion
+@inject NavigationManager Navegacion
+
+@* Resumen y confirmación de una reserva (specs/002-reservar-pagar/research.md E11; tasks.md T024).
+   La regla vive en la API: la pantalla pide el resumen, lo muestra y crea la reserva con el importe mostrado. *@
+
+<PageTitle>Confirmar la reserva · SI-18</PageTitle>
+
+@* <h1> escrito a mano (con las clases de MudText) para poder devolverle el foco tras un rechazo. *@
+<h1 tabindex="-1" @ref="_titulo" class="mud-typography mud-typography-h4 mud-typography-gutterbottom">Confirmar la reserva</h1>
+
+<MensajeAccesible @ref="_mensaje" />
+
+@if (_resumen is not null)
+{
+    <ResumenReserva Pista="@_resumen.Pista" Centro="@_resumen.Centro" Fecha="_resumen.Fecha"
+                    HoraInicio="@_resumen.HoraInicio" HoraFin="@_resumen.HoraFin" Importe="_resumen.Importe" />
+
+    <form @onsubmit="Confirmar" novalidate class="acciones-reserva">
+        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Disabled="_enviando">
+            Confirmar reserva
+        </MudButton>
+    </form>
+}
+else if (_rechazada)
+{
+    <div class="acciones-reserva">
+        <MudButton Href="/buscar-pistas" Variant="Variant.Text" Color="Color.Primary">Volver a buscar pistas</MudButton>
+    </div>
+}
+
+@code {
+    [SupplyParameterFromQuery(Name = "instalacionId")] public int? InstalacionId { get; set; }
+    [SupplyParameterFromQuery(Name = "inicioUtc")] public string? InicioUtc { get; set; }
+
+    private MensajeAccesible _mensaje = null!;
+    private ResumenReservaDto? _resumen;
+    private bool _enviando;
+    private bool _rechazada;
+    private bool _enfocarTitulo;
+    private ElementReference _titulo;
+    private (string Texto, Severity Tipo)? _mensajePendiente;
+
+    protected override async Task OnInitializedAsync()
+    {
+        switch (await AccesoReservas.Comprobar(Sesion))
+        {
+            case Acceso.SinSesion:
+                Navegacion.NavigateTo(ClienteApi.RutaInicioSesion);
+                return;
+            case Acceso.SinPermiso:
+                _mensajePendiente = (AccesoReservas.AvisoSinPermiso, Severity.Warning);
+                return;
+        }
+
+        try
+        {
+            _resumen = await PedirResumen();
+        }
+        catch (ErrorApi error)
+        {
+            _rechazada = true;
+            _mensajePendiente = (error.Detalle, Severity.Error);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // MensajeAccesible solo existe después del primer renderizado.
+        if (_mensajePendiente is { } pendiente)
+        {
+            _mensajePendiente = null;
+            _mensaje.Mostrar(pendiente.Texto, pendiente.Tipo);
+        }
+
+        // El botón pulsado ha desaparecido o se ha desactivado: el foco vuelve al título para no perderse en <body>.
+        if (_enfocarTitulo)
+        {
+            _enfocarTitulo = false;
+            await _titulo.FocusAsync();
+        }
+    }
+
+    private async Task VolverAPedirResumen(string detalle)
+    {
+        try
+        {
+            _resumen = await PedirResumen();
+            _mensaje.Mostrar(detalle, Severity.Warning);
+        }
+        catch (ErrorApi error)
+        {
+            Rechazar(error.Detalle);
+        }
+    }
+
+    /// <summary>Sin resumen ni botón: solo el motivo y el enlace para volver a buscar (T037).</summary>
+    private void Rechazar(string detalle)
+    {
+        _resumen = null;
+        _rechazada = true;
+        _mensaje.Mostrar(detalle, Severity.Error);
+    }
+
+    // Un parámetro que falta en la URL no se envía vacío: la API responde 400 con el error de ese campo.
+    private Task<ResumenReservaDto> PedirResumen()
+    {
+        var parametros = new List<string>();
+        if (InstalacionId is { } instalacionId)
+        {
+            parametros.Add($"instalacionId={instalacionId.ToString(System.Globalization.CultureInfo.InvariantCulture)}");
+        }
+
+        if (!string.IsNullOrEmpty(InicioUtc))
+        {
+            parametros.Add($"inicioUtc={Uri.EscapeDataString(InicioUtc)}");
+        }
+
+        return Api.GetAsync<ResumenReservaDto>($"/api/reservas/resumen?{string.Join('&', parametros)}");
+    }
+
+    private async Task Confirmar()
+    {
+        if (_enviando || _resumen is null)
+        {
+            return;
+        }
+
+        _enviando = true;
+        _mensaje.Limpiar();
+
+        try
+        {
+            var reserva = await Api.PostAsync<PeticionReserva, ReservaDto>(
+                "/api/reservas", new PeticionReserva(_resumen.InstalacionId, _resumen.InicioUtc, _resumen.Importe));
+            Navegacion.NavigateTo($"/reservas/{reserva.Id}/pago");
+        }
+        catch (ErrorApi error) when (error.Codigo == "PRECIO_CAMBIADO")
+        {
+            // HU4 esc. 5: se vuelve a pedir el resumen y se puede confirmar con el importe nuevo.
+            await VolverAPedirResumen(error.Detalle);
+            _enfocarTitulo = true;
+        }
+        catch (ErrorApi error)
+        {
+            Rechazar(error.Detalle);
+            _enfocarTitulo = true;
+        }
+        finally
+        {
+            _enviando = false;
+        }
+    }
+}

@@ -1,0 +1,200 @@
+@page "/franjas-fijas/revision"
+@using SI18.Contratos.Disponibilidad
+@inject ClienteApi Api
+@inject EstadoSesion Sesion
+@inject NavigationManager Navegacion
+
+@* Revisar las solicitudes de franjas fijas (spec-005 HU-05, historias 2–4; research.md F8; tasks.md T013, T017, T020,
+   T024). Los conflictos se calculan en la API y se vuelven a comprobar al aprobar: aquí solo se muestran. *@
+
+<PageTitle>Revisar franjas fijas · SI-18</PageTitle>
+
+<MudText Typo="Typo.h4" HtmlTag="h1" GutterBottom="true">Revisar franjas fijas</MudText>
+
+<MensajeAccesible @ref="_mensaje" />
+
+@if (_puede)
+{
+    <div tabindex="-1" @ref="_contenedorLista" class="contenedor-avisos">
+        @if (_solicitudes.Count == 0)
+        {
+            <MudText>No hay solicitudes.</MudText>
+        }
+        else
+        {
+            <ul role="list" class="lista-solicitudes">
+                @foreach (var s in _solicitudes)
+                {
+                    var conflictos = _conflictos.GetValueOrDefault(s.Id);
+                    var idDetalle = $"conflictos-{s.Id}";
+                    var idMotivo = $"motivo-{s.Id}";
+                    <li role="listitem" class="solicitud">
+                        <div>
+                            <strong>@s.ClubNombre</strong>: @TextosFranjasFijas.Resumen(s) —
+                            <strong>@TextosFranjasFijas.Estado(s.Estado)</strong>
+                        </div>
+
+                        @if (s.Estado == EstadoSolicitud.Pendiente)
+                        {
+                            <div class="acciones-solicitud">
+                                <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="() => Alternar(s.Id)"
+                                           aria-expanded="@(_abiertos.Contains(s.Id) ? "true" : "false")" aria-controls="@idDetalle">
+                                    Ver conflictos
+                                </MudButton>
+                                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="() => Resolver(s, aprobar: true)"
+                                           Disabled="@(conflictos is { PuedeAprobarse: false })"
+                                           aria-label="@($"Aprobar la solicitud de {s.ClubNombre}: {TextosFranjasFijas.Resumen(s)}")"
+                                           aria-describedby="@(conflictos is { PuedeAprobarse: false } ? idMotivo : null)">
+                                    Aprobar
+                                </MudButton>
+                                <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="() => Resolver(s, aprobar: false)"
+                                           aria-label="@($"Rechazar la solicitud de {s.ClubNombre}: {TextosFranjasFijas.Resumen(s)}")">
+                                    Rechazar
+                                </MudButton>
+                                @if (conflictos is { PuedeAprobarse: false })
+                                {
+                                    <MudText id="@idMotivo" Typo="Typo.body2">No se puede aprobar: hay reservas o franjas fijas en conflicto.</MudText>
+                                }
+                            </div>
+
+                            <div id="@idDetalle" hidden="@(!_abiertos.Contains(s.Id))">
+                                @if (conflictos is null)
+                                {
+                                    <MudText Typo="Typo.body2">Cargando conflictos…</MudText>
+                                }
+                                else if (conflictos.PuedeAprobarse)
+                                {
+                                    <MudText Typo="Typo.body2">No hay conflictos.</MudText>
+                                }
+                                else
+                                {
+                                    <ul role="list" class="lista-conflictos">
+                                        @foreach (var r in conflictos.Reservas)
+                                        {
+                                            <li role="listitem">
+                                                Reserva @TextosFranjasFijas.NombresDias[(int)r.Fecha.DayOfWeek == 0 ? 6 : (int)r.Fecha.DayOfWeek - 1]
+                                                @r.Fecha.ToString("dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture),
+                                                @r.HoraInicio–@r.HoraFin · @(r.Estado == EstadoReservaEnConflicto.Confirmada ? "confirmada" : "pendiente de pago")
+                                            </li>
+                                        }
+                                        @foreach (var o in conflictos.Solapadas)
+                                        {
+                                            <li role="listitem">
+                                                Franja fija de @o.ClubNombre: @TextosFranjasFijas.Dias(o.DiasSemana) de @o.HoraInicio a @o.HoraFin
+                                            </li>
+                                        }
+                                    </ul>
+                                }
+                            </div>
+                        }
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+}
+
+@code {
+    private MensajeAccesible _mensaje = null!;
+    private ElementReference _contenedorLista;
+    private bool _puede;
+    private bool _sinPermiso;
+    private bool _resolviendo;
+    private (string Texto, Severity Tipo)? _mensajePendiente;
+
+    private List<SolicitudFranjasFijasDto> _solicitudes = [];
+    private readonly Dictionary<int, ConflictosSolicitudDto> _conflictos = [];
+    private readonly HashSet<int> _abiertos = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        var estado = await Sesion.GetAuthenticationStateAsync();
+        if (estado.User.Identity?.IsAuthenticated != true)
+        {
+            Navegacion.NavigateTo(ClienteApi.RutaInicioSesion);
+            return;
+        }
+
+        if (!estado.User.IsInRole("tecnico_concejalia"))
+        {
+            _sinPermiso = true;
+            return;
+        }
+
+        try
+        {
+            await Cargar();
+            _puede = true;
+        }
+        catch (ErrorApi error)
+        {
+            _mensajePendiente = (error.Detalle, Severity.Error);
+        }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (_sinPermiso)
+        {
+            _sinPermiso = false;
+            _mensaje.Mostrar("La revisión de franjas fijas es para técnicos de la concejalía.", Severity.Warning);
+        }
+        else if (_mensajePendiente is { } pendiente)
+        {
+            _mensajePendiente = null;
+            _mensaje.Mostrar(pendiente.Texto, pendiente.Tipo);
+        }
+    }
+
+    /// <summary>Carga la lista y los conflictos de las pendientes, para que «Aprobar» ya salga desactivado si toca.</summary>
+    private async Task Cargar()
+    {
+        _solicitudes = await Api.GetAsync<List<SolicitudFranjasFijasDto>>("/api/solicitudes-franjas-fijas");
+        _conflictos.Clear();
+        foreach (var s in _solicitudes.Where(s => s.Estado == EstadoSolicitud.Pendiente))
+        {
+            _conflictos[s.Id] = await Api.GetAsync<ConflictosSolicitudDto>($"/api/solicitudes-franjas-fijas/{s.Id}/conflictos");
+        }
+    }
+
+    private void Alternar(int id)
+    {
+        if (!_abiertos.Remove(id))
+        {
+            _abiertos.Add(id);
+        }
+    }
+
+    private async Task Resolver(SolicitudFranjasFijasDto s, bool aprobar)
+    {
+        if (_resolviendo)
+        {
+            return;
+        }
+
+        _resolviendo = true;
+        _mensaje.Limpiar();
+        try
+        {
+            var accion = aprobar ? "aprobacion" : "rechazo";
+            await Api.PostAsync<object?, SolicitudFranjasFijasDto>($"/api/solicitudes-franjas-fijas/{s.Id}/{accion}", null);
+            _mensaje.Mostrar(
+                $"Solicitud de {s.ClubNombre} {(aprobar ? "aprobada" : "rechazada")}. Se ha avisado al club.",
+                Severity.Success);
+        }
+        catch (ErrorApi error)
+        {
+            _mensaje.Mostrar(error.Detalle, Severity.Error);
+        }
+        finally
+        {
+            _resolviendo = false;
+        }
+
+        await Cargar();
+        StateHasChanged();
+        // El botón pulsado desaparece al resolver: el foco pasa a la lista para no perderse en <body> (T024).
+        await Task.Yield();
+        await _contenedorLista.FocusAsync();
+    }
+}

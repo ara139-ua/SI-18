@@ -1,0 +1,95 @@
+@page "/mis-avisos"
+@inject ClienteApi Api
+
+@* «Mis avisos» del usuario identificado (tasks.md T067; HU-C4). Accesibilidad según quickstart.md §6: el
+   estado «No leído» va en texto, no solo en color, y cada botón dice a qué aviso se refiere. *@
+
+<PageTitle>Mis avisos · SI-18</PageTitle>
+
+<MudText Typo="Typo.h4" HtmlTag="h1" GutterBottom="true">Mis avisos</MudText>
+
+<MensajeAccesible @ref="_mensaje" />
+
+@if (_avisos is null)
+{
+    <MudProgressLinear Indeterminate="true" Color="Color.Primary" aria-label="Cargando avisos" />
+}
+else if (_avisos.Count == 0)
+{
+    <MudText>No tienes avisos.</MudText>
+}
+else
+{
+    @* Al marcar un aviso su botón desaparece: el foco pasa a este contenedor para no perderse en <body>. *@
+    <div tabindex="-1" @ref="_contenedorLista" class="contenedor-avisos">
+    @* MudList se dibuja con <div>: los role hacen que el lector de pantalla la anuncie como lista de N elementos.
+       tabindex="-1" saca cada elemento del orden del tabulador: no se pueden pulsar, solo su botón. *@
+    <MudList T="AvisoDto" ReadOnly="true" Class="lista-avisos" role="list" aria-label="Avisos">
+        @foreach (var aviso in _avisos)
+        {
+            <MudListItem T="AvisoDto" @key="aviso.Id" role="listitem" tabindex="-1" Class="@(aviso.Leido ? "aviso" : "aviso aviso-no-leido")">
+                <div class="d-flex flex-wrap align-center gap-3">
+                    <div class="flex-grow-1">
+                        <MudText Typo="Typo.body1">@aviso.Texto</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">
+                            @FormatoEs.FechaHora(aviso.FechaUtc.ToUniversalTime())
+                            @if (!aviso.Leido)
+                            {
+                                <span> · </span><strong>No leído</strong>
+                            }
+                            else
+                            {
+                                <span> · Leído</span>
+                            }
+                        </MudText>
+                    </div>
+                    @if (!aviso.Leido)
+                    {
+                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
+                                   OnClick="() => MarcarLeido(aviso)"
+                                   aria-label="@($"Marcar como leído: {aviso.Texto}")">
+                            Marcar como leído
+                        </MudButton>
+                    }
+                </div>
+            </MudListItem>
+        }
+    </MudList>
+    </div>
+}
+
+@code {
+    private MensajeAccesible _mensaje = null!;
+    private List<AvisoDto>? _avisos;
+    private ElementReference _contenedorLista;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _avisos = await Api.GetAsync<List<AvisoDto>>("/api/avisos");
+        }
+        catch (ErrorApi error)
+        {
+            // Sin sesión, ClienteApi ya lleva a /iniciar-sesion.
+            _avisos = [];
+            _mensaje?.Mostrar(error.Detalle, Severity.Error);
+        }
+    }
+
+    private async Task MarcarLeido(AvisoDto aviso)
+    {
+        try
+        {
+            await Api.PutAsync($"/api/avisos/{aviso.Id}/leido");
+            var indice = _avisos!.IndexOf(aviso);
+            _avisos[indice] = aviso with { Leido = true };
+            _mensaje.Mostrar("Aviso marcado como leído.", Severity.Success);
+            await _contenedorLista.FocusAsync();
+        }
+        catch (ErrorApi error)
+        {
+            _mensaje.Mostrar(error.Detalle, Severity.Error);
+        }
+    }
+}

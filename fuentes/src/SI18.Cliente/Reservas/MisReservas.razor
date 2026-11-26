@@ -1,0 +1,112 @@
+@page "/mis-reservas"
+@using SI18.Contratos.Reservas
+@inject ClienteApi Api
+@inject EstadoSesion Sesion
+@inject NavigationManager Navegacion
+@inject TimeProvider Reloj
+
+@* «Mis reservas» (specs/002-reservar-pagar/research.md E11; tasks.md T040). El orden y el estado efectivo los
+   decide la API (RF-015, RF-015a); la pantalla los muestra tal cual. El estado va siempre escrito; el color del
+   chip solo lo refuerza. *@
+
+<PageTitle>Mis reservas · SI-18</PageTitle>
+
+<MudText Typo="Typo.h4" HtmlTag="h1" GutterBottom="true">Mis reservas</MudText>
+
+<MensajeAccesible @ref="_mensaje" />
+
+@if (_reservas is { Count: > 0 })
+{
+    <ul role="list" class="lista-reservas">
+        @foreach (var reserva in _reservas)
+        {
+            <li role="listitem" @key="reserva.Id" class="reserva">
+                <MudText Typo="Typo.h6" HtmlTag="h2">@reserva.Pista · @reserva.Centro</MudText>
+                <p>
+                    @TextosReservas.Fecha(reserva.Fecha), @TextosReservas.Horas(reserva.HoraInicio, reserva.HoraFin)
+                    · @FormatoEs.Importe(reserva.Importe)
+                </p>
+                <p>
+                    Estado:
+                    <MudChip T="string" Color="ColorEstado(reserva.Estado)" Size="Size.Small" Variant="Variant.Outlined">
+                        @TextosReservas.Estado(reserva.Estado)
+                    </MudChip>
+                </p>
+
+                @if (reserva.Estado == EstadoReserva.Confirmada && reserva.CodigoAcceso is not null)
+                {
+                    <CodigoAcceso Codigo="@reserva.CodigoAcceso" Descripcion="@TextosReservas.Descripcion(reserva)" />
+                }
+                else if (reserva.Estado == EstadoReserva.PendientePago && PlazoTerminado(reserva))
+                {
+                    @* RF-017 (aclaración 2026-11-26): pasada la hora límite que manda la API (la franja ya ha empezado),
+                       no se ofrece «Pagar»; si se intentara, la API respondería FRANJA_YA_EMPEZADA. *@
+                    <p>El plazo para pagar terminó a las @reserva.HoraLimitePago.</p>
+                }
+                else if (reserva.Estado == EstadoReserva.PendientePago)
+                {
+                    <p>Paga antes de las @reserva.HoraLimitePago.</p>
+                    <MudButton Href="@($"/reservas/{reserva.Id}/pago")" Variant="Variant.Filled" Color="Color.Primary"
+                               aria-label="@($"Pagar la reserva de {TextosReservas.Descripcion(reserva)}")">
+                        Pagar
+                    </MudButton>
+                }
+
+                @* Hueco de Cancelaciones (spec-003): botón «Cancelar» en las confirmadas. *@
+            </li>
+        }
+    </ul>
+}
+
+@code {
+    private MensajeAccesible _mensaje = null!;
+    private List<ReservaDto>? _reservas;
+    private (string Texto, Severity Tipo)? _mensajePendiente;
+
+    /// <summary>La hora límite la calcula la API (RF-008a); aquí solo se compara con la hora del cliente.</summary>
+    private bool PlazoTerminado(ReservaDto reserva) =>
+        reserva.LimitePagoUtc is { } limite && Reloj.GetUtcNow().UtcDateTime >= limite;
+
+    protected override async Task OnInitializedAsync()
+    {
+        switch (await AccesoReservas.Comprobar(Sesion))
+        {
+            case Acceso.SinSesion:
+                Navegacion.NavigateTo(ClienteApi.RutaInicioSesion);
+                return;
+            case Acceso.SinPermiso:
+                _mensajePendiente = (AccesoReservas.AvisoSinPermiso, Severity.Warning);
+                return;
+        }
+
+        try
+        {
+            _reservas = await Api.GetAsync<List<ReservaDto>>("/api/reservas");
+            if (_reservas.Count == 0)
+            {
+                _mensajePendiente = ("Todavía no tienes reservas.", Severity.Info);
+            }
+        }
+        catch (ErrorApi error)
+        {
+            _mensajePendiente = (error.Detalle, Severity.Error);
+        }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        // MensajeAccesible solo existe después del primer renderizado.
+        if (_mensajePendiente is { } pendiente)
+        {
+            _mensajePendiente = null;
+            _mensaje.Mostrar(pendiente.Texto, pendiente.Tipo);
+        }
+    }
+
+    private static Color ColorEstado(EstadoReserva estado) => estado switch
+    {
+        EstadoReserva.Confirmada => Color.Success,
+        EstadoReserva.PendientePago => Color.Warning,
+        _ => Color.Default,
+    };
+}

@@ -1,0 +1,73 @@
+@page "/iniciar-sesion"
+@inject EstadoSesion Sesion
+@inject NavigationManager Navegacion
+
+@* Inicio de sesión con correo y contraseña (tasks.md T055; HU-C3). Accesibilidad según quickstart.md §6:
+   etiquetas visibles, autocompletado del navegador, errores anunciados y foco de vuelta al primer campo. *@
+
+<PageTitle>Iniciar sesión · SI-18</PageTitle>
+
+<MudText Typo="Typo.h4" HtmlTag="h1" GutterBottom="true">Iniciar sesión</MudText>
+
+<MensajeAccesible @ref="_mensaje" />
+
+<form @onsubmit="Enviar" novalidate style="max-width: 28rem">
+    <MudTextField @ref="_campoCorreo" T="string" @bind-Value="_correo"
+                  Label="Correo electrónico" InputType="InputType.Email" Variant="Variant.Outlined"
+                  Required="true" RequiredError="Escribe tu correo electrónico."
+                  Error="@(_errorCorreo is not null)" ErrorText="@_errorCorreo"
+                  autocomplete="username" Class="mb-4" />
+
+    <MudTextField T="string" @bind-Value="_contrasena"
+                  Label="Contraseña" InputType="InputType.Password" Variant="Variant.Outlined"
+                  Required="true" RequiredError="Escribe tu contraseña."
+                  Error="@(_errorContrasena is not null)" ErrorText="@_errorContrasena"
+                  autocomplete="current-password" Class="mb-4" />
+
+    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Disabled="_enviando">
+        Iniciar sesión
+    </MudButton>
+</form>
+
+@code {
+    private MensajeAccesible _mensaje = null!;
+    private MudTextField<string> _campoCorreo = null!;
+    private string _correo = string.Empty;
+    private string _contrasena = string.Empty;
+    private string? _errorCorreo;
+    private string? _errorContrasena;
+    private bool _enviando;
+
+    private async Task Enviar()
+    {
+        _errorCorreo = null;
+        _errorContrasena = null;
+        _mensaje.Limpiar();
+        _enviando = true;
+
+        try
+        {
+            await Sesion.IniciarSesion(new PeticionInicioSesion { Correo = _correo, Contrasena = _contrasena });
+            Navegacion.NavigateTo("/");
+        }
+        catch (ErrorApi error)
+        {
+            _errorCorreo = PrimerError(error, "correo");
+            _errorContrasena = PrimerError(error, "contrasena");
+            _contrasena = string.Empty;
+            _mensaje.Mostrar(error.Detalle, Severity.Error);
+            await _campoCorreo.FocusAsync();
+        }
+        catch (HttpRequestException)
+        {
+            _mensaje.Mostrar("No se ha podido conectar con el servidor. Inténtalo de nuevo.", Severity.Error);
+        }
+        finally
+        {
+            _enviando = false;
+        }
+    }
+
+    private static string? PrimerError(ErrorApi error, string campo) =>
+        error.Errores.TryGetValue(campo, out var mensajes) ? mensajes.FirstOrDefault() : null;
+}
