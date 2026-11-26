@@ -456,7 +456,10 @@ ve el personal.
     T026; **revisa @ara139-ua** el código común de T016 (C2) y T024 (C1).
 
   Los aprueba otra persona del grupo.
-- [ ] T031 Después de fusionar los dos PR, ejecutar `/speckit-converge` para la spec 006.
+- [X] T031 Después de fusionar los dos PR, ejecutar `/speckit-converge` para la spec 006.
+  **Hecho** (26/11/2026): dos informes, [converge-2026-11-26.md](./converge-2026-11-26.md) y
+  [converge-2026-11-26-2.md](./converge-2026-11-26-2.md); T032 y T033 resueltas. **F1 (revisión de C1 y C2) y F2 (T023)
+  siguen abiertos, pendientes de @ara139-ua** (el #46 se fusionó sin su revisión por la entrega, como el #31 y el #36).
 
 ---
 
