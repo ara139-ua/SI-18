@@ -114,7 +114,7 @@ Reglas (E13 de spec-002):
 
 **⚠️ CRÍTICO**: ninguna historia puede empezar sin esta fase.
 
-- [ ] T003 Crear `src/SI18.Api/Modulos/Reservas/ServicioValidarAcceso.cs` (clase `sealed`, scoped;
+- [X] T003 Crear `src/SI18.Api/Modulos/Reservas/ServicioValidarAcceso.cs` (clase `sealed`, scoped;
   dependencias: `Si18DbContext`, `TimeProvider`, `IUsuarioActual`) con:
   - el método público `Task<ResultadoValidacion> Validar(string codigo, CancellationToken ct)`, de
     momento con `throw new NotImplementedException()`;
@@ -125,7 +125,7 @@ Reglas (E13 de spec-002):
 
   Registrarlo con `services.AddScoped<ServicioValidarAcceso>();` en `AddReservas()` de
   `src/SI18.Api/Modulos/Reservas/RegistroReservas.cs`. Depende de T001.
-- [ ] T004 Crear `src/SI18.Api/Modulos/Reservas/EndpointsValidacionesAcceso.cs` con
+- [X] T004 Crear `src/SI18.Api/Modulos/Reservas/EndpointsValidacionesAcceso.cs` con
   `MapValidacionesAcceso(this WebApplication app)` y llamarlo desde `MapReservas()` en
   `RegistroReservas.cs` (`Program.cs` no cambia; research.md V1, V7):
   - grupo `/api/validaciones-acceso` con **exactamente** `.RequireAuthorization(Politicas.EsPersonal)`

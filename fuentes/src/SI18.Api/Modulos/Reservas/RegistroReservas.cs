@@ -17,12 +17,16 @@ public static class RegistroReservas
         // Casos de uso de los endpoints de /api/reservas (research.md E2–E6).
         services.AddScoped<ServicioReservar>();
 
+        // Validación del código de acceso en la entrada, HU-06 (specs/006-validar-qr/research.md V3–V5).
+        services.AddScoped<ServicioValidarAcceso>();
+
         return services;
     }
 
     public static WebApplication MapReservas(this WebApplication app)
     {
         app.MapEndpointsReservas();
+        app.MapValidacionesAcceso();
         return app;
     }
 }
