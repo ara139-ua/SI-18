@@ -65,3 +65,9 @@ aparece).
 | CE-004 | Todos los representantes reciben aviso; si falla, no cambia el estado | F5 | T012, T019 | `RevisarFranjasFijasTests`; un único `SaveChanges` (revisión de código) |
 | CE-005 | Búsqueda igual con la definitiva que con la provisional | F6 | T022, T023 | `ConsultaFranjasFijasTests` (pruebas movidas de spec-001); todas las de HU-01 en verde |
 | CE-006 | Teclado, Lighthouse ≥ 95, axe sin graves | F7, F8 | T024, T025 | Manual (T025, 26/11/2026) |
+
+## 3. Revisión entre compañeros (enunciado 5.2)
+
+| Criterio revisado | Revisor | Fecha | Qué comprobó | Resultado |
+|-------------------|---------|-------|--------------|-----------|
+| RF-009 (una solicitud con conflictos no se aprueba y sigue pendiente; los conflictos se vuelven a comprobar al aprobar) | Saul | 26/11/2026 | Las pruebas `ConflictosFranjasFijasTests.Esc1_2_una_reserva_confirmada_sale_sin_datos_personales_e_impide_aprobar` (409 `SOLICITUD_CON_CONFLICTOS` y sigue `Pendiente`), `Esc5_si_se_solapa_con_otra_aprobada_no_se_puede_aprobar` y `Con_reservas_y_solapes_a_la_vez_el_error_es_el_de_las_reservas`, y que `ServicioSolicitudesFranjasFijas.Aprobar` (`ServicioSolicitudesFranjasFijas.cs:141–157`) vuelve a llamar a `Conflictos()` antes de aprobar, leyendo las reservas por `IConsultaReservas` dentro de la temporada | ✅ Cubierto; sin incidencias |

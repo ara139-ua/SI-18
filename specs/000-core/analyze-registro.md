@@ -55,7 +55,7 @@ sobre la versión actual (no una reconstrucción).
 
 | ID | Historia / criterio | Gravedad | Evidencia (analyze final) | Decisión | Responsable | Revisor | Estado | Dónde se resuelve |
 |----|---------------------|----------|---------------------------|----------|-------------|---------|--------|-------------------|
-| D1 | RF-016, tabla de responsables, data-model `Confirmar` | CRITICAL | spec-002 RF-009a (aclaración del 26/11/2026) añade una causa de caducidad que 000-core no tiene (principio VII) | Añadir la causa en 000-core por PR revisado por Artur, antes de implementar RF-009a | Saul | Artur | Abierto: spec-002 T055, pendiente de aprobación | spec.md RF-016, data-model.md § Reserva |
+| D1 | RF-016, tabla de responsables, data-model `Confirmar` | CRITICAL | spec-002 RF-009a (aclaración del 26/11/2026) añade una causa de caducidad que 000-core no tiene (principio VII) | Añadir la causa en 000-core por PR revisado por Artur, antes de implementar RF-009a | Saul | Artur (revisión pedida en el PR) | Resuelto: spec-002 T055 (`7cd5517`) | spec.md RF-016, data-model.md § Reserva |
 | I1 | spec.md L46, L49, L56, CE-007; tasks.md fase 3 y T011 | MEDIUM | «Las cuatro personas» y «persona C/D» frente a la constitución 1.2.x (dos personas) | Nota de alcance junto a CE-007, sin reescribir lo decidido | Saul | — | Abierto (documentación) | spec.md |
 | I2 | tasks.md T076 | LOW | «falta la 006», ya fusionada | Actualizar la nota | Saul | — | Abierto (documentación) | tasks.md T076 |
 | I3 | research.md L44–L45 | LOW | «Persona C/D» sin nota de alcance | Nota o referencia a plan.md | Saul | — | Abierto (documentación) | research.md |
