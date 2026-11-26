@@ -172,7 +172,9 @@ HU-06, por tanto, compone lo que hay en un servicio, un endpoint y una pantalla.
   - **Resultado** (en la misma página, debajo del formulario, sin cambiar de ruta):
     - aceptada: encabezado «Acceso permitido» con icono, y una lista de definiciones con titular,
       instalación y centro, fecha (`TextosReservas.DiaYFecha`) y «de HH:mm a HH:mm»; si hay validación
-      anterior, un aviso con icono: «Este código ya se validó hoy a las HH:mm»;
+      anterior, un aviso con icono: «Este código ya se validó hoy a las HH:mm» si la anterior es del mismo
+      día de Madrid, y «Este código se validó por última vez el dd/MM/yyyy a las HH:mm» si no
+      (`TextosReservas.AvisoValidacionAnterior`, T032; documentado en T035);
     - rechazada: encabezado «Acceso denegado» con icono distinto, el `detail` del catálogo y, si la
       extensión `reserva` viene, instalación, centro, fecha y horas (nunca titular);
     - el color (verde / rojo del tema) solo refuerza; el texto y el icono bastan (RF-013).
