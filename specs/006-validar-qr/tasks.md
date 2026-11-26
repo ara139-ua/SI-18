@@ -365,7 +365,7 @@ ve el personal.
   `/iniciar-sesion`; con un ciudadano → `AvisoSinPermisoValidar` y ningún formulario. Depende de T012.
 - [ ] T023 [US4] (sin código) Confirmar con @ara139-ua el texto «Validar acceso» y su posición en el hueco
   del personal, dejando sitio al enlace de cierres de spec-007 (plan.md C1).
-- [ ] T024 [US4] **[código común, revisión de @ara139-ua — C1]** En
+- [X] T024 [US4] **[código común, revisión de @ara139-ua — C1]** En
   `src/SI18.Cliente/Layout/MainLayout.razor`, dentro de
   `<AuthorizeView Roles="personal_centro" Context="personal">`, sustituir el comentario del hueco por
   `<MudButton Href="/validar-acceso" Color="Color.Inherit" Variant="Variant.Text">Validar acceso</MudButton>`
