@@ -736,8 +736,13 @@ responsable.
   reales de `.env` no están en ningún fichero versionado. Tras «000-core T074: correcciones del
   quickstart» quedan 5: desaparece `quickstart.md:29` (ya no se usa `user-secrets`) y la orden de §7
   pasa a `quickstart.md:134`.
-- [ ] T076 [Ambos] Abrir el PR final de `develop` → `main`, con la lista de los principios I–IX
+- [X] T076 [Ambos] Abrir el PR final de `develop` → `main`, con la lista de los principios I–IX
   revisados (constitución, «Flujo de trabajo»). Después, ejecutar `/speckit-converge` para 000-core.
+
+  **Hecho (2026-11-26, Saul)**: PR `develop` → `main` abierto en https://github.com/ara139-ua/SI-18/pull/43,
+  con los principios I–IX revisados. Se fusiona cuando estén todas las specs (falta la 006). `/speckit-converge`
+  ejecutado para 000-core: 3 hallazgos LOW, añadidos como Fase 8 (T077–T079) y resueltos; informe en
+  [converge-2026-11-26.md](./converge-2026-11-26.md).
 
 ---
 
