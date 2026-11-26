@@ -213,6 +213,11 @@ cada módulo se registra dentro de su `Registro<Modulo>.cs`, que solo toca su du
 | `Cancelaciones`  | HU-03, HU-07 | `devoluciones`, `cierres_mantenimiento`              | Persona C      |
 | `CursosInformes` | HU-04, HU-08 | `cursos` (solo la siembra), `inscripciones`          | Persona D      |
 
+> **Alcance (26/11/2026)**: el grupo son dos personas y HU-03, HU-04, HU-07 y HU-08 quedaron **fuera del
+> alcance comprometido** por acuerdo con el profesor. `Cancelaciones` y `CursosInformes` no tienen dueño:
+> solo existe la base de 000-core, que se conserva para trabajo futuro (ver
+> [docs/agrupamiento.md](../../docs/agrupamiento.md) y la constitución 1.2.0).
+
 ## Piezas transversales (qué entrega 000-core en `develop`)
 
 1. **Esqueleto de la solución**: proyectos, props centralizados, analizador de `DateTime.Now` y

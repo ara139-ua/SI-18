@@ -35,6 +35,10 @@ provisionales de spec-001.
 
 ## Coordinación
 
+> **Alcance (26/11/2026)**: HU-03 y HU-07 quedaron **fuera del alcance comprometido** por acuerdo con el
+> profesor (el grupo son dos personas; ver [docs/agrupamiento.md](../../../docs/agrupamiento.md)). La fila de «C (spec-007)» ya no tiene destinatario; `RepresentantesAfectados` sigue implementado y probado. Se conserva
+> como base para trabajo futuro: no hay nadie asignado y no es trabajo pendiente.
+
 | Con                    | Qué                                                                                                                                   |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
 | Saul (spec-002)        | Los dos PR quitan cada uno su provisional de `RegistroDisponibilidad.cs`, `ConsultasProvisionalesTests.cs` y `DatosDisponibilidad.cs`. El segundo en llegar hace `rebase` y resuelve (research.md F11) |

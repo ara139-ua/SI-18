@@ -149,6 +149,10 @@ cliente: resultado con texto e icono · MensajeAccesible (una vez) · campo vac�
 | C3 | Grupo (000-core) | Comprobación de centro dentro de `ReglaAcceso` | **No se propone ahora** (principio VIII): queda anotado por si otra historia necesita la misma regla (V3) | — |
 | C4 | **C** (HU-03, HU-07) | Invalidación del código | Nada que hacer: una reserva cancelada se rechaza sola (RF-012). Aviso al grupo de la dependencia ([contracts/modulos.md](./contracts/modulos.md)) | Al publicar este plan |
 
+> **Alcance (26/11/2026)**: HU-03 y HU-07 quedaron **fuera del alcance comprometido** por acuerdo con el
+> profesor (el grupo son dos personas; ver [docs/agrupamiento.md](../../docs/agrupamiento.md)). El punto C4, dirigido a «C», ya no tiene destinatario. Se conserva
+> como base para trabajo futuro: no hay nadie asignado y no es trabajo pendiente.
+
 ## Reparto en dos PR (como spec-002)
 
 | PR | Contenido | Revisión |
