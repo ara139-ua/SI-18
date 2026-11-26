@@ -134,7 +134,7 @@ public sealed class DatosDisponibilidad(FabricaApi fabrica)
         var servicio = new ServicioSolicitudesFranjasFijas(
             db,
             reloj,
-            new ConsultaReservasProvisional(db, reloj),
+            new ConsultaReservas(db, reloj),
             ambito.ServiceProvider.GetRequiredService<SI18.Api.Modulos.Comun.IServicioAvisos>());
 
         return await accion(servicio);

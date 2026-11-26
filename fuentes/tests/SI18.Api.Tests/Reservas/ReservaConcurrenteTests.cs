@@ -7,7 +7,7 @@ namespace SI18.Api.Tests.Reservas;
 
 /// <summary>
 /// Exclusión mutua con peticiones simultáneas (specs/002-reservar-pagar tasks.md T029; CE-002, HU2 esc. 2, RF-007).
-/// Polideportivo Oeste, «Pista de pádel 1», 22/12/2026 a las 19:00.
+/// Polideportivo Oeste, «Pista de pádel 1», 23/12/2026 a las 19:00.
 /// </summary>
 [Collection(ColeccionApi.Nombre)]
 public class ReservaConcurrenteTests(FabricaApi fabrica)
@@ -21,7 +21,7 @@ public class ReservaConcurrenteTests(FabricaApi fabrica)
     public async Task De_20_peticiones_simultaneas_a_la_misma_franja_solo_una_crea_la_reserva()
     {
         var pista = await _datos.Pista("Polideportivo Oeste", "Pista de pádel 1");
-        var inicio = Utc(new DateOnly(2026, 12, 22), 19);
+        var inicio = Utc(new DateOnly(2026, 12, 23), 19);
 
         // La siembra solo tiene estas tres personas que puedan reservar fuera de MisReservasTests.
         var sesiones = new[]
