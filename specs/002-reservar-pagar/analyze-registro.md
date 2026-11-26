@@ -32,10 +32,18 @@ versión funcional ([clarify-funcional.md](./clarify-funcional.md)).
 | ID | Historia / criterio | Gravedad | Evidencia (analyze final) | Decisión | Responsable | Revisor | Estado | Dónde se resuelve |
 |----|---------------------|----------|---------------------------|----------|-------------|---------|--------|-------------------|
 | D1 | RF-009a; 000-core RF-016 y `Confirmar` | CRITICAL | La aclaración 1 añade una causa de caducidad que 000-core no tiene (principio VII) | Proponer primero el cambio en 000-core, por PR revisado por Artur | Saul | Artur (revisión pedida en el PR) | Resuelto: T055 (`7cd5517`) | 000-core spec.md RF-016 y data-model.md § Reserva |
-| C1 | RF-009a, RF-008a, RF-011, RF-017, HU-2 esc. 6, HU-5 esc. 3 | HIGH | Criterios nuevos sin tarea ni prueba; research.md E4 sin el paso nuevo | Convertirlo en tareas con `/speckit-converge` y documentar el paso | Saul | Artur (revisión pedida en el PR) | Resuelto: T056 (`51dd22c`), T057 (`01127dd`), T058 (`b7b8a14`; comprobación manual de accesibilidad pendiente) y T060 | converge-2026-11-26-2.md F2–F4, F6 |
+| C1 | RF-009a, RF-008a, RF-011, RF-017, HU-2 esc. 6, HU-5 esc. 3 | HIGH | Criterios nuevos sin tarea ni prueba; research.md E4 sin el paso nuevo | Convertirlo en tareas con `/speckit-converge` y documentar el paso | Saul | Artur (revisión pedida en el PR) | Resuelto: T056 (`51dd22c`), T057 (`01127dd`), T058 (`b7b8a14`; la comprobación manual de accesibilidad no se hizo: excepción justificada en [docs/evidencias/t058-revision-de-marcado.md](../../docs/evidencias/t058-revision-de-marcado.md)) y T060 | converge-2026-11-26-2.md F2–F4, F6 |
 | C2 | HU-4 esc. 3 (representante del club dueño) | MEDIUM | La prueba existente usa una ciudadana | Añadir la prueba (el código ya lo cumple) | Saul | Artur (revisión pedida en el PR) | Resuelto: T059 (`84a67ee`) | converge-2026-11-26-2.md F5 |
 | C3 | RF-013 (reservas de tarifa club) | LOW | Sin prueba con dos representantes del mismo club | Aceptado: exigiría añadir usuarios a la siembra (principio VIII); la propiedad por usuario ya está probada | Saul | — | Aceptado (justificado) | — |
 | I1 | RF-009a, RF-020 | LOW | El texto de `FRANJA_YA_EMPEZADA` dice «no se puede reservar» | Aceptado: no se crea un código ni un texto nuevo (principio VII) | Saul | — | Aceptado (justificado) | — |
+
+## Converge final (26/11/2026)
+
+Registro de [converge-2026-11-26-final.md](./converge-2026-11-26-final.md), posterior a las correcciones T055–T060 del #54.
+
+| ID | Historia / criterio | Gravedad | Evidencia (converge final) | Decisión | Responsable | Revisor | Estado | Dónde se resuelve |
+|----|---------------------|----------|----------------------------|----------|-------------|---------|--------|-------------------|
+| F1 | RF-009a; contrato de `/pago` | LOW | `contracts/api-reservas.openapi.yaml`, operación `/pago`: el 422 solo describía `PAGO_RECHAZADO` y `TRANSICION_NO_PERMITIDA` no incluía la caducidad por franja ya empezada | Documentarlo en el contrato (T061); sin cambios de código | Saul | Sin revisión registrada (PR #55 fusionado por Saul) | Resuelto: T061 (`babe58e`) | contracts/api-reservas.openapi.yaml · tasks.md T061 |
 
 ## Revisión entre compañeros (enunciado 5.2)
 
@@ -61,7 +69,7 @@ diga otra cosa. Los criterios de la aclaración del 26/11/2026 se cubren con la 
 | RF-008 | Pagar sin guardar la tarjeta | E4 | T015, T048 | `PagarReservaTests.El_numero_de_tarjeta_no_aparece_en_ningun_registro` |
 | RF-008a | Hora límite fija (la más temprana entre creación + 10 min e inicio) | E4, E11 | T025, T057 | `CrearReservaTests.RF008a_creada_5_min_antes_del_inicio_la_hora_limite_es_la_del_inicio` y `RF008a_creada_con_mas_antelacion_la_hora_limite_es_la_creacion_mas_10_minutos` |
 | RF-009 | Caducada por tiempo → `RESERVA_CADUCADA` sin cobro | E4 | T027, T030 | `PagarReservaTests.HU2_esc3_a_los_10_minutos_exactos_caduca_sin_cobrar`, `A_los_9_59_se_cobra_y_queda_confirmada`, `Caducada_por_el_barrido_…` |
-| RF-009a | Pagar con la franja empezada → `FRANJA_YA_EMPEZADA`, caducada, sin cobro | E4 paso 4b | T055, T056, T060 | `PagarReservaTests.RF009a_…` (4 casos) y `ReservaTests.Confirmar_en_el_inicio_de_la_franja_…`, `Confirmar_1_s_antes_del_inicio_confirma` (rojo antes y verde después: clarify-funcional.md §2) |
+| RF-009a | Pagar con la franja empezada → `FRANJA_YA_EMPEZADA`, caducada, sin cobro | E4 paso 4b | T055, T056, T060, T061 | `PagarReservaTests.RF009a_…` (4 casos) y `ReservaTests.Confirmar_en_el_inicio_de_la_franja_…`, `Confirmar_1_s_antes_del_inicio_confirma` (rojo antes y verde después: clarify-funcional.md §2) |
 | RF-010 | Confirmar con código | E4 | T015, T019 | `PagarReservaTests.HU1_esc3_…` |
 | RF-011 | Rechazo sin reintento | E4 | T033, T034 | `PagarReservaTests.HU3_esc1_…`, `HU3_esc2_…`, `Pagar_dos_veces_es_TRANSICION_NO_PERMITIDA_y_conserva_el_codigo` |
 | RF-012 | Tarjeta mal formada → 400 sin cambiar nada | E4 | T017, T034 | `PagarReservaTests.HU3_esc4_una_tarjeta_con_formato_no_valido_da_400_y_no_cambia_nada` |
