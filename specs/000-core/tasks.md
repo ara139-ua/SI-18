@@ -714,9 +714,9 @@ responsable.
 - [X] T075 [Ambos] Revisar los secretos según quickstart.md §7 (`git grep` sin resultados) y comprobar
   con `git ls-files fuentes/.env` que `.env` no está versionado.
 
-  **Hecho (2026-11-26, Saul)**: el `git grep` de §7 devuelve 5 coincidencias y ninguna es un secreto:
+  **Hecho (2026-11-26, Saul)**: el `git grep` de §7 devuelve 6 coincidencias y ninguna es un secreto:
   `ErroresTests.cs:18` (contraseña `no-importa` en una cadena falsa a `127.0.0.1:1` para provocar el 500),
-  `quickstart.md:29` y `tasks.md:95` (huecos `<la de .env>` y `<cambia-esto>`), `quickstart.md:119`
+  `quickstart.md:29`, `tasks.md:95` y `tasks.md:96` (huecos `<la de .env>` y `<cambia-esto>`), `quickstart.md:119`
   (la propia orden) y `tasks.md:213` (`clave-de-prueba` de `FabricaApi`). Se deja el patrón como está
   y se justifican en el PR. `git ls-files fuentes/.env` no devuelve nada (lo excluye
   `fuentes/.gitignore:15`), `fuentes/.env` no aparece en el historial de ninguna rama y las contraseñas
