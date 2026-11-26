@@ -154,4 +154,35 @@ public class MotivosRechazoTests(FabricaApi fabrica)
         Assert.Equal("08:00", pagada.HoraInicio);
         Assert.Equal("09:00", pagada.HoraFin);
     }
+
+    /// <summary>
+    /// Fin del horario de verano (T053; spec, «Casos límite»). Sur «Pista de tenis 1»: el 25/10/2026 solo lo usa,
+    /// en la base compartida, la búsqueda de spec-001 (<c>BuscarFranjasTests</c>), y en Norte pádel.
+    /// </summary>
+    [Fact]
+    [Trait("Categoria", "Limites")]
+    public async Task El_dia_que_acaba_el_horario_de_verano_hay_14_franjas_y_la_de_las_8_dura_una_hora()
+    {
+        var pista = await Tenis1();
+        var dia = new DateOnly(2026, 10, 25);
+        var ahora = Utc(new DateOnly(2026, 10, 22), 12);
+
+        for (var hora = 8; hora <= 21; hora++)
+        {
+            var inicio = Utc(dia, hora);
+            var resumen = await _datos.ConServicio(ahora, Ana, s => s.Resumen(pista, inicio, Ct));
+            Assert.Equal($"{hora:00}:00", resumen.HoraInicio);
+        }
+
+        var ocho = Utc(dia, 8);
+        Assert.Equal(new DateTime(2026, 10, 25, 7, 0, 0, DateTimeKind.Utc), ocho);
+
+        var creada = await _datos.ConServicio(ahora, Ana, s => s.Crear(new PeticionReserva(pista, ocho, 6.00m), Ct));
+        var pagada = await _datos.ConServicio(ahora, Ana, s => s.Pagar(creada.Id, TarjetaAceptada, Ct));
+
+        Assert.Equal(EstadoReserva.Confirmada, pagada.Estado);
+        Assert.Equal(TimeSpan.FromHours(1), pagada.FinUtc - pagada.InicioUtc);
+        Assert.Equal("08:00", pagada.HoraInicio);
+        Assert.Equal("09:00", pagada.HoraFin);
+    }
 }
