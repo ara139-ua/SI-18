@@ -4,7 +4,7 @@
 
 **Alcance comprometido**: HU-01 y HU-05 (Artur), HU-02 y HU-06 (Saul). HU-03, HU-04, HU-07 y HU-08 quedan fuera, por acuerdo con el profesor (`docs/agrupamiento.md`, constitución 1.2.1).
 
-**Estado de partida del refinamiento**: commit de referencia `36a3166` ([commit-referencia.md](./evidencias/commit-referencia.md)). **Estado final**: `develop` con los PR #54, #55 y #56.
+**Estado de partida del refinamiento**: commit de referencia `36a3166` ([commit-referencia.md](./evidencias/commit-referencia.md)). **Estado final**: `develop` con los PR #54 a #57.
 
 ## Índice
 
@@ -322,7 +322,7 @@ Campos del enunciado (5.4): historia y criterio, hallazgo o decisión, comando u
 
 ## 4. Balance de la iteración
 
-Compara la versión de partida (commit de referencia `36a3166`, 26/11/2026 18:25) con la final (`develop` después del #56). Los indicadores describen la mejora; no se ha buscado maximizar los hallazgos. Alcance: HU-01, HU-02, HU-05 y HU-06 (las incidencias de `000-core` se cuentan aparte).
+Compara la versión de partida (commit de referencia `36a3166`, 26/11/2026 18:25) con la final (`develop` después del #57). Los indicadores describen la mejora; no se ha buscado maximizar los hallazgos. Alcance: HU-01, HU-02, HU-05 y HU-06 (las incidencias de `000-core` se cuentan aparte).
 
 | Indicador | Resultado | Denominador | Evidencias |
 | --------- | --------- | ----------- | ---------- |

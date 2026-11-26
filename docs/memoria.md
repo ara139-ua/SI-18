@@ -2,7 +2,7 @@
 
 **Aplicación web para que un ayuntamiento gestione la reserva de pistas deportivas de sus polideportivos**
 
-Autores: Saul Pérez y Artur Ramazanov · Grupo G18 · Fecha de la memoria: 26 de noviembre de 2026 · Estado del código: rama `develop`, commit `95c777c` (después del #56) más el PR de esta memoria
+Autores: Saul Pérez y Artur Ramazanov · Grupo G18 · Fecha de la memoria: 26 de noviembre de 2026 · Estado del código: rama `develop`, commit `f4090a9` (después del #57)
 
 ---
 
@@ -276,7 +276,7 @@ El código de producción son unas 9 900 líneas entre `.cs` y `.razor` (`git ls
 
 ### 7.2 Resultados de las pruebas automáticas
 
-Sobre `develop` después del #56 (`95c777c`):
+Sobre `develop` después del #57 (`f4090a9`):
 
 | Comando | Resultado |
 | ------- | --------- |
@@ -418,7 +418,7 @@ Las entradas de las iteraciones 1 a 3 son el historial real de PR y commits; las
 
 ### 9.5 Issues y pull requests
 
-Los PR están numerados del #1 al #56 en <https://github.com/ara139-ua/SI-18/pulls>. No se han usado issues. El **#43** (`develop` → `main`) es la entrega y sigue abierto hasta el final. Los PR del refinamiento son el #51 (evidencias), #52 (analyze y converge finales de 001 y 005), #53 (constitución 1.2.1), #54 (refinamiento de 002 y 006), #55 (cierre de la fase 1) y #56 (verificación integrada).
+Los PR están numerados del #1 al #57 en <https://github.com/ara139-ua/SI-18/pulls>. No se han usado issues. El **#43** (`develop` → `main`) es la entrega y sigue abierto hasta el final. Los PR del refinamiento son el #51 (evidencias), #52 (analyze y converge finales de 001 y 005), #53 (constitución 1.2.1), #54 (refinamiento de 002 y 006), #55 (cierre de la fase 1), #56 (verificación integrada) y #57 (memoria y trazabilidad).
 
 ---
 
