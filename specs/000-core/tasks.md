@@ -696,7 +696,7 @@ responsable.
   - añadir `AddOpenApi()` y `MapOpenApi()` (solo en Development) para servir `/openapi/v1.json`;
   - comprobar que ningún `.cs` de `src/` usa `DateTime.Now` ni `UtcNow` (lo garantiza el analizador:
     `dotnet build` en verde).
-- [ ] T073 [Ambos] Revisar la accesibilidad de `InicioSesion`, `MainLayout` y `MisAvisos` según
+- [X] T073 [Ambos] Revisar la accesibilidad de `InicioSesion`, `MainLayout` y `MisAvisos` según
   quickstart.md §6:
   - recorrido solo con teclado;
   - mensaje de error anunciado;
@@ -708,6 +708,12 @@ responsable.
   ya corregidos en `app.css` y `MainLayout.razor`: el foco no se veía en los botones y enlaces de MudBlazor (sus reglas
   `button:focus` y `a:focus-visible` anulaban la de `:focus-visible`; ni en las casillas ni en la barra azul) y la
   barra superior se cortaba a 320 px («Cerrar sesión» quedaba fuera). Falta la revisión conjunta y Lighthouse/axe.
+
+  **Hecho (2026-11-26, Saul)**: revisión automática y manual en los cuatro estados (InicioSesion sin sesión y con
+  mensaje de error, MainLayout y MisAvisos con sesión). Automática: Lighthouse Accesibilidad 100 y axe sin
+  infracciones en los cuatro. Manual: teclado, NVDA (el error se lee una sola vez, con icono, y el foco vuelve al
+  correo) y 320 px, todo correcto. Resultados en https://github.com/ara139-ua/SI-18/pull/41#issuecomment-7195036538.
+  @ara139-ua puede revisarla después de la fusión.
 - [ ] T074 [Ambos] Ejecutar quickstart.md §2–§5 de principio a fin en las dos máquinas, con .NET 10:
   docker compose, `dotnet ef database update`, siembra, V1–V10 manuales y `dotnet test SI18.slnx`
   en verde.
