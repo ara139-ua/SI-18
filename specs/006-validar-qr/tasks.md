@@ -177,7 +177,7 @@ franja; si ya se había aceptado, con el aviso de la hora anterior.
 
 ### Pruebas de US1 (antes de la implementación)
 
-- [ ] T007 [P] [US1] Crear `tests/SI18.Api.Tests/Reservas/ValidarAccesoTests.cs` (HTTP, sesión de
+- [X] T007 [P] [US1] Crear `tests/SI18.Api.Tests/Reservas/ValidarAccesoTests.cs` (HTTP, sesión de
   `personal.este`), que implementa `IAsyncLifetime` y en `InitializeAsync` obtiene **una sola vez** la
   reserva compartida con `DatosValidaciones.ConfirmadaCompartida()` (idempotente; análisis C1). Todas
   las pruebas de la clase que necesitan una confirmada en su ventana usan esa reserva y **ninguna
@@ -192,7 +192,7 @@ franja; si ya se había aceptado, con el aviso de la hora anterior.
   - el mismo código con espacios delante y detrás → 201 (RF-004).
 
   Depende de T006.
-- [ ] T008 [P] [US1] Crear `tests/SI18.Api.Tests/Reservas/AvisoValidacionAnteriorTests.cs` con
+- [X] T008 [P] [US1] Crear `tests/SI18.Api.Tests/Reservas/AvisoValidacionAnteriorTests.cs` con
   `DatosValidaciones.ConServicio` (RF-006a, CE-007). **Cada caso tiene su propia reserva de Carla en Este
   «Pista de pádel 2», de 10:00 a 11:00, en su propia fecha** (tabla «Asignación de fechas»; análisis C2):
   - **18/01/2027**, un único `[Fact]` con la secuencia: primera aceptada a las 09:50 → sin aviso;
@@ -209,7 +209,7 @@ franja; si ya se había aceptado, con el aviso de la hora anterior.
 
 ### Implementación de US1
 
-- [ ] T009 [US1] Implementar `ServicioValidarAcceso.Validar` (research.md V3, V4; data-model.md § 2):
+- [X] T009 [US1] Implementar `ServicioValidarAcceso.Validar` (research.md V3, V4; data-model.md § 2):
   - `ahora` se lee **una sola vez** al principio;
   - busca con `AsNoTracking` la reserva cuyo `CodigoAcceso == codigo`, con su instalación, su centro y
     el nombre de su titular;
@@ -223,7 +223,7 @@ franja; si ya se había aceptado, con el aviso de la hora anterior.
     `Codigo` y `ValidacionId` (la `Reserva` del rechazo la completa T015).
 
   Depende de T003, T007.
-- [ ] T010 [US1] Añadir a `Validar` el aviso de RF-006a (research.md V5): solo si se acepta y **antes**
+- [X] T010 [US1] Añadir a `Validar` el aviso de RF-006a (research.md V5): solo si se acepta y **antes**
   de insertar, `MAX(FechaUtc)` de `ValidacionesAcceso` con `ReservaId == reserva.Id && Aceptada`; si hay
   valor, `ValidacionAnteriorUtc` y `ValidacionAnteriorHora` («`HH:mm`» de Madrid). Depende de T008, T009.
 - [ ] T011 [P] [US1] Añadir `ComprobarPersonal(EstadoSesion sesion)` a

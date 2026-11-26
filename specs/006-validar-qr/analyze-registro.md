@@ -26,7 +26,7 @@ Estados: **Resuelto** (corregido en el commit «spec-006: correcciones de analyz
 
 | ID | Historia / criterio | Gravedad | Evidencia (analyze-2) | Decisión | Responsable | Estado | Dónde se resuelve |
 |----|---------------------|----------|-----------------------|----------|-------------|--------|-------------------|
-| L1 | HU-1 esc. 1; RF-006a | LOW | Con la reserva HTTP compartida (C1), T007 no puede exigir `validacionAnteriorHora` nulo en el primer 201; «sin aviso en la primera» se prueba solo en el servicio (T008) | Pendiente de decidir; no bloquea. Propuesta: al escribir T007, comprobar que es nulo o igual a la hora de una aceptada anterior de esa reserva leída de la base | Saul | Abierto (no bloquea) | tasks.md T007 |
+| L1 | HU-1 esc. 1; RF-006a | LOW | Con la reserva HTTP compartida (C1), T007 no puede exigir `validacionAnteriorHora` nulo en el primer 201; «sin aviso en la primera» se prueba solo en el servicio (T008) | Decidido: en T007, el primer 201 acepta `validacionAnteriorHora` nulo **o** igual a la hora de una validación aceptada anterior de esa reserva, leída de la base antes de la petición; «sin aviso en la primera» se prueba en T008 | Saul | Resuelto (T007; `ValidarAccesoTests`) | tasks.md T007 |
 
 ## 2. Matriz de trazabilidad de HU-06
 
