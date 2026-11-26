@@ -144,7 +144,7 @@ pared `HH:mm` y fechas `yyyy-MM-dd`.
 | `inicioUtc`, `finUtc` | instante UTC   |                                                                                  |
 | `importe`        | decimal (2 dec.)    | El fijado al reservar                                                            |
 | `estado`         | `EstadoReserva`     | **Efectivo**: `pendiente_pago` no vigente → `caducada` (RF-015)                  |
-| `limitePagoUtc`  | instante UTC o nulo | `creada_en_utc + TiempoBloqueoPago`; solo si `estado = pendiente_pago`            |
+| `limitePagoUtc`  | instante UTC o nulo | El más temprano entre `creada_en_utc + TiempoBloqueoPago` e `inicio_utc` (RF-008a, aclaración 2026-11-26); solo si `estado = pendiente_pago` |
 | `horaLimitePago` | `HH:mm` o nulo      | `limitePagoUtc` en Madrid, truncada al minuto; solo si `estado = pendiente_pago` (RF-008a) |
 | `codigoAcceso`   | texto o nulo        | Solo si `estado = confirmada` (RF-016)                                           |
 

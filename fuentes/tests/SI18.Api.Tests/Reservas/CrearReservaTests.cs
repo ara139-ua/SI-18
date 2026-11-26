@@ -24,6 +24,39 @@ public class CrearReservaTests(FabricaApi fabrica)
 
     private Task<int> Padel1() => _datos.Pista(Sur, "Pista de pádel 1");
 
+    // ── T057: hora límite de pago = la más temprana entre creación + 10 min e inicio (RF-008a; aclaración 2026-11-26) ──
+    // Polideportivo Sur, «Pista de pádel 1», sábado 26/12/2026 (comprobado con git grep: ninguna otra prueba usa ese día
+    // en esa pista). Reloj propio. La pantalla de pago y «Mis reservas» muestran esta misma HoraLimitePago.
+
+    [Fact]
+    [Trait("Categoria", "Limites")]
+    public async Task RF008a_creada_5_min_antes_del_inicio_la_hora_limite_es_la_del_inicio()
+    {
+        var pista = await Padel1();
+        var inicio = Utc(new DateOnly(2026, 12, 26), 10);
+
+        var reserva = await _datos.ConServicio(inicio - TimeSpan.FromMinutes(5), Ana,
+            servicio => servicio.Crear(new PeticionReserva(pista, inicio, 6.00m), Ct));
+
+        Assert.Equal(inicio, reserva.LimitePagoUtc);
+        Assert.Equal("10:00", reserva.HoraLimitePago);
+    }
+
+    [Fact]
+    [Trait("Categoria", "Limites")]
+    public async Task RF008a_creada_con_mas_antelacion_la_hora_limite_es_la_creacion_mas_10_minutos()
+    {
+        var pista = await Padel1();
+        var inicio = Utc(new DateOnly(2026, 12, 26), 11);
+        var creada = inicio - TimeSpan.FromMinutes(30);
+
+        var reserva = await _datos.ConServicio(creada, Ana,
+            servicio => servicio.Crear(new PeticionReserva(pista, inicio, 6.00m), Ct));
+
+        Assert.Equal(creada + ValoresNegocio.TiempoBloqueoPago, reserva.LimitePagoUtc);
+        Assert.Equal("10:40", reserva.HoraLimitePago);
+    }
+
     // ── Historia 1 ───────────────────────────────────────────────────────────────
 
     [Fact]

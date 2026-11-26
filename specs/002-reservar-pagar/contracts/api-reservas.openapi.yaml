@@ -306,7 +306,7 @@ components:
         limitePagoUtc:
           type: [string, 'null']
           format: date-time
-          description: creadaEnUtc + 10 min. Solo si estado = pendiente_pago.
+          description: El más temprano entre creadaEnUtc + 10 min e inicioUtc (RF-008a). Solo si estado = pendiente_pago.
         horaLimitePago:
           type: [string, 'null']
           examples: ['18:42']

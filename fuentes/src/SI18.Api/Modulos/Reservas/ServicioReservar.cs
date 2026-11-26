@@ -266,7 +266,9 @@ public sealed class ServicioReservar(
             ? EstadoReserva.Caducada
             : r.Estado;
         var pendiente = estado == EstadoReserva.PendientePago;
-        var limitePago = r.CreadaEnUtc + ValoresNegocio.TiempoBloqueoPago;
+        // RF-008a: la más temprana entre el fin del bloqueo y el inicio de la franja (después ya no se puede pagar, RF-009a).
+        var finBloqueo = r.CreadaEnUtc + ValoresNegocio.TiempoBloqueoPago;
+        var limitePago = finBloqueo < r.InicioUtc ? finBloqueo : r.InicioUtc;
         var (fecha, horaInicio) = HorarioMadrid.ALocal(r.InicioUtc);
         var (_, horaFin) = HorarioMadrid.ALocal(r.FinUtc);
 
