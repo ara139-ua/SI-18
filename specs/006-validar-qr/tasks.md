@@ -393,7 +393,7 @@ ve el personal.
     `ValidarAcceso.razor.css`.
 
   Depende de T012 y T017.
-- [ ] T026 [US5] Comprobar a mano quickstart.md §5 sobre `/validar-acceso`, **aplicando lo aprendido en
+- [X] T026 [US5] Comprobar a mano quickstart.md §5 sobre `/validar-acceso`, **aplicando lo aprendido en
   T073 de 000-core** (#41, #42):
   - **foco visible con MudBlazor**: Lighthouse y axe no lo detectan. Recorrer con el teclado y, en el
     `MudTextField` «Código de acceso», el `MudButton` «Validar» y el enlace «Validar acceso» del menú,
@@ -413,6 +413,9 @@ ve el personal.
     aceptado con aviso y con uno rechazado.
 
   Anotar el resultado en la descripción del PR (principio I). Depende de T024 y T025.
+  **Hecha**: parte automática (Lighthouse 100 y axe sin infracciones, 320 px, menús de los demás roles) anotada en el
+  PR #46; revisión manual (foco visible en el campo, «Validar» y el enlace del menú; barra y menú a 320 px y al 200 %
+  con `personal.este`; NVDA; iconos distintos) hecha por Saul el 26/11/2026, todo correcto.
 
 **Punto de control**: CE-006 cumplido, o sus fallos ajenos anotados y coordinados.
 
