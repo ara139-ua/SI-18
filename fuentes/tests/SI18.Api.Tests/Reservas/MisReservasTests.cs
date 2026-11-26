@@ -41,7 +41,7 @@ public class MisReservasTests(FabricaApi fabrica)
         var (hoy, hora) = HorarioMadrid.ALocal(ahora);
         var enCurso = await _datos.Confirmada(Diego, await Tenis2(), Utc(hoy, hora.Hour), ahora - TimeSpan.FromHours(2));
         var dia27 = await _datos.Confirmada(Diego, await Tenis1(), Utc(new DateOnly(2026, 12, 27), 10), ahora - TimeSpan.FromHours(1));
-        var dia26 = await _datos.Confirmada(Diego, await Tenis1(), Utc(new DateOnly(2026, 12, 26), 10), ahora - TimeSpan.FromHours(1));
+        var dia26 = await _datos.Confirmada(Diego, await Tenis1(), Utc(new DateOnly(2026, 12, 25), 10), ahora - TimeSpan.FromHours(1));
         var dia20Nov = await _datos.Confirmada(Diego, await Tenis1(), Utc(new DateOnly(2026, 11, 20), 10), Utc(new DateOnly(2026, 11, 19), 9));
 
         var lista = await MisReservas();

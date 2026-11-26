@@ -117,7 +117,7 @@ public sealed class DatosReservas(FabricaApi fabrica)
             reloj,
             new ConsultaReservas(db, reloj),
             new ConsultaCierresProvisional(db),
-            new ConsultaFranjasFijasProvisional(db));
+            new ConsultaFranjasFijas(db, new ConsultaCierresProvisional(db)));
         var servicio = new ServicioReservar(db, reloj, disponibilidad, pasarela ?? new PasarelaSimulada(), usuario);
 
         return await accion(servicio);
