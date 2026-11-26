@@ -31,11 +31,10 @@
 
 ## Notes
 
-- Quedan 2 marcadores [NEEDS CLARIFICATION] (límite: 3), para `/speckit-clarify`:
-  1. RF-003: si la lectura con la cámara entra en esta spec y con qué alcance (la introducción manual es
-     obligatoria).
-  2. Casos límite: si un código ya aceptado se vuelve a aceptar en cada validación dentro de su ventana
-     o solo la primera vez.
+- No queda ningún [NEEDS CLARIFICATION]. Los dos marcadores de specify (cámara en RF-003 y reutilización
+  del código) se resolvieron en `/speckit-clarify` el 2026-11-26, junto con una tercera pregunta (datos de
+  la reserva en los rechazos de RF-007); las tres están en spec.md, «Clarifications», con su
+  justificación y la historia afectada.
 - Los códigos de motivo (`QR_DESCONOCIDO`, `QR_OTRO_CENTRO`, etc.) y «el servidor» se citan porque son
   el vocabulario común del catálogo de errores de `000-core` y de la constitución (principio III), no
   decisiones de implementación de esta spec; es la misma convención que spec-002.
