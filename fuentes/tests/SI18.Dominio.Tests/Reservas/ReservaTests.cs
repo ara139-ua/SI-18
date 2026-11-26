@@ -140,6 +140,29 @@ public class ReservaTests
     }
 
     [Fact]
+    public void Confirmar_en_el_inicio_de_la_franja_lanza_FRANJA_YA_EMPEZADA_y_no_cambia_nada()
+    {
+        // T056 (spec-002 RF-009a): creada 5 min antes del inicio, sigue vigente cuando empieza la franja.
+        var r = new Reserva(1, 1, Inicio, TipoTarifa.Empadronado, 6.00m, Inicio - TimeSpan.FromMinutes(5));
+
+        ExigeCodigo("FRANJA_YA_EMPEZADA", () => r.Confirmar(Codigo, Inicio));
+
+        Assert.Equal(EstadoReserva.PendientePago, r.Estado);
+        Assert.Equal(EstadoPago.Pendiente, r.Pago!.Estado);
+        Assert.Null(r.CodigoAcceso);
+    }
+
+    [Fact]
+    public void Confirmar_1_s_antes_del_inicio_confirma()
+    {
+        var r = new Reserva(1, 1, Inicio, TipoTarifa.Empadronado, 6.00m, Inicio - TimeSpan.FromMinutes(5));
+
+        r.Confirmar(Codigo, Inicio - UnSegundo);
+
+        Assert.Equal(EstadoReserva.Confirmada, r.Estado);
+    }
+
+    [Fact]
     public void Cancelar_por_el_usuario_en_el_inicio_exacto_lanza_RESERVA_YA_EMPEZADA()
     {
         var r = Confirmada();
