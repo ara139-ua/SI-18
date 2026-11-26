@@ -1,6 +1,7 @@
 @page "/buscar-pistas"
 @using System.Globalization
 @using SI18.Contratos.Disponibilidad
+@using SI18.Cliente.Reservas
 @inject ClienteApi Api
 @inject EstadoSesion Sesion
 @inject NavigationManager Navegacion
@@ -56,7 +57,8 @@
                     <ul role="list" class="lista-franjas">
                         @foreach (var franja in pista.Franjas)
                         {
-                            <li role="listitem">@franja.HoraInicio–@franja.HoraFin · @FormatoEs.Importe(franja.Precio)</li>
+                            <li role="listitem">@franja.HoraInicio–@franja.HoraFin · @FormatoEs.Importe(franja.Precio)
+                                <EnlaceReservar Pista="pista" Franja="franja" Fecha="_resultado.Fecha" /></li>
                         }
                     </ul>
                 </section>

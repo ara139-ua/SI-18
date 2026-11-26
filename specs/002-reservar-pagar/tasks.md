@@ -268,7 +268,7 @@ una tarjeta aceptada y ver la reserva confirmada con su QR.
     accesible empieza por el texto visible (WCAG 2.5.3);
   - el estilo que separe el botón del texto de la franja va en el propio componente
     (`EnlaceReservar.razor.css`), no en `BuscarPistas.razor` ni en `app.css`.
-- [ ] T022 [US1] **[código de Artur, revisión de Artur]** En `src/SI18.Cliente/Disponibilidad/BuscarPistas.razor`
+- [X] T022 [US1] **[código de Artur, revisión de Artur]** En `src/SI18.Cliente/Disponibilidad/BuscarPistas.razor`
   añadir **solo** (research.md E10; aclaración de spec-001; confirmado por Artur):
   - `@using SI18.Cliente.Reservas` junto a los otros `@using`;
   - `<EnlaceReservar Pista="pista" Franja="franja" Fecha="_resultado.Fecha" />` **dentro** del
