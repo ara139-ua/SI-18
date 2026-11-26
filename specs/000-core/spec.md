@@ -4,7 +4,7 @@
 
 **Creada**: 2026-10-21
 
-**Estado**: Borrador
+**Estado**: Implementada (todas las tareas de `tasks.md` cerradas; estado actualizado el 26/11/2026)
 
 **Entrada**: Descripción del usuario: "Crea la spec 000-core en specs/000-core (número 000, nombre corto "core"). Es el núcleo común de SI-18: no añade pantallas propias, define el vocabulario, las entidades, los estados, los valores de negocio, los roles y quién es responsable de cada cambio de estado, para que las specs 001 a 008 lo referencien en lugar de redefinirlo (constitución, principio VII). Usa como contenido el documento "Proyecto SDD/propuesta-000-core.md", secciones 2 a 9, incluidas las decisiones D1–D10 tomadas por el grupo (regístralas como Assumptions con su motivo). Las historias de usuario de 000-core son: (1) un único modelo de datos para las cuatro personas, (2) valores de negocio definidos una sola vez, (3) identidad, rol, tarifa y centro de trabajo comunes, (4) eventos entre historias con responsable claro. Todo en español."
 
