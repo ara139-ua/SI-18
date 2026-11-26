@@ -77,7 +77,7 @@ converge ([converge-2026-11-26-3.md](./converge-2026-11-26-3.md)).
 |----|---------------------|----------|-----------------------|----------|-------------|---------|--------|-------------------|
 | G1 | RF-004 (mayúsculas) | MEDIUM | Criterio nuevo sin prueba automática | Prueba en `ValidarAccesoTests` | Saul | Artur (revisión pedida en el PR) | Resuelto (T034) | tasks.md T034 |
 | G2 | research.md V10 (F7 del segundo converge) | LOW | Solo recogía el texto «hoy a las HH:mm» | Documentar el segundo texto | Saul | — | Resuelto (T035) | research.md V10 |
-| P1 | Revisión del código común C1 y C2 (#46) | HIGH | Sigue sin la revisión de @ara139-ua | Sigue pedida en el #43 | Saul | Artur | Abierto | — |
+| P1 | Revisión del código común C1 y C2 (#46) | HIGH | Sigue sin la revisión de @ara139-ua | Sigue pedida en el #43 | Saul | Artur | Resuelto (revisión de Artur, 26/11/2026: aprobados sin cambios) | [revision-c1-c2.md](./revision-c1-c2.md) |
 
 ### Criterios nuevos
 
