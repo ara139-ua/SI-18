@@ -43,12 +43,25 @@
             <MudButton Href="/mis-reservas" Variant="Variant.Text" Color="Color.Primary">Ver mis reservas</MudButton>
         </section>
     }
+    else
+    {
+        <section aria-labelledby="encabezado-resultado">
+            <h2 id="encabezado-resultado" tabindex="-1" @ref="_encabezado" class="mud-typography mud-typography-h5 encabezado-resultado">
+                @Encabezado(_resultado)
+            </h2>
+            <MudButton Href="/buscar-pistas" Variant="Variant.Text" Color="Color.Primary">Volver a buscar pistas</MudButton>
+        </section>
+    }
 }
 
 @code {
     [Parameter] public long Id { get; set; }
 
-    private enum Resultado { Pendiente, Confirmada }
+    private enum Resultado { Pendiente, Confirmada, Caducada }
+
+    // Si la reserva ya llega caducada no hay respuesta de error de la que leer el detalle; puede haber caducado
+    // por tiempo, por un pago rechazado o por un cierre, así que el texto no dice por qué.
+    private const string TextoYaCaducada = "Esta reserva ha caducado sin pagarse. Si la franja sigue libre, haz una reserva nueva.";
 
     private static readonly Dictionary<string, object> _atributosTarjeta = new() { ["autocomplete"] = "cc-number" };
 
@@ -77,7 +90,17 @@
         try
         {
             _reserva = await Api.GetAsync<ReservaDto>($"/api/reservas/{Id}");
-            _resultado = _reserva.Estado == EstadoReserva.Confirmada ? Resultado.Confirmada : Resultado.Pendiente;
+            _resultado = _reserva.Estado switch
+            {
+                EstadoReserva.Confirmada => Resultado.Confirmada,
+                EstadoReserva.Caducada => Resultado.Caducada,
+                _ => Resultado.Pendiente,
+            };
+
+            if (_resultado == Resultado.Caducada)
+            {
+                _mensajePendiente = (TextoYaCaducada, Severity.Warning);
+            }
         }
         catch (ErrorApi error)
         {
@@ -125,6 +148,10 @@
             // Formato de la tarjeta: el error va en el propio campo; el formulario se queda.
             _errorTarjeta = string.Join(' ', errores);
         }
+        catch (ErrorApi error) when (error.Codigo == "RESERVA_CADUCADA")
+        {
+            MostrarResultado(Resultado.Caducada, error.Detalle, Severity.Warning);
+        }
         catch (ErrorApi error)
         {
             _mensaje.Mostrar(error.Detalle, Severity.Error);
@@ -134,6 +161,12 @@
             _enviando = false;
         }
     }
+
+    private static string Encabezado(Resultado resultado) => resultado switch
+    {
+        Resultado.Caducada => "La reserva ha caducado",
+        _ => throw new ArgumentOutOfRangeException(nameof(resultado), resultado, null),
+    };
 
     private void MostrarResultado(Resultado resultado, string texto, Severity tipo)
     {

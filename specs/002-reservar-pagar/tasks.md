@@ -370,7 +370,7 @@ caducidad al reservar y al pagar, y la misma respuesta antes y después del barr
   `DatosReservas.ConServicio` y una `PasarelaContadora`, dos llamadas a `Pagar` en paralelo (cada una
   con su ámbito y su `Si18DbContext`) → una confirma y la otra recibe `TRANSICION_NO_PERMITIDA`; la
   pasarela se llama **una sola vez**. Depende de T027.
-- [ ] T032 [US2] En `src/SI18.Cliente/Reservas/PagarReserva.razor`, con 409 `RESERVA_CADUCADA`: el
+- [X] T032 [US2] En `src/SI18.Cliente/Reservas/PagarReserva.razor`, con 409 `RESERVA_CADUCADA`: el
   formulario desaparece, `<h2 tabindex="-1">La reserva ha caducado</h2>` recibe el foco y
   `MensajeAccesible` (`Severity.Warning`) anuncia el `Detalle` del catálogo, con el enlace «Volver a
   buscar pistas». Si `GET /api/reservas/{id}` ya la devuelve `caducada`, se muestra lo mismo sin
