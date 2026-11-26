@@ -30,8 +30,8 @@ aparece).
 | ID | Historia / criterio | Gravedad | Evidencia (analyze final) | Decisión | Responsable | Revisor | Estado | Dónde se resuelve |
 |----|---------------------|----------|---------------------------|----------|-------------|---------|--------|-------------------|
 | I1 | RF-014a · «Supuestos» · `ConsultaCierresProvisional` | MEDIA | La provisional de cierres «la sustituirá spec-007 (C)», pero HU-07 está fuera del alcance comprometido (constitución 1.2.0) | Nota de alcance: la provisional se queda como implementación de `IConsultaCierres` y base para trabajo futuro | Saul | Artur (revisa el cambio de Saul) | Resuelto (por Saul, #50) | contracts/modulos.md «Alcance (26/11/2026)» |
-| I2 | plan.md «Código fuente» | BAJA | Lista dos provisionales ya retiradas (#31, #33) | Nota en plan.md | Artur | — | Pendiente (documentación) | plan.md |
-| I3 | plan.md D6 | BAJA | Dice que la convención de `Program.cs` entra en el PR de HU-01; entró en el #18 | Nota en plan.md | Artur | — | Pendiente (documentación) | plan.md |
+| I2 | plan.md «Código fuente» | BAJA | Lista dos provisionales ya retiradas (#31, #33) | Nota en plan.md | Artur | Saul (en el PR) | Resuelto (nota en plan.md, 26/11/2026) | plan.md «Código fuente» |
+| I3 | plan.md D6 | BAJA | Dice que la convención de `Program.cs` entra en el PR de HU-01; entró en el #18 | Nota en plan.md | Artur | Saul (en el PR) | Resuelto (nota en plan.md, 26/11/2026) | plan.md «Dependencias y riesgos» y «Comprobación de la constitución» |
 | E1 | CE-001 | BAJA | Sin tarea que mida «menos de 1 minuto» | Se da por cumplido con el recorrido de T021 (búsqueda completa con teclado en unos segundos) | Artur | — | Aceptado | tasks.md T021 |
 | U1 | Cabecera de spec.md | BAJA | «Estado: Borrador» | Cambiar a «Implementada» | Saul | Artur (revisa el cambio de Saul) | Resuelto (por Saul, #51) | spec.md «Estado: Implementada» |
 

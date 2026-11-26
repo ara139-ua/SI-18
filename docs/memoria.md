@@ -281,7 +281,7 @@ Sobre `develop` después del #57 (`f4090a9`):
 | Comando | Resultado |
 | ------- | --------- |
 | `dotnet build SI18.slnx` | 0 advertencias, 0 errores |
-| `dotnet test SI18.slnx` | **408 de 408** correctas, 0 omitidas |
+| `dotnet test SI18.slnx` | **410 de 410** correctas, 0 omitidas |
 | `dotnet test SI18.slnx --filter-trait "Categoria=Limites"` | **167 de 167** correctas |
 
 Los métodos de prueba (`[Fact]` y `[Theory]`) pasaron de 271 en el commit de referencia del refinamiento (`36a3166`) a 283 en la versión final. Salidas y detalle en [verificacion-integrada.md](./verificacion-integrada.md), «Regresión».
@@ -405,9 +405,9 @@ La **matriz de trazabilidad global** (112 criterios de HU-01, HU-02, HU-05 y HU-
 2. **Implementación** (noviembre de 2026): `000-core` (#10–#22), HU-01 (#19, #23, #24, #27), HU-02 (#25, #29–#31, #36, #39), HU-05 (#32–#34) y HU-06 (#45–#47).
 3. **Primer refinamiento** (25–26/11/2026), antes de la versión funcional completa: `clarify` y `analyze` previos al plan en HU-02, `converge` de HU-01, HU-05 y `000-core`.
 4. **Refinamiento sobre la versión funcional** (26/11/2026, enunciado 5.1–5.3). Commit de referencia `36a3166` ([commit-referencia.md](./evidencias/commit-referencia.md)); versión de Spec Kit 1.1.2.dev0.
-   - **clarify**: 23 preguntas respondidas e integradas en las cuatro specs, 5 de ellas sobre la versión funcional (3 en HU-02, 2 en HU-06). Informes: `clarify-diff.md` de cada spec y `clarify-funcional.md` de 002 y 006, con tres situaciones probadas por historia contra la API local.
-   - **analyze**: informes inicial y final por spec (`analyze-registro.md`, `analyze-final*.md`, `analyze-1/2/3.md` de 006) y revisión entre compañeros; 52 hallazgos, 48 cerrados y 4 abiertos.
-   - **converge**: 22 hallazgos, 15 resueltos con tarea, 6 aceptados con justificación y 1 abierto de proceso; sin brechas de código pendientes. Informes `converge-*.md` de cada spec (002: pasadas 1, 2 y final; 006: pasadas 1 a 4).
+   - **clarify**: 27 preguntas respondidas e integradas en las cuatro specs, 9 de ellas sobre la versión funcional (2 en HU-01, 3 en HU-02, 2 en HU-05, 2 en HU-06). Informes: `clarify-diff.md` de cada spec y `clarify-funcional.md` de las cuatro specs, con tres situaciones probadas por historia contra la API local.
+   - **analyze**: informes inicial y final por spec (`analyze-registro.md`, `analyze-final*.md`, `analyze-1/2/3.md` de 006) y revisión entre compañeros; 54 hallazgos, todos cerrados.
+   - **converge**: 24 hallazgos, 17 resueltos con tarea, 1 de proceso resuelto con la revisión de C1 y C2, y 6 aceptados con justificación; sin brechas pendientes. La prueba del fallo previo de T030 está en `docs/evidencias/t030-antes-despues.md`. Informes `converge-*.md` de cada spec (002: pasadas 1, 2 y final; 006: pasadas 1 a 4).
 5. **Verificación integrada** (26/11/2026, enunciado 5.4): R1 y R2 automatizados ([verificacion-integrada.md](./verificacion-integrada.md)) y balance con denominadores ([trazabilidad.md](./trazabilidad.md), sección 4).
 
 Las entradas de las iteraciones 1 a 3 son el historial real de PR y commits; las fechas del refinamiento son las de los informes. Los informes originales de `analyze` de HU-02 y de `000-core` no se conservaron: sus registros son reconstrucciones marcadas como tales.
@@ -426,7 +426,7 @@ Los PR están numerados del #1 al #57 en <https://github.com/ara139-ua/SI-18/pul
 
 ### 10.1 Qué se consiguió
 
-- Cuatro historias de extremo a extremo, más la base común, con 408 pruebas automáticas en verde y una categoría de pruebas de límites de tiempo (167).
+- Cuatro historias de extremo a extremo, más la base común, con 410 pruebas automáticas en verde y una categoría de pruebas de límites de tiempo (169).
 - Un proceso trazable: cada criterio de las cuatro historias tiene decisión de plan, tareas y prueba ([trazabilidad.md](./trazabilidad.md)).
 - Un refinamiento con consecuencias reales en el código: el `clarify` sobre la versión funcional encontró un defecto de comportamiento (pagar con la franja ya empezada) que las pruebas existentes no cubrían, y converge generó tareas con prueba del fallo previo.
 - Una constitución que obligó a llevar los cambios de reglas compartidas a `000-core` antes que a una historia (principio VII).
@@ -437,12 +437,12 @@ Los PR están numerados del #1 al #57 en <https://github.com/ara139-ua/SI-18/pul
 - **Revisión cruzada incompleta.** El #46 (pantalla de HU-06 con los cambios de código común C1 y C2), el #31 y el #36 se fusionaron sin la revisión de la otra persona del grupo, por la entrega. La de C1 y C2 la hizo Artur después y quedó cerrada sin cambios (F1 de converge, P1 de analyze-3).
 - **Informes no conservados.** Los informes originales de `analyze` de HU-02 y de `000-core` se perdieron; sus registros son reconstrucciones a partir de commits y PR, marcadas como tales.
 - **Pruebas que se pisan.** La base de pruebas se comparte; hubo que repartir fechas y pistas por spec (#37) y comprobarlas con `git grep`.
-- **Incidencias documentales abiertas**: 001 I2 e I3 (dos notas en `plan.md`), 005 E2 (comprobación manual) y las tres de `000-core` (I1–I3); ninguna afecta al comportamiento.
+- **Incidencias documentales abiertas**: las tres de `000-core` (I1–I3); ninguna afecta al comportamiento. Las de las cuatro historias están cerradas (001 I2 e I3 con notas en `plan.md`, 005 E2 verificada en la demo).
 
 ### 10.3 Trabajo futuro
 
 - **HU-03, HU-04, HU-07 y HU-08.** Están fuera del alcance acordado con el profesor, pero `000-core` ya prepara su base: `Devolucion`, `PoliticaDevolucion` y `IServicioReservas.CancelarPorUsuario` (HU-03); `Curso`, `Inscripcion` y la siembra de cursos (HU-04); `CierreMantenimiento`, `IConsultaCierres`, `IServicioReservas.AplicarCierre`, `IConsultaFranjasFijas.RepresentantesAfectados` e `IServicioAvisos` (HU-07); y las reglas de cómputo y el rol de técnico (HU-08). La consulta provisional de cierres (`ConsultaCierresProvisional`) se retiraría al implementar HU-07.
-- **Pendientes de las historias hechas**: la comprobación manual de T058 (NVDA, Lighthouse y axe sobre los dos estados nuevos), el escenario R19 de `quickstart.md` a mano y las notas de `plan.md` de HU-01.
+- **Pendientes de las historias hechas**: la comprobación manual de T058 (NVDA, Lighthouse y axe sobre los dos estados nuevos), y el escenario R19 de `quickstart.md` a mano.
 - **Mejoras**: integración continua, pruebas de componentes del cliente y un recorrido de navegador automatizado.
 
 ---
