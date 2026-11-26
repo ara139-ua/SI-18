@@ -59,7 +59,7 @@ public sealed class ClienteApi(HttpClient http, NavigationManager navegacion)
             return;
         }
 
-        var problema = await LeerProblemaAsync(respuesta, ct);
+        var (problema, extensiones) = await LeerProblemaAsync(respuesta, ct);
         var codigo = problema?.Codigo ?? $"HTTP_{(int)respuesta.StatusCode}";
         var detalle = problema?.Detail ?? $"No se ha podido completar la operación (estado {(int)respuesta.StatusCode}).";
 
@@ -74,23 +74,47 @@ public sealed class ClienteApi(HttpClient http, NavigationManager navegacion)
         throw new ErrorApi(codigo, detalle, respuesta.StatusCode)
         {
             Errores = problema?.Errors ?? new Dictionary<string, string[]>(),
+            Extensiones = extensiones,
         };
     }
 
-    private static async Task<ProblemaDto?> LeerProblemaAsync(HttpResponseMessage respuesta, CancellationToken ct)
+    private static readonly IReadOnlyDictionary<string, JsonElement> SinExtensiones = new Dictionary<string, JsonElement>();
+
+    // Propiedades que ya recoge ProblemaDto (o que no interesan al cliente): el resto son extensiones.
+    private static readonly HashSet<string> PropiedadesConocidas =
+        new(["type", "title", "status", "detail", "instance", "codigo", "traceId", "errors"], StringComparer.OrdinalIgnoreCase);
+
+    private static async Task<(ProblemaDto? Problema, IReadOnlyDictionary<string, JsonElement> Extensiones)> LeerProblemaAsync(
+        HttpResponseMessage respuesta, CancellationToken ct)
     {
         if (respuesta.Content.Headers.ContentType?.MediaType is not ("application/problem+json" or "application/json"))
         {
-            return null;
+            return (null, SinExtensiones);
         }
 
         try
         {
-            return await respuesta.Content.ReadFromJsonAsync<ProblemaDto>(OpcionesJson.Predeterminadas, ct);
+            var texto = await respuesta.Content.ReadAsStringAsync(ct);
+            var problema = JsonSerializer.Deserialize<ProblemaDto>(texto, OpcionesJson.Predeterminadas);
+
+            using var documento = JsonDocument.Parse(texto);
+            var extensiones = new Dictionary<string, JsonElement>();
+            if (documento.RootElement.ValueKind == JsonValueKind.Object)
+            {
+                foreach (var propiedad in documento.RootElement.EnumerateObject())
+                {
+                    if (!PropiedadesConocidas.Contains(propiedad.Name))
+                    {
+                        extensiones[propiedad.Name] = propiedad.Value.Clone();
+                    }
+                }
+            }
+
+            return (problema, extensiones);
         }
         catch (JsonException)
         {
-            return null;
+            return (null, SinExtensiones);
         }
     }
 

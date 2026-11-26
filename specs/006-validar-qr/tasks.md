@@ -293,7 +293,7 @@ centro, con la instalación y la franja (nunca el titular).
   `QR_RESERVA_NO_CONFIRMADA` y `QR_FUERA_DE_VENTANA`, `Reserva = new ReservaValidadaDto(...)` con
   instalación, centro, fecha y horas de Madrid; con `QR_DESCONOCIDO` y `QR_OTRO_CENTRO`, `Reserva = null`
   (RF-007; research.md V2). Depende de T009, T013, T014.
-- [ ] T016 [US2] **[código común, revisión de @ara139-ua — C2]** Añadir a
+- [X] T016 [US2] **[código común, revisión de @ara139-ua — C2]** Añadir a
   `src/SI18.Cliente/Comun/ErrorApi.cs` la propiedad
   `IReadOnlyDictionary<string, JsonElement> Extensiones { get; init; }` (vacía por defecto) y rellenarla
   en `src/SI18.Cliente/Comun/ClienteApi.cs` al leer el Problem Details (todas las propiedades que no son
