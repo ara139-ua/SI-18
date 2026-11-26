@@ -57,7 +57,16 @@ public sealed class ServicioValidarAcceso(Si18DbContext db, TimeProvider reloj, 
 
         if (motivo is not null)
         {
-            return ResultadoValidacion.Rechazar(motivo, validacion.Id, null);
+            // RF-007: con estos dos motivos se informa de la reserva (nunca del titular); con los otros dos, de nada.
+            ReservaValidadaDto? datos = motivo is ReglaAcceso.QrReservaNoConfirmada or ReglaAcceso.QrFueraDeVentana
+                ? new ReservaValidadaDto(
+                    fila!.Instalacion,
+                    fila.Centro,
+                    Fecha(fila.Reserva.InicioUtc),
+                    Hora(fila.Reserva.InicioUtc),
+                    Hora(fila.Reserva.FinUtc))
+                : null;
+            return ResultadoValidacion.Rechazar(motivo, validacion.Id, datos);
         }
 
         var reserva = fila!.Reserva;

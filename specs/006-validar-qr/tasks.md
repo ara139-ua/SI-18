@@ -262,7 +262,7 @@ centro, con la instalación y la franja (nunca el titular).
 
 ### Pruebas de US2 (antes de la implementación)
 
-- [ ] T013 [P] [US2] Añadir a `tests/SI18.Api.Tests/Reservas/ValidarAccesoTests.cs` los rechazos por HTTP:
+- [X] T013 [P] [US2] Añadir a `tests/SI18.Api.Tests/Reservas/ValidarAccesoTests.cs` los rechazos por HTTP:
   - `"noexiste"` → 422 `QR_DESCONOCIDO`, con `validacionId` y **sin** extensión `reserva`; fila con
     `reserva_id` nulo (HU2 esc. 4; HU3 esc. 3);
   - la reserva compartida (T007) con la sesión de `personal.oeste` → 403 `QR_OTRO_CENTRO`, sin extensión
@@ -274,7 +274,7 @@ centro, con la instalación y la franja (nunca el titular).
   - un código de 100 caracteres → 422 `QR_DESCONOCIDO`, registrado recortado a 64.
 
   Depende de T006.
-- [ ] T014 [P] [US2] Crear `tests/SI18.Api.Tests/Reservas/LimitesValidacionTests.cs` con
+- [X] T014 [P] [US2] Crear `tests/SI18.Api.Tests/Reservas/LimitesValidacionTests.cs` con
   **`[Trait("Categoria", "Limites")]`** y `DatosValidaciones.ConServicio` (reloj propio; research.md V11;
   CE-002):
   - **una** reserva de Carla el 21/01/2027 de 10:00 a 11:00, compartida de solo lectura por todos los
@@ -289,7 +289,7 @@ centro, con la instalación y la franja (nunca el titular).
 
 ### Implementación de US2
 
-- [ ] T015 [US2] Completar los rechazos en `ServicioValidarAcceso.Validar`: con
+- [X] T015 [US2] Completar los rechazos en `ServicioValidarAcceso.Validar`: con
   `QR_RESERVA_NO_CONFIRMADA` y `QR_FUERA_DE_VENTANA`, `Reserva = new ReservaValidadaDto(...)` con
   instalación, centro, fecha y horas de Madrid; con `QR_DESCONOCIDO` y `QR_OTRO_CENTRO`, `Reserva = null`
   (RF-007; research.md V2). Depende de T009, T013, T014.

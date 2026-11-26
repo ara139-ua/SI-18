@@ -142,6 +142,32 @@ public sealed class DatosValidaciones(FabricaApi fabrica)
         return await Reservas.Confirmada(Carla, pista, inicioUtc, inicioUtc - TimeSpan.FromDays(1));
     }
 
+    /// <summary>
+    /// Cancelada de Carla en la pista de HU-06 en <paramref name="inicioUtc"/>, creada de forma idempotente. Una
+    /// cancelada no es activa: no choca con <c>ux_reservas_activa</c> ni con la confirmada de la misma franja.
+    /// </summary>
+    public async Task<long> CanceladaEn(DateTime inicioUtc)
+    {
+        var pista = await Reservas.Pista(Este, Pista);
+        var carla = await Reservas.Usuario(Carla);
+
+        using (var ambito = fabrica.Services.CreateScope())
+        {
+            var db = ambito.ServiceProvider.GetRequiredService<Si18DbContext>();
+            var existente = await db.Reservas.AsNoTracking()
+                .Where(r => r.UsuarioId == carla && r.InstalacionId == pista && r.InicioUtc == inicioUtc
+                    && r.Estado == EstadoReserva.Cancelada)
+                .Select(r => (long?)r.Id)
+                .FirstOrDefaultAsync(Ct);
+            if (existente is not null)
+            {
+                return existente.Value;
+            }
+        }
+
+        return await Reservas.Cancelada(Carla, pista, inicioUtc, inicioUtc - TimeSpan.FromDays(1));
+    }
+
     /// <summary>Confirmada de Carla en la pista de HU-06 el <paramref name="fecha"/> a las 10:00 de Madrid.</summary>
     public Task<long> ConfirmadaALasDiez(DateOnly fecha) => ConfirmadaEn(DatosReservas.Utc(fecha, 10));
 
