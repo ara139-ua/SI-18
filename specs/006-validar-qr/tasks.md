@@ -534,7 +534,7 @@ C2), el PR de API se abre antes (T030).
   que usa `FormatoEs.FechaHora` (misma zona que `HorarioMadrid`; `SI18.Cliente` no referencia `SI18.Dominio`).
   Prueba `AvisoValidacionAnteriorTextoTests` con el mismo día, otro día (aunque sea el mismo día UTC) y
   horario de verano.
-- [ ] T033 (F5) Corregir en `quickstart.md` §4 paso 1 la frase «Si el cambio de `MainLayout.razor` … aún no está
+- [X] T033 (F5) Corregir en `quickstart.md` §4 paso 1 la frase «Si el cambio de `MainLayout.razor` … aún no está
   fusionado, abre `/validar-acceso` a mano» (C1 ya está fusionado) y en la matriz de `analyze-registro.md` la
   de CE-006 «sin marcar hasta hacerla» (T026 está hecha).
 

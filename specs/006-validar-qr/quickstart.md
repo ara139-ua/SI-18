@@ -56,8 +56,7 @@ de spec-003 y spec-007, que no están en `develop`. Se valida con `ValidarAcceso
 ## 4. Escenarios manuales en la pantalla
 
 1. Inicia sesión como `personal.este@si18.test`. El menú muestra «Validar acceso» (y no «Buscar pistas»
-   ni «Mis reservas»). *(Si el cambio de `MainLayout.razor` —punto a coordinar C1— aún no está
-   fusionado, abre `/validar-acceso` a mano.)*
+   ni «Mis reservas»). *(El enlace llegó a `develop` con el #46, punto a coordinar C1.)*
 2. Pulsa «Validar» con el campo vacío: el campo se marca y se anuncia «Escribe el código de acceso.»; no
    se envía nada.
 3. Escribe `{código}` dentro de la ventana y pulsa «Validar» (o Intro): aparece «Acceso permitido» con

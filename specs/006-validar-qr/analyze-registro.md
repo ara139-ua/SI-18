@@ -55,6 +55,6 @@ Estados: **Resuelto** (corregido en el commit «spec-006: correcciones de analyz
 | CE-003 | Rechazos sin datos indebidos | V2, V9 | T001, T013, T015 | `ValidarAccesoTests` (extensión `reserva` según el motivo; `ReservaValidadaDto` sin titular) |
 | CE-004 | Todo intento del personal registrado; nada de otros | V4, V7 | T007, T013, T018, T020 | `ValidarAccesoTests` (filas por `validacionId`, `UltimoId` y `HayValidacionConCodigo`) |
 | CE-005 | < 15 s a mano | V10 | T028 | Medición manual con cronómetro |
-| CE-006 | Teclado, 320 px, Lighthouse ≥ 95, axe, lector | V10 | T025, T026 | Manual: quickstart §5 (sin marcar hasta hacerla) |
+| CE-006 | Teclado, 320 px, Lighthouse ≥ 95, axe, lector | V10 | T025, T026 | Manual: quickstart §5 (hecha el 26/11/2026, T026) |
 | CE-007 | Aviso correcto en el 100 % | V5 | T008, T010 | `AvisoValidacionAnteriorTests` |
 | (rendimiento 000-core) | < 300 ms p95 por validación | V12 | T028 | 20 llamadas con la API local |
