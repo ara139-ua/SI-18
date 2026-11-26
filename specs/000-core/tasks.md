@@ -720,7 +720,9 @@ responsable.
   (la propia orden) y `tasks.md:213` (`clave-de-prueba` de `FabricaApi`). Se deja el patrón como está
   y se justifican en el PR. `git ls-files fuentes/.env` no devuelve nada (lo excluye
   `fuentes/.gitignore:15`), `fuentes/.env` no aparece en el historial de ninguna rama y las contraseñas
-  reales de `.env` no están en ningún fichero versionado.
+  reales de `.env` no están en ningún fichero versionado. Tras «000-core T074: correcciones del
+  quickstart» quedan 5: desaparece `quickstart.md:29` (ya no se usa `user-secrets`) y la orden de §7
+  pasa a `quickstart.md:134`.
 - [ ] T076 [Ambos] Abrir el PR final de `develop` → `main`, con la lista de los principios I–IX
   revisados (constitución, «Flujo de trabajo»). Después, ejecutar `/speckit-converge` para 000-core.
 
