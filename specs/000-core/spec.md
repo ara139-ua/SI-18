@@ -243,7 +243,9 @@ declaran la dependencia en su spec.
   pendiente de pago → caducada; confirmada → cancelada. Cancelada y caducada son estados finales. No
   existe la transición pendiente de pago → cancelada.
 - **RF-016**: Una reserva pendiente de pago DEBE pasar a caducada si el pago falla, si no se completa
-  en 10 minutos desde su creación o si su franja queda dentro de un cierre por mantenimiento. Al
+  en 10 minutos desde su creación, si se intenta pagar cuando su franja ya ha empezado (aunque no hayan
+  pasado los 10 minutos; spec-002 RF-009a, aclaración 2026-11-26) o si su franja queda dentro de un
+  cierre por mantenimiento. Al
   caducar, su pago pendiente DEBE pasar a fallido, sin cobro ni devolución. Un pago fallido NO DEBE
   poder reintentarse: para volver a intentarlo, el usuario DEBE crear una reserva nueva si la franja
   sigue libre.
@@ -331,7 +333,7 @@ declaran la dependencia en su spec.
 | ------------------------------------------------------------------------------------------------------- | ----------- | -------------------------- |
 | Reserva nueva → pendiente de pago (la franja deja de estar libre)                                       | HU-02       | HU-01                      |
 | Reserva pendiente de pago → confirmada (se genera el QR)                                                | HU-02       | HU-01, HU-06, HU-08        |
-| Reserva pendiente de pago → caducada (pago fallido o tiempo agotado; pago → fallido)                    | HU-02       | HU-01                      |
+| Reserva pendiente de pago → caducada (pago fallido, tiempo agotado o pago con la franja ya empezada; pago → fallido) | HU-02 | HU-01           |
 | Reserva confirmada → cancelada por el usuario antes del inicio (+ devolución si procede)                | HU-03       | HU-01, HU-06, HU-08        |
 | Instalación → cerrada por mantenimiento; reservas confirmadas → canceladas con devolución íntegra y aviso | HU-07     | HU-01, HU-02, HU-06, HU-08 |
 | Reserva pendiente de pago → caducada por cierre (pago → fallido, sin cobro; mecanismo de HU-02) y aviso | HU-07       | HU-01, HU-02               |
