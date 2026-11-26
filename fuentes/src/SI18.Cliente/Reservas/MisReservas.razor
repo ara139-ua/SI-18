@@ -3,6 +3,7 @@
 @inject ClienteApi Api
 @inject EstadoSesion Sesion
 @inject NavigationManager Navegacion
+@inject TimeProvider Reloj
 
 @* «Mis reservas» (specs/002-reservar-pagar/research.md E11; tasks.md T040). El orden y el estado efectivo los
    decide la API (RF-015, RF-015a); la pantalla los muestra tal cual. El estado va siempre escrito; el color del
@@ -36,6 +37,12 @@
                 {
                     <CodigoAcceso Codigo="@reserva.CodigoAcceso" Descripcion="@TextosReservas.Descripcion(reserva)" />
                 }
+                else if (reserva.Estado == EstadoReserva.PendientePago && PlazoTerminado(reserva))
+                {
+                    @* RF-017 (aclaración 2026-11-26): pasada la hora límite que manda la API (la franja ya ha empezado),
+                       no se ofrece «Pagar»; si se intentara, la API respondería FRANJA_YA_EMPEZADA. *@
+                    <p>El plazo para pagar terminó a las @reserva.HoraLimitePago.</p>
+                }
                 else if (reserva.Estado == EstadoReserva.PendientePago)
                 {
                     <p>Paga antes de las @reserva.HoraLimitePago.</p>
@@ -55,6 +62,10 @@
     private MensajeAccesible _mensaje = null!;
     private List<ReservaDto>? _reservas;
     private (string Texto, Severity Tipo)? _mensajePendiente;
+
+    /// <summary>La hora límite la calcula la API (RF-008a); aquí solo se compara con la hora del cliente.</summary>
+    private bool PlazoTerminado(ReservaDto reserva) =>
+        reserva.LimitePagoUtc is { } limite && Reloj.GetUtcNow().UtcDateTime >= limite;
 
     protected override async Task OnInitializedAsync()
     {

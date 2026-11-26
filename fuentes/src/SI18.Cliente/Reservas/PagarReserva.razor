@@ -64,7 +64,7 @@
 @code {
     [Parameter] public long Id { get; set; }
 
-    private enum Resultado { Pendiente, Confirmada, Caducada, Rechazado, NoPagable }
+    private enum Resultado { Pendiente, Confirmada, Caducada, Rechazado, NoPagable, YaEmpezada }
 
     // Si la reserva ya llega caducada no hay respuesta de error de la que leer el detalle; puede haber caducado
     // por tiempo, por un pago rechazado o por un cierre, así que el texto no dice por qué.
@@ -174,6 +174,11 @@
         {
             MostrarResultado(Resultado.Caducada, error.Detalle, Severity.Warning);
         }
+        catch (ErrorApi error) when (error.Codigo == "FRANJA_YA_EMPEZADA")
+        {
+            // RF-009a: la franja empezó antes de pagar; la reserva queda caducada y no se puede reintentar.
+            MostrarResultado(Resultado.YaEmpezada, error.Detalle, Severity.Warning);
+        }
         catch (ErrorApi error) when (error.Codigo == "PAGO_RECHAZADO")
         {
             MostrarResultado(Resultado.Rechazado, error.Detalle, Severity.Error);
@@ -197,6 +202,7 @@
         Resultado.Caducada => "La reserva ha caducado",
         Resultado.Rechazado => "El pago no se ha completado",
         Resultado.NoPagable => "Esta reserva ya no se puede pagar",
+        Resultado.YaEmpezada => "La franja ya ha empezado",
         _ => throw new ArgumentOutOfRangeException(nameof(resultado), resultado, null),
     };
 

@@ -59,6 +59,7 @@ un `inicioUtc` libre de `GET /api/disponibilidad/franjas` para mañana. Contrato
 | R16 | Con la sesión de R4: `GET /api/reservas/{id de R2}` y `POST /api/reservas/{id de R2}/pago`              | 404 `NO_ENCONTRADO` en los dos                                                                         | HU5 esc. 4 |
 | R17 | Sesión como `personal.norte@si18.test` o `tecnico@si18.test`; cualquier endpoint de `/api/reservas`     | 403 `ROL_NO_PERMITIDO`                                                                                 | RF-001 |
 | R18 | Sin sesión                                                                                              | 401 `NO_AUTENTICADO`                                                                                   | RF-001 |
+| R19 | Reserva una franja que empiece en menos de 10 minutos (por ejemplo, a las 20:55 la de las 21:00) y págala cuando ya haya empezado | La `horaLimitePago` de la reserva es la de inicio de la franja; el pago da 422 `FRANJA_YA_EMPEZADA`, `GET /api/reservas/{id}` → `caducada`, sin código y sin cobro; un segundo pago, 409 `TRANSICION_NO_PERMITIDA` | RF-008a, RF-009a, HU2 esc. 6 |
 
 Las operaciones de `IServicioReservas` (cancelar por el usuario, aplicar un cierre) no tienen endpoint
 en esta spec: se validan con `ServicioReservasTests` y, de punta a punta, con las specs 003 y 007.

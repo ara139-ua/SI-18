@@ -42,7 +42,8 @@ Esta spec **no redefine** nada de `000-core` (constitución, principio VII). Usa
 **Fuera de alcance**: control de aforo; validar inscripciones a cursos; generar o mostrar el QR (lo
 hace spec-002); cancelar reservas (spec-003) o cerrar instalaciones (spec-007); pantallas para consultar
 o exportar el historial de validaciones; cambiar el centro asignado a una persona del personal; leer
-el QR con la cámara (aclaración 2026-11-26).
+el QR con la cámara (aclaración 2026-11-26); validar el acceso de un club en sus franjas fijas, que no
+generan reserva ni código (aclaración 2026-11-26, sobre la versión funcional).
 
 ## Clarifications
 
@@ -71,6 +72,28 @@ el QR con la cámara (aclaración 2026-11-26).
     mantenimiento de HU-07; nunca se muestra el titular y solo ocurre con reservas del mismo centro,
     así que solo se expone lo que ya sabe quien enseña el código.
   - **Historia afectada**: HU-2 (escenarios 1, 2 y 3), RF-007 y CE-003.
+
+### Session 2026-11-26 (sobre la versión funcional, enunciado 5.1)
+
+Pasada de clarify sobre la aplicación ya implementada, después de probar el recorrido habitual, una
+entrada inválida o un límite y una condición de permiso o de estado (detalle y evidencias en
+[clarify-funcional.md](./clarify-funcional.md)). Respuestas de Saul.
+
+- Q: ¿El acceso de un club a su franja fija aprobada lo valida el personal en esta historia? → A: No;
+  queda fuera de alcance.
+  - **Justificación**: la descripción del sistema solo habla de validar los QR de las reservas, y una
+    franja fija no genera reserva ni código (HU-05, D9 de `000-core`): no hay nada que validar en
+    HU-06. Añadir otra forma de acceso sería alcance nuevo (principio VIII).
+  - **Historia afectada**: «Fuera de alcance».
+- Q: ¿El código se compara distinguiendo mayúsculas y minúsculas? → A: Sí, se compara exacto; un
+  código con una letra en otra caja se rechaza con `QR_DESCONOCIDO`.
+  - **Justificación**: es el mismo código que la persona ve escrito en «Mis reservas» (spec-002);
+    ignorar mayúsculas obligaría a cambiar el índice único del código en `000-core` (principio VII) y
+    reduciría la aleatoriedad del código (R14). La versión funcional ya compara exacto, pero la decisión
+    se toma por estos motivos, no por eso.
+  - **Historia afectada**: RF-004 y «Casos límite».
+- Relacionada con spec-002 (aclaración 2026-11-26): en las reservas con tarifa club, el titular que
+  muestra RF-006 es el representante que reservó, no el club. No cambia nada en HU-06.
 
 ## Escenarios de usuario y pruebas *(obligatorio)*
 
@@ -237,6 +260,8 @@ lector de pantalla y con la pantalla a 320 px de ancho.
   en este orden: código desconocido → otro centro → reserva no confirmada → fuera de la ventana. Así el
   personal de un centro no averigua el estado ni el horario de las reservas de otro centro.
 - **Código con espacios** al principio o al final (al copiarlo o dictarlo): se ignoran esos espacios.
+- **Mayúsculas y minúsculas** (aclaración 2026-11-26): el código se compara exacto; con una sola letra
+  en otra caja se rechaza con `QR_DESCONOCIDO` y se registra como cualquier otro rechazo.
 - **Campo vacío**: no se envía; se pide escribir el código y no se registra ninguna validación.
 - **Código muy largo o con caracteres extraños**: se rechaza como `QR_DESCONOCIDO`; se registra lo
   leído recortado a la longitud máxima de `000-core` (64 caracteres).
@@ -265,7 +290,8 @@ lector de pantalla y con la pantalla a 320 px de ancho.
 - **RF-003**: La pantalla de validación DEBE permitir **introducir el código a mano** y validarlo. Es
   la única forma de lectura: la cámara queda fuera de alcance (aclaración 2026-11-26).
 - **RF-004**: Antes de validar, se DEBEN quitar los espacios del principio y del final del código. Un
-  código vacío NO DEBE enviarse a validar.
+  código vacío NO DEBE enviarse a validar. La comparación DEBE distinguir mayúsculas y minúsculas
+  (aclaración 2026-11-26).
 - **RF-005**: La decisión DEBE tomarse siempre en el servidor, a partir del código recibido y de la hora
   actual, aplicando en este orden la primera condición que se cumpla:
   1. ninguna reserva tiene ese código → `QR_DESCONOCIDO`;
@@ -277,7 +303,8 @@ lector de pantalla y con la pantalla a 320 px de ancho.
 
   Las condiciones 1, 3 y 4 son exactamente las de la regla de acceso de `000-core` (RF-018); HU-06
   añade la 2 (D7). No se redefinen la ventana ni los motivos.
-- **RF-006**: Si el código se acepta, se DEBEN mostrar el nombre del titular de la reserva, la
+- **RF-006**: Si el código se acepta, se DEBEN mostrar el nombre del titular de la reserva (en las de
+  tarifa club, el representante que reservó; aclaración de spec-002, 2026-11-26), la
   instalación (con su centro) y la franja (fecha y horas de inicio y fin en hora de Madrid).
 - **RF-006a**: Si el código se acepta y la reserva ya tenía al menos una validación **aceptada**
   registrada, el resultado DEBE mostrar además un aviso con la fecha y hora (de Madrid) de la más

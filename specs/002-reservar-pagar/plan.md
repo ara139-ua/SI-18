@@ -170,13 +170,14 @@ POST /api/reservas { instalacionId, inicioUtc, importeMostrado }
    ├─ BEGIN · FOR UPDATE pendientes NO vigentes de la franja → Caducar (pago → fallido)   (R8.2)
    ├─ INSERT reserva(pendiente_pago) + pago(pendiente)
    └─ COMMIT ── 23505 ux_reservas_activa ──► 409 FRANJA_OCUPADA                         (R7)
-   → 201 ReservaDto (horaLimitePago) ──► /reservas/{id}/pago
+   → 201 ReservaDto (horaLimitePago = mín(creación + 10 min, inicio), T057) ──► /reservas/{id}/pago
 POST /api/reservas/{id}/pago { numeroTarjeta }
    ├─ ≠ 16 dígitos                                          → 400 (sin pasarela, sin cambios)
    ├─ BEGIN · FOR UPDATE reserva del usuario + pago          → 404 si no es suya
    ├─ caducada por tiempo (barrido, caducidad al reservar)  → 409 RESERVA_CADUCADA      (E4)
    ├─ confirmada · cancelada · caducada por rechazo o cierre → 409 TRANSICION_NO_PERMITIDA
    ├─ !EstaVigente(ahora): Caducar · COMMIT                 → 409 RESERVA_CADUCADA     (R8.3)
+   ├─ ahora ≥ inicio (franja empezada): Caducar · COMMIT    → 422 FRANJA_YA_EMPEZADA   (RF-009a, T056)
    ├─ IPasarelaPago.Cobrar
    │    ok → Confirmar(GeneradorCodigoAcceso.Nuevo()) · COMMIT → 200 ReservaDto(codigoAcceso)
    │    ko → Caducar · COMMIT                               → 422 PAGO_RECHAZADO

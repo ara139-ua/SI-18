@@ -61,6 +61,39 @@ spec-003 y spec-007 los cambios de estado de las reservas (RF-019a).
   ve un mensaje distinto según haya pasado o no el barrido. Las caducadas por un pago rechazado o por
   un cierre siguen dando `TRANSICION_NO_PERMITIDA` (plan, research.md E4).
 
+### Session 2026-11-26 (sobre la versión funcional, enunciado 5.1)
+
+Pasada de clarify sobre la aplicación ya implementada, después de probar el recorrido habitual, una
+entrada inválida o un límite y una condición de permiso o de estado (detalle y evidencias en
+[clarify-funcional.md](./clarify-funcional.md)). Respuestas de Saul.
+
+- Q: ¿Se puede pagar una reserva pendiente cuando su franja ya ha empezado, aunque no hayan pasado 10
+  minutos desde que se creó? → A: No. Al pagar después del inicio, la reserva caduca, su pago queda
+  fallido, no se llama a la pasarela y se responde `FRANJA_YA_EMPEZADA`. La hora límite de la pantalla
+  de pago es la más temprana entre «creación + 10 minutos» y el inicio de la franja.
+  - **Justificación**: reservar una franja que ya ha empezado está prohibido (`FRANJA_YA_EMPEZADA`,
+    RF-011 de `000-core`) y la descripción del sistema solo habla de reservar franjas futuras; dejar
+    pagar después del inicio confirmaría por la puerta de atrás una reserva que no se podría crear. La
+    versión funcional sí lo permitía (comprobado el 26/11/2026, ver clarify-funcional.md), y no se
+    acepta esa conducta solo porque ya funcione así. Se reutiliza un código del catálogo, sin códigos
+    nuevos (principio VII).
+  - **Historia afectada**: HU-2 (escenario 6), HU-5 (escenario 3), «Casos límite», RF-008a, RF-009a,
+    RF-011 y RF-017.
+- Q: ¿Puede un representante de club reservar una franja que está bloqueada por una franja fija
+  aprobada de su propio club? → A: No; se rechaza con `FRANJA_BLOQUEADA_CLUB`, como a cualquier otra
+  persona.
+  - **Justificación**: las franjas fijas no se cobran (D9 de `000-core`): el club ya dispone de esa
+    franja, y dejar que la reserve además sería cobrarle por algo que ya es suyo. La regla vive en
+    HU-01 (`IConsultaDisponibilidad`, de Artur) y no cambia.
+  - **Historia afectada**: HU-4 (escenario 3) y «Casos límite».
+- Q: Las reservas que hace un representante con la tarifa de club, ¿son del representante o del club?
+  → A: Del representante que reserva: solo él las ve y las paga, y en HU-06 aparece su nombre como
+  titular.
+  - **Justificación**: en `000-core` la reserva pertenece a un usuario, no a un club (spec.md,
+    «Entidades clave»); hacerla del club cambiaría el modelo de datos común (principio VII) por un caso
+    que la descripción del sistema no pide. El club solo determina la tarifa.
+  - **Historia afectada**: HU-1 (escenario 4), RF-013 y «Entidades clave».
+
 ## Escenarios de usuario y pruebas *(obligatorio)*
 
 ### Historia de usuario 1 - Reservar una franja libre y pagarla en el momento (Prioridad: P1)
@@ -90,7 +123,8 @@ importe de su tarifa y con un código QR.
    tarjeta que la pasarela acepta, **entonces** el pago se completa, la reserva pasa a confirmada y Ana
    ve un mensaje de confirmación con su código QR.
 4. **Dado** un representante de club (esté o no empadronado), **cuando** reserva y paga, **entonces**
-   se le cobra la tarifa club (4,00 €).
+   se le cobra la tarifa club (4,00 €). La reserva es suya (de su usuario), no del club: ningún otro
+   representante del mismo club la ve ni la paga (aclaración 2026-11-26).
 5. **Dado** cualquier reserva confirmada, **cuando** se consulta, **entonces** su importe es
    exactamente el que se mostró en la búsqueda y en el resumen.
 
@@ -125,6 +159,10 @@ libre, que la reserva queda caducada y que ya no se puede pagar.
 5. **Dado** que nadie intenta reservar ni pagar, **cuando** pasan 10 minutos desde que Ana creó su
    reserva, **entonces** la reserva acaba guardada como caducada y su pago como fallido sin que nadie
    haga nada (barrido de `000-core`).
+6. **Dado** que Ana creó a las 20:55 una reserva pendiente para la franja de las 21:00, **cuando**
+   intenta pagarla a las 21:00:00 o después (aunque no hayan pasado 10 minutos), **entonces** se
+   rechaza con `FRANJA_YA_EMPEZADA`, la reserva pasa a caducada, su pago a fallido y no se cobra nada
+   (aclaración 2026-11-26).
 
 ---
 
@@ -177,7 +215,8 @@ precio (RF-013 de `000-core`); pero solo aporta valor una vez que reservar funci
    se rechaza con `FRANJA_YA_EMPEZADA`.
 3. **Dado** una franja cerrada por mantenimiento o bloqueada por una franja fija de club, **cuando**
    Ana intenta reservarla, **entonces** se rechaza con `INSTALACION_CERRADA` o
-   `FRANJA_BLOQUEADA_CLUB`.
+   `FRANJA_BLOQUEADA_CLUB`. También se rechaza con `FRANJA_BLOQUEADA_CLUB` si quien intenta reservar
+   es un representante del club dueño de esa franja fija (aclaración 2026-11-26).
 4. **Dado** una sala, una piscina o un pabellón, **cuando** alguien intenta reservarlo por franjas,
    **entonces** se rechaza con `INSTALACION_NO_RESERVABLE`.
 5. **Dado** que el precio de la franja ha cambiado desde que Ana la vio, **cuando** intenta reservar
@@ -206,7 +245,8 @@ que solo ve las suyas, con el estado correcto, y el QR solo en las confirmadas.
 2. **Dado** que Ana tiene reservas caducadas o canceladas, **cuando** abre «Mis reservas», **entonces**
    las ve con su estado y sin QR.
 3. **Dado** que Ana tiene una reserva pendiente de pago vigente, **cuando** abre «Mis reservas»,
-   **entonces** la ve como «Pendiente de pago» y puede volver a pagarla mientras siga vigente.
+   **entonces** la ve como «Pendiente de pago» y puede volver a pagarla mientras siga vigente y su
+   franja no haya empezado (aclaración 2026-11-26).
 4. **Dado** las reservas de otra persona, **cuando** Ana abre «Mis reservas» o intenta ver o pagar una
    reserva ajena, **entonces** no la ve, y el intento se rechaza con `NO_ENCONTRADO` (sin revelar que
    existe).
@@ -254,6 +294,12 @@ al reservar y pagar:
   17:59:59, sí.
 - **Pagar en el límite del bloqueo**: pagar 9 minutos y 59 segundos después de crear la reserva → se
   intenta el cobro; pagar a los 10 minutos exactos → `RESERVA_CADUCADA`, sin cobro.
+- **Pagar cuando la franja ya ha empezado** (aclaración 2026-11-26): reserva pendiente creada a las
+  20:55 para la franja de las 21:00; pagar a las 20:59:59 → se intenta el cobro; pagar a las 21:00:00 o
+  después → `FRANJA_YA_EMPEZADA`, la reserva queda caducada y su pago fallido, sin cobro. Si además ya
+  han pasado los 10 minutos, se responde `RESERVA_CADUCADA` (RF-009 se comprueba primero).
+- **Franja fija del propio club** (aclaración 2026-11-26): el representante del club dueño de una franja
+  fija aprobada tampoco puede reservarla (`FRANJA_BLOQUEADA_CLUB`).
 - **Caducada por el barrido**: pagar una reserva que el barrido ya ha guardado como caducada por tiempo
   → `RESERVA_CADUCADA` (el mismo mensaje que antes del barrido), sin cobro.
 - **Reservar una franja con una pendiente ajena que acaba de caducar**: con la otra reserva creada hace
@@ -316,22 +362,29 @@ al reservar y pagar:
   ficticia, que se envían a la pasarela simulada de `000-core` (RF-021). Los datos de la tarjeta NO
   DEBEN guardarse ni registrarse.
 - **RF-008a**: La pantalla de pago DEBE mostrar, como texto fijo, la hora límite para pagar en hora de
-  Madrid (creación de la reserva + el tiempo de bloqueo de `000-core`), por ejemplo «Paga antes de las
-  18:42; después la reserva caduca». No hay cuenta atrás que se actualice en pantalla.
+  Madrid: la más temprana entre «creación de la reserva + el tiempo de bloqueo de `000-core`» y el
+  inicio de la franja (aclaración 2026-11-26), por ejemplo «Paga antes de las 18:42; después la reserva
+  caduca». No hay cuenta atrás que se actualice en pantalla.
 - **RF-009**: Si al pagar la reserva ya no está vigente (10 minutos o más desde su creación), el
   sistema DEBE caducarla, dejar su pago fallido, no llamar a la pasarela y responder
   `RESERVA_CADUCADA`. Lo mismo si la reserva ya está guardada como caducada por tiempo (por el barrido o
   por la caducidad al reservar): la respuesta no depende de si el barrido ha pasado.
+- **RF-009a**: Si al pagar la reserva sigue vigente pero su franja ya ha empezado (la hora actual es
+  igual o posterior al inicio), el sistema DEBE caducarla, dejar su pago fallido, no llamar a la
+  pasarela y responder `FRANJA_YA_EMPEZADA` (aclaración 2026-11-26). RF-009 se comprueba antes.
 - **RF-010**: Si la pasarela acepta el cobro, la reserva DEBE pasar a confirmada, su pago a completado
   y la reserva DEBE recibir un código de acceso opaco y aleatorio (RF-017 de `000-core`), que se
   muestra al usuario como QR y como texto.
 - **RF-011**: Si la pasarela rechaza el cobro, la reserva DEBE pasar a caducada y su pago a fallido, y
   el usuario DEBE ver el mensaje de `PAGO_RECHAZADO`. El pago NO DEBE poder reintentarse; cualquier
   intento de pagar una reserva que no está pendiente DEBE rechazarse con `TRANSICION_NO_PERMITIDA`,
-  salvo una caducada por tiempo, que responde `RESERVA_CADUCADA` (RF-009).
+  salvo una caducada por tiempo, que responde `RESERVA_CADUCADA` (RF-009). Pagar una reserva vigente
+  cuya franja ya ha empezado responde `FRANJA_YA_EMPEZADA` (RF-009a).
 - **RF-012**: Un número de tarjeta con un formato no válido DEBE rechazarse con `PETICION_INVALIDA`
   sin llamar a la pasarela y sin cambiar el estado de la reserva.
-- **RF-013**: Solo el titular DEBE poder pagar o ver una reserva; para cualquier otra persona, la
+- **RF-013**: Solo el titular DEBE poder pagar o ver una reserva. El titular es el usuario que la
+  creó; en las reservas con tarifa club, el representante que reservó, no el club (aclaración
+  2026-11-26); para cualquier otra persona, la
   reserva DEBE comportarse como inexistente (`NO_ENCONTRADO`).
 
 **Caducidad**
@@ -351,7 +404,8 @@ al reservar y pagar:
   reciente a la más antigua. No tiene paginación.
 - **RF-016**: Las reservas confirmadas DEBEN mostrar su código de acceso como QR y como texto; las que
   no están confirmadas NO DEBEN mostrar ningún código.
-- **RF-017**: Desde una reserva pendiente de pago vigente, el usuario DEBE poder ir a pagarla.
+- **RF-017**: Desde una reserva pendiente de pago vigente cuya franja no ha empezado, el usuario DEBE
+  poder ir a pagarla (aclaración 2026-11-26).
 
 **Datos que se ofrecen a otras historias**
 
@@ -395,7 +449,7 @@ al reservar y pagar:
 HU-02 no crea entidades nuevas. Usa las de `000-core` (spec.md, «Entidades clave»; data-model.md):
 
 - **Reserva** (propietaria: HU-02): la crea pendiente de pago, la confirma y la caduca. Guarda el
-  usuario, la instalación, el inicio y el fin, la tarifa aplicada, el importe, el estado, la fecha de
+  usuario (en las de tarifa club, el representante que reserva; aclaración 2026-11-26), la instalación, el inicio y el fin, la tarifa aplicada, el importe, el estado, la fecha de
   creación y, si está confirmada, el código de acceso.
 - **Pago** (propietaria: HU-02): uno por reserva; pendiente → completado o fallido. No guarda datos de
   tarjeta.

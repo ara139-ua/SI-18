@@ -170,16 +170,21 @@ Objeto de valor `Franja(InstalacionId, Fecha: DateOnly, HoraInicio: TimeOnly, In
              Confirmar(codigo, ahora)            Cancelar(motivo, ahora)
 pendiente_pago ───────────────────► confirmada ───────────────────────► cancelada  (final)
       │  requiere EstaVigente(ahora)                 motivo=usuario ⇒ ahora < inicio_utc
+      │  y ahora < inicio_utc
       │                                              motivo=cierre  ⇒ sin límite de hora
       │ Caducar(ahora)
       └──────────────────► caducada (final)
-         pago fallido · tiempo agotado (ahora ≥ creada_en_utc + 10 min) · cierre por mantenimiento
+         pago fallido · tiempo agotado (ahora ≥ creada_en_utc + 10 min) · pago con la franja ya
+         empezada (ahora ≥ inicio_utc) · cierre por mantenimiento
 ```
 
 - `EstaVigente(ahora)` = `{ ahora < creada_en_utc + 10 min, si estado = pendiente_pago ; true, si estado = confirmada ; false, en otro caso }`.
+- `Confirmar` lanza `RESERVA_CADUCADA` si la reserva ya no está vigente y, si lo está pero `ahora ≥
+  inicio_utc`, `FRANJA_YA_EMPEZADA` (spec-002 RF-009a, aclaración 2026-11-26). En los dos casos quien
+  paga caduca la reserva sin cobrar.
 - Cualquier otra transición (incluida `pendiente_pago → cancelada`) lanza `ErrorNegocio`
   `TRANSICION_NO_PERMITIDA`.
-- **Responsables**: HU-02 → `Confirmar`, `Caducar` (pago fallido o tiempo agotado); HU-03 →
+- **Responsables**: HU-02 → `Confirmar`, `Caducar` (pago fallido, tiempo agotado o franja ya empezada); HU-03 →
   `Cancelar(usuario)`; HU-07 → `Cancelar(cierre)` y `Caducar` por cierre. HU-03 y HU-07 los invocan a
   través de `IServicioReservas` (R4).
 - **Al caducar**, el `Pago` pendiente asociado pasa a `fallido` en la misma transacción.

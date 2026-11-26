@@ -357,6 +357,81 @@ public class PagarReservaTests(FabricaApi fabrica)
 
     // ── Pulido: la tarjeta no se registra (R9) ───────────────────────────────────
 
+    // ── T056: pagar con la franja ya empezada (RF-009a, HU-2 esc. 6; aclaración 2026-11-26) ──────────────────
+    // Polideportivo Este, «Pista de tenis 1», domingo 27/12/2026 de 10:00 a 14:00 (comprobado con git grep: ninguna
+    // otra prueba usa ese día en esa pista; las franjas fijas de 005 en ella son de lunes y viernes).
+    // Reserva creada 5 minutos antes del inicio: sigue vigente (RF-009) cuando empieza la franja. Reloj propio.
+
+    private static readonly DateOnly Dia27 = new(2026, 12, 27);
+
+    [Fact]
+    [Trait("Categoria", "Limites")]
+    public async Task RF009a_pagar_1_s_antes_del_inicio_cobra_y_confirma()
+    {
+        var inicio = Utc(Dia27, 10);
+        var id = await _datos.Pendiente(Ana, await Tenis1(), inicio, inicio - TimeSpan.FromMinutes(5));
+        var pasarela = new PasarelaContadora();
+
+        var reserva = await _datos.ConServicio(inicio - TimeSpan.FromSeconds(1), Ana,
+            servicio => servicio.Pagar(id, TarjetaAceptada, Ct), pasarela);
+
+        Assert.Equal(EstadoReserva.Confirmada, reserva.Estado);
+        Assert.Equal(1, pasarela.Cobros);
+    }
+
+    [Fact]
+    [Trait("Categoria", "Limites")]
+    public async Task RF009a_pagar_en_el_inicio_dentro_de_los_10_minutos_caduca_sin_cobrar_con_FRANJA_YA_EMPEZADA()
+    {
+        var inicio = Utc(Dia27, 11);
+        var id = await _datos.Pendiente(Ana, await Tenis1(), inicio, inicio - TimeSpan.FromMinutes(5));
+        var pasarela = new PasarelaContadora();
+
+        var error = await Assert.ThrowsAsync<ErrorNegocio>(() => _datos.ConServicio(inicio, Ana,
+            servicio => servicio.Pagar(id, TarjetaAceptada, Ct), pasarela));
+
+        Assert.Equal(CodigosError.FranjaYaEmpezada, error.Codigo);
+        Assert.Equal(0, pasarela.Cobros);
+        var guardada = await _datos.Leer(id);
+        Assert.Equal(EstadoReservaDominio.Caducada, guardada.Estado);
+        Assert.Equal(EstadoPago.Fallido, guardada.Pago!.Estado);
+        Assert.Null(guardada.CodigoAcceso);
+    }
+
+    [Fact]
+    [Trait("Categoria", "Limites")]
+    public async Task RF009a_despues_de_FRANJA_YA_EMPEZADA_un_segundo_intento_es_TRANSICION_NO_PERMITIDA_sin_cobro()
+    {
+        var inicio = Utc(Dia27, 12);
+        var id = await _datos.Pendiente(Ana, await Tenis1(), inicio, inicio - TimeSpan.FromMinutes(5));
+        var pasarela = new PasarelaContadora();
+
+        var primero = await Assert.ThrowsAsync<ErrorNegocio>(() => _datos.ConServicio(inicio + TimeSpan.FromMinutes(1), Ana,
+            servicio => servicio.Pagar(id, TarjetaAceptada, Ct), pasarela));
+        var segundo = await Assert.ThrowsAsync<ErrorNegocio>(() => _datos.ConServicio(inicio + TimeSpan.FromMinutes(2), Ana,
+            servicio => servicio.Pagar(id, TarjetaAceptada, Ct), pasarela));
+
+        Assert.Equal(CodigosError.FranjaYaEmpezada, primero.Codigo);
+        Assert.Equal(CodigosError.TransicionNoPermitida, segundo.Codigo);
+        Assert.Equal(0, pasarela.Cobros);
+    }
+
+    [Fact]
+    [Trait("Categoria", "Limites")]
+    public async Task RF009a_con_10_minutos_y_la_franja_empezada_responde_RESERVA_CADUCADA_porque_RF009_va_primero()
+    {
+        var inicio = Utc(Dia27, 13);
+        var id = await _datos.Pendiente(Ana, await Tenis1(), inicio, inicio - ValoresNegocio.TiempoBloqueoPago);
+        var pasarela = new PasarelaContadora();
+
+        var error = await Assert.ThrowsAsync<ErrorNegocio>(() => _datos.ConServicio(inicio, Ana,
+            servicio => servicio.Pagar(id, TarjetaAceptada, Ct), pasarela));
+
+        Assert.Equal(CodigosError.ReservaCaducada, error.Codigo);
+        Assert.Equal(0, pasarela.Cobros);
+        Assert.Equal(EstadoReservaDominio.Caducada, (await _datos.Leer(id)).Estado);
+    }
+
     [Fact]
     public async Task El_numero_de_tarjeta_no_aparece_en_ningun_registro()
     {

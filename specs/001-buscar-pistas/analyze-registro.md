@@ -63,3 +63,9 @@ aparece).
 | CE-005 | Empadronado y no empadronado ven precios distintos | D4 | T014 | `PrecioPorTarifaTests` |
 | CE-006 | Teclado, Lighthouse ≥ 95, axe sin graves | D7 | T020, T021 | Manual (T021, 26/11/2026) |
 | CE-007 | Ninguna búsqueda sin resultados deja la pantalla vacía | D8 | T018, T019 | `BuscarSinResultadosTests`; manual |
+
+## 3. Revisión entre compañeros (enunciado 5.2)
+
+| Criterio revisado | Revisor | Fecha | Qué comprobó | Resultado |
+|-------------------|---------|-------|--------------|-----------|
+| RF-005 (solo se busca desde hoy hasta hoy + 7 en hora de Madrid; fuera, `FUERA_DE_ANTELACION`) | Saul | 26/11/2026 | Las pruebas `BuscarSinResultadosTests.Hoy_mas_7_tiene_franjas_y_hoy_mas_8_esta_fuera_de_antelacion` (hoy + 7 → 200 con pistas; hoy + 8 → 422 con el texto del catálogo) y `Ayer_esta_fuera_de_antelacion`, y que `ServicioDisponibilidad.Buscar` (`ServicioDisponibilidad.cs:35–38`) compara la fecha con `HorarioMadrid.Hoy(Ahora)` y `ValoresNegocio.AntelacionMaximaDias`, sin escribir la cifra a mano | ✅ Cubierto; sin incidencias |

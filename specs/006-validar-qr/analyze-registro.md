@@ -58,3 +58,30 @@ Estados: **Resuelto** (corregido en el commit «spec-006: correcciones de analyz
 | CE-006 | Teclado, 320 px, Lighthouse ≥ 95, axe, lector | V10 | T025, T026 | Manual: quickstart §5 (hecha el 26/11/2026, T026) |
 | CE-007 | Aviso correcto en el 100 % | V5 | T008, T010 | `AvisoValidacionAnteriorTests` |
 | (rendimiento 000-core) | < 300 ms p95 por validación | V12 | T028 | 20 llamadas con la API local |
+
+## 3. Revisión entre compañeros (enunciado 5.2)
+
+| Criterio revisado | Revisor | Fecha | Qué comprobó | Resultado |
+|-------------------|---------|-------|--------------|-----------|
+| RF-002 (el centro del personal es el asignado en 000-core) | Artur | 26/11/2026 | La prueba `ValidarAccesoTests.HU2_esc5_el_codigo_de_otro_centro_se_rechaza_sin_datos_de_la_reserva_pero_se_registra_con_ella` y que `ServicioValidarAcceso` compara el `CentroId` de la instalación con el del usuario (`ServicioValidarAcceso.cs:39`) | ✅ Cubierto; sin incidencias |
+
+## 4. Criterios de la pasada de clarify sobre la versión funcional (26/11/2026)
+
+Aclaraciones de spec.md, sesión «2026-11-26 (sobre la versión funcional)»; detalle en
+[clarify-funcional.md](./clarify-funcional.md). Después se repitieron analyze ([analyze-3.md](./analyze-3.md)) y
+converge ([converge-2026-11-26-3.md](./converge-2026-11-26-3.md)).
+
+### Hallazgos de analyze-3
+
+| ID | Historia / criterio | Gravedad | Evidencia (analyze-3) | Decisión | Responsable | Revisor | Estado | Dónde se resuelve |
+|----|---------------------|----------|-----------------------|----------|-------------|---------|--------|-------------------|
+| G1 | RF-004 (mayúsculas) | MEDIUM | Criterio nuevo sin prueba automática | Prueba en `ValidarAccesoTests` | Saul | Artur (revisión pedida en el PR) | Resuelto (T034) | tasks.md T034 |
+| G2 | research.md V10 (F7 del segundo converge) | LOW | Solo recogía el texto «hoy a las HH:mm» | Documentar el segundo texto | Saul | — | Resuelto (T035) | research.md V10 |
+| P1 | Revisión del código común C1 y C2 (#46) | HIGH | Sigue sin la revisión de @ara139-ua | Sigue pedida en el #43 | Saul | Artur | Abierto | — |
+
+### Criterios nuevos
+
+| Criterio | Qué exige | Tareas | Prueba |
+|----------|-----------|--------|--------|
+| RF-004 (mayúsculas) | El código se compara exacto; otra caja → `QR_DESCONOCIDO` | T034 (el código ya lo cumplía: `ServicioValidarAcceso.cs:31`) | `ValidarAccesoTests.RF004_el_codigo_con_una_letra_en_otra_caja_es_desconocido_y_se_registra_sin_reserva`; además, comprobado a mano contra la API el 26/11/2026 (clarify-funcional.md) |
+| «Fuera de alcance» (franjas fijas de club) | El acceso de un club a su franja fija no se valida en HU-06 | Ninguna | No aplica |

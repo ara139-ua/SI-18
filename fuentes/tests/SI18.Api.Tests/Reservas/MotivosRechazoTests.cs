@@ -108,6 +108,23 @@ public class MotivosRechazoTests(FabricaApi fabrica)
         await AssertRechazo(await Reservar(pista, inicio), HttpStatusCode.UnprocessableEntity, CodigosError.FranjaBloqueadaClub, pista, inicio);
     }
 
+    [Fact]
+    public async Task HU4_esc3_el_representante_del_club_duenio_de_la_franja_fija_tampoco_puede_reservarla()
+    {
+        // T059 (aclaración 2026-11-26): la franja fija bloquea también al propio club. Sur «Pista de tenis 2», domingos de
+        // 10:00 a 11:00 de la temporada (git grep: ninguna otra prueba usa esa pista en domingo a esa hora; las de cambio
+        // de hora usan la «Pista de tenis 1»). Elena es representante de «Club de Pádel Ejemplo» (tarifa club, 4,00 €).
+        var pista = await Tenis2();
+        var fecha = new DateOnly(2026, 12, 27);
+        var inicio = Utc(fecha, 10);
+        await _datos.Disponibilidad.FranjaFija(pista, [DatosDisponibilidad.DiaIso(fecha)], 10, 11, club: "Club de Pádel Ejemplo");
+        using var cliente = await fabrica.CrearClienteConSesion(Elena);
+
+        var respuesta = await PedirReserva(cliente, pista, inicio, 4.00m);
+
+        await AssertRechazo(respuesta, HttpStatusCode.UnprocessableEntity, CodigosError.FranjaBloqueadaClub, pista, inicio);
+    }
+
     [Theory]
     [InlineData("Sala polivalente")]
     [InlineData("Pabellón")]
