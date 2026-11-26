@@ -1,5 +1,17 @@
 <!--
 Sync Impact Report
+- Versión: 1.2.0 → 1.2.1 (2026-11-26)
+- Motivo: hallazgo C1 de /speckit-analyze en las specs 001 y 005. La constitución pedía ramas
+  `spec-001` a `spec-008` y la base común directamente en `develop`, pero el grupo trabaja desde el
+  principio con ramas `feature/NNN-…` (también `feature/000-core-…`) fusionadas en `develop` por PR.
+  Decisión del grupo (Artur y Saul): escribir la práctica real en lugar de renombrar ramas ya
+  fusionadas.
+- Cambios: «Acuerdos de colaboración», punto de las ramas. Ningún principio cambia.
+- Impacto: ninguno en specs, planes, código ni plantillas; las ramas existentes ya cumplen.
+- Versión de parche porque solo aclara la redacción de un acuerdo para que coincida con lo que ya se
+  hace; no añade ni amplía ninguna regla.
+---
+Informe anterior (1.2.0, 2026-11-26):
 - Versión: 1.1.0 → 1.2.0 (2026-11-26)
 - Motivo: el grupo son dos personas (Saul y Artur), con dos historias cada una; el alcance
   comprometido (HU-01, HU-02, HU-05 y HU-06) está acordado con el profesor. HU-03, HU-04, HU-07 y
@@ -147,9 +159,11 @@ de hora decide si se devuelve o no el dinero.
   comprometido (HU-01, HU-02, HU-05 y HU-06) está acordado con el profesor, y HU-03, HU-04, HU-07 y
   HU-08 quedan fuera de él. El reparto está en `docs/agrupamiento.md` y no cambia sin acuerdo del
   grupo.
-- Cada spec se trabaja en su propia rama (`spec-001` a `spec-008`); la base común (`000-core`, la
-  constitución y la estructura del proyecto) se trabaja en `develop` y se lleva a `main` por pull
-  request.
+- Cada spec se trabaja en ramas propias con el prefijo `feature/NNN-` (por ejemplo,
+  `feature/001-buscar-pistas` o `feature/005-franjas-fijas-api`), que se fusionan en `develop` por pull
+  request; la base común (`000-core`, la constitución y la estructura del proyecto) sigue el mismo
+  camino con ramas `feature/000-core-…` o `feature/constitucion-…`. `develop` se lleva a `main` por
+  pull request.
 - Cada módulo de la API y del frontend tiene un único dueño, que es el único que escribe en sus
   tablas; los demás usan su interfaz pública. Los cambios en el modelo de datos compartido o en
   los valores de negocio van por pull request revisado por al menos otra persona del grupo.
@@ -173,4 +187,4 @@ El cumplimiento se revisa en cada pull request y en la fase de planificación de
 explícitamente antes de fusionar. La guía de uso para quien contribuye está en
 [README.md](../../README.md).
 
-**Versión**: 1.2.0 | **Ratificada**: 2026-10-21 | **Última modificación**: 2026-11-26
+**Versión**: 1.2.1 | **Ratificada**: 2026-10-21 | **Última modificación**: 2026-11-26
