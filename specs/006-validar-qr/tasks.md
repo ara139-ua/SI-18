@@ -426,7 +426,7 @@ ve el personal.
 - [X] T027 [P] Comprobar que no se ha escrito la zona horaria a mano (research.md V8; lección de T078 de
   000-core): `git grep -n "Europe/Madrid" -- fuentes/src/SI18.Api/Modulos/Reservas fuentes/src/SI18.Cliente/Reservas fuentes/src/SI18.Contratos/Reservas`
   sin resultados.
-- [ ] T028 Ejecutar quickstart.md §2–§5 de principio a fin: `dotnet test SI18.slnx` en verde (también
+- [X] T028 Ejecutar quickstart.md §2–§5 de principio a fin: `dotnet test SI18.slnx` en verde (también
   con `--filter-trait "Categoria=Limites"`), los escenarios Q1–Q10 contra la API y los pasos de la
   pantalla. Medir y anotar en el PR:
   - el tiempo desde pulsar «Validar» hasta que se ve y se anuncia el resultado, **20 veces**: < 1 s en
