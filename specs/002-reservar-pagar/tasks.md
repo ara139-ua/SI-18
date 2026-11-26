@@ -536,7 +536,7 @@ efectivo y el QR solo en las confirmadas.
     líneas y el SVG del QR usa `max-width: 100%`. Los estilos van en los `.razor.css` de Reservas.
 
   Depende de T037, T035 y T040.
-- [ ] T043 [US6] Comprobar a mano quickstart.md §5 sobre el botón «Reservar» de `/buscar-pistas`,
+- [X] T043 [US6] Comprobar a mano quickstart.md §5 sobre el botón «Reservar» de `/buscar-pistas`,
   `/reservas/nueva`, `/reservas/{id}/pago` y `/mis-reservas`, **aplicando lo aprendido en T073 de
   000-core** (`specs/000-core/checklists/cierre-saul.md`, hallazgos 5 y 6):
   - **foco visible con MudBlazor**: Lighthouse y axe no lo detectan. Recorrer con el teclado y, en cada
