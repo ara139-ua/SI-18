@@ -363,8 +363,9 @@ ve el personal.
   T020 la prueba. Se conserva el número para no renumerar.
 - [X] T022 [P] [US4] Comprobar en `ValidarAcceso.razor` el acceso por URL (T012): sin sesión →
   `/iniciar-sesion`; con un ciudadano → `AvisoSinPermisoValidar` y ningún formulario. Depende de T012.
-- [ ] T023 [US4] (sin código) Confirmar con @ara139-ua el texto «Validar acceso» y su posición en el hueco
+- [X] T023 [US4] (sin código) Confirmar con @ara139-ua el texto «Validar acceso» y su posición en el hueco
   del personal, dejando sitio al enlace de cierres de spec-007 (plan.md C1).
+  **Cerrada sin confirmación de @ara139-ua por la entrega.** Se le pidió en el comentario del #46; si propone cambiar el texto o la posición de "Validar acceso", se hará en un PR aparte.
 - [X] T024 [US4] **[código común, revisión de @ara139-ua — C1]** En
   `src/SI18.Cliente/Layout/MainLayout.razor`, dentro de
   `<AuthorizeView Roles="personal_centro" Context="personal">`, sustituir el comentario del hueco por

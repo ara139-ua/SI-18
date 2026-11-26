@@ -327,13 +327,14 @@ deporte y cuando la fecha está fuera de plazo.
   < 500 ms (research.md D10).
   **Resultado (2026-11-25)**: 240/240 pruebas (101 de límites); B1–B10 como se esperaba; B1 entre 30 y 44 ms
   en 10 peticiones locales.
-- [ ] T023 [P] Avisar al grupo de las consultas provisionales (constitución, «Acuerdos de
+- [X] T023 [P] Avisar al grupo de las consultas provisionales (constitución, «Acuerdos de
   colaboración»): mensaje a Saul (`IConsultaReservas`, spec-002) y a C (`IConsultaCierres`, spec-007)
   con la ruta del fichero provisional y su prueba en `ConsultasProvisionalesTests`, para que las
   sustituyan y las borren en su PR. Anotarlo en la descripción del PR. Como las specs 002, 005 y 007
   aún no existen, pedir a cada dueño que, al crearla con `/speckit-specify`, anote en su sección de
   dependencias la provisional que sustituye (constitución: «la dependencia se anota en las dos
   specs»). Para la 005, que es tuya, hacerlo tú.
+  **Cerrada por Saul el 26/11/2026 por la entrega.** El aviso quedó obsoleto: ConsultaReservasProvisional se retiró en el #31 (spec-002 T009–T010) y ConsultaFranjasFijasProvisional en el #33 (spec-005). La coordinación consta en el #37, en el comentario del #39 y en el issue #40.
 - [X] T024 Abrir el PR de `feature/001-buscar-pistas` a `develop`, con la propuesta de convención de
   `Program.cs` (dos líneas por módulo, research.md D6), la lista de los principios I–IX revisados y la
   comprobación de accesibilidad de T021. Lo aprueba otra persona del grupo.

@@ -404,11 +404,12 @@ provisional de spec-001 retirada.
   **Resultado (2026-11-25)**: 298/298 pruebas (129 de límites); en el navegador, solicitud con el
   teclado, errores por campo, conflictos, aprobar, rechazar y avisos; `GET …/conflictos` entre 14 y
   17 ms en 10 peticiones locales.
-- [ ] T027 [P] Avisar al grupo (constitución, «Acuerdos de colaboración»):
+- [X] T027 [P] Avisar al grupo (constitución, «Acuerdos de colaboración»):
   - a Saul: este PR toca `RegistroDisponibilidad.cs`, `ConsultasProvisionalesTests.cs` y
     `DatosDisponibilidad.cs`, igual que su retirada de `ConsultaReservasProvisional`; el segundo PR hace
     `rebase` (research.md F11);
   - a C: `IConsultaFranjasFijas.RepresentantesAfectados` ya está disponible para spec-007.
+  **Cerrada por Saul el 26/11/2026 por la entrega.** Los cambios en RegistroDisponibilidad.cs, ConsultasProvisionalesTests.cs y DatosDisponibilidad.cs se coordinaron en el #31 y el #37. IConsultaFranjasFijas.RepresentantesAfectados para C queda documentado en specs/005-franjas-fijas/contracts/modulos.md.
 
   Anotarlo en la descripción del PR.
 - [X] T028 Abrir el PR de `feature/005-franjas-fijas` a `develop`, con la lista de los principios I–IX
