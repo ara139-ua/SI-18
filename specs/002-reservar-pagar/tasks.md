@@ -508,7 +508,7 @@ efectivo y el QR solo en las confirmadas.
     dentro del `<li>` (plan.md, C4).
 
   Depende de T038 y T023.
-- [ ] T041 [P] [US5] Añadir «Mis reservas» (`MudButton Href="/mis-reservas" Color="Color.Inherit" Variant="Variant.Text"`)
+- [X] T041 [P] [US5] Añadir «Mis reservas» (`MudButton Href="/mis-reservas" Color="Color.Inherit" Variant="Variant.Text"`)
   en el hueco `@* Hueco de Reservas (spec-002, 003): mis reservas. *@` de
   `src/SI18.Cliente/Layout/MainLayout.razor`, quitando la parte «mis reservas» del comentario (RF-002;
   T056 de 000-core). **Ojo**: añade un botón más a la barra superior, que ya se desborda a 320 px
