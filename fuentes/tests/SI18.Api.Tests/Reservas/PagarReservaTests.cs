@@ -358,7 +358,8 @@ public class PagarReservaTests(FabricaApi fabrica)
     // ── Pulido: la tarjeta no se registra (R9) ───────────────────────────────────
 
     // ── T056: pagar con la franja ya empezada (RF-009a, HU-2 esc. 6; aclaración 2026-11-26) ──────────────────
-    // Polideportivo Este, «Pista de tenis 1», domingo 27/12/2026 de 10:00 a 12:00 (no los usa ninguna otra prueba).
+    // Polideportivo Este, «Pista de tenis 1», domingo 27/12/2026 de 10:00 a 14:00 (comprobado con git grep: ninguna
+    // otra prueba usa ese día en esa pista; las franjas fijas de 005 en ella son de lunes y viernes).
     // Reserva creada 5 minutos antes del inicio: sigue vigente (RF-009) cuando empieza la franja. Reloj propio.
 
     private static readonly DateOnly Dia27 = new(2026, 12, 27);

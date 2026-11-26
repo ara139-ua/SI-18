@@ -83,9 +83,13 @@ public class Reserva
         _ => false,
     };
 
+    /// <summary>La franja ya ha empezado: <c>ahora ≥ InicioUtc</c> (spec-002 RF-009a; 000-core RF-016).</summary>
+    public bool YaEmpezada(DateTime ahoraUtc) => ahoraUtc >= InicioUtc;
+
     /// <summary>Pago completado: pasa a confirmada con su código de acceso. Responsable: HU-02.</summary>
     /// <exception cref="ErrorNegocio">
-    /// <c>TRANSICION_NO_PERMITIDA</c> si no está pendiente de pago; <c>RESERVA_CADUCADA</c> si ya no está vigente.
+    /// <c>TRANSICION_NO_PERMITIDA</c> si no está pendiente de pago; <c>RESERVA_CADUCADA</c> si ya no está vigente;
+    /// <c>FRANJA_YA_EMPEZADA</c> si está vigente pero su franja ya ha empezado (spec-002 RF-009a; 000-core RF-016).
     /// </exception>
     public void Confirmar(string codigoAcceso, DateTime ahoraUtc)
     {
@@ -93,6 +97,11 @@ public class Reserva
         if (!EstaVigente(ahoraUtc))
         {
             throw CodigosError.Error(CodigosError.ReservaCaducada);
+        }
+
+        if (YaEmpezada(ahoraUtc))
+        {
+            throw CodigosError.Error(CodigosError.FranjaYaEmpezada);
         }
 
         PagoCargado().Completar(ahoraUtc);

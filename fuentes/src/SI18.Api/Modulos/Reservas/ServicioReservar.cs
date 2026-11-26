@@ -131,6 +131,16 @@ public sealed class ServicioReservar(
             throw CodigosError.Error(CodigosError.ReservaCaducada);
         }
 
+        if (reserva.YaEmpezada(ahora))
+        {
+            // RF-009a: vigente pero con la franja ya empezada. Se caduca y se guarda sin llamar a la pasarela, como la
+            // rama anterior; un segundo intento responde TRANSICION_NO_PERMITIDA (no es una caducidad por tiempo).
+            reserva.Caducar(ahora);
+            await db.SaveChangesAsync(ct);
+            await transaccion.CommitAsync(ct);
+            throw CodigosError.Error(CodigosError.FranjaYaEmpezada);
+        }
+
         if (!await pasarela.Cobrar(reserva.Importe, numeroTarjeta, ct))
         {
             // Pago rechazado: queda caducada y el pago fallido antes de responder (RF-011).
