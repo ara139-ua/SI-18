@@ -639,7 +639,7 @@ efectivo y el QR solo en las confirmadas.
     T043; **revisa Artur** el cambio de `BuscarPistas.razor` (T022).
 
   Los aprueba otra persona del grupo.
-- [ ] T052 Después de fusionar, ejecutar `/speckit-converge` para la spec 002.
+- [X] T052 Después de fusionar, ejecutar `/speckit-converge` para la spec 002.
 
 ---
 
@@ -712,3 +712,10 @@ puede adelantar) → Pulido. Si las pantallas se retrasan, el PR de API se abre 
 - Fuera de `*/Reservas` solo se tocan: `Program.cs` (T001), `BarridoCaducidades.cs` (T005–T006, de
   Saul), `MainLayout.razor` (T041, el hueco de Reservas) y, con revisión de Artur, los ficheros de T009
   y `BuscarPistas.razor` (T022).
+
+---
+
+## Phase 11: Convergence
+
+- [ ] T053 Añadir a `tests/SI18.Api.Tests/Reservas/MotivosRechazoTests.cs` el caso de cambio de hora del 25/10/2026 (`[Trait("Categoria","Limites")]`, con `DatosReservas.ConServicio` y un reloj propio anterior a ese día): las 14 franjas de 08:00 a 21:00 de Madrid se pueden resumir, la de 08:00 es `2026-10-25T07:00:00Z`, y reservar y pagar la de 08:00 da `finUtc − inicioUtc = 1 h`. Usar una pista y una franja que no pise ninguna otra prueba de la base compartida per Casos límite «Cambio de hora», Constitution II (partial)
+- [ ] T054 Actualizar en este `tasks.md` las fechas de T029 (23/12/2026 a las 19:00) y T039 (25/12 en vez de 26/12), con una nota de que cambiaron en el #37 porque pisaban las de `ConflictosFranjasFijasTests` (spec-005) per tasks.md T029 y T039 (partial)
