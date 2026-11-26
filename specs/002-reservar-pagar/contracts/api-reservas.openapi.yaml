@@ -139,8 +139,8 @@ paths:
       description: >
         Secuencia de research.md E4. Una tarjeta de 16 dígitos que termina en 0002 se rechaza; cualquier
         otra se acepta (R9 de 000-core). El número de tarjeta no se guarda ni se registra. Si el pago se
-        rechaza o la reserva ya no está vigente, la reserva queda caducada y el pago fallido antes de
-        responder; no hay reintento.
+        rechaza, la reserva ya no está vigente o su franja ya ha empezado, la reserva queda caducada y el
+        pago fallido antes de responder; no hay reintento.
       parameters:
         - $ref: '#/components/parameters/IdReserva'
       requestBody:
@@ -190,13 +190,16 @@ paths:
           description: >
             RESERVA_CADUCADA (han pasado 10 minutos o más: queda caducada y el pago fallido, sin cobro;
             la misma respuesta si el barrido ya la había guardado como caducada por tiempo) o
-            TRANSICION_NO_PERMITIDA (confirmada, cancelada, o caducada por un pago rechazado o por un
-            cierre).
+            TRANSICION_NO_PERMITIDA (confirmada, cancelada, o caducada por un pago rechazado, por una
+            franja ya empezada o por un cierre).
           content:
             application/problem+json:
               schema: { $ref: '../../000-core/contracts/api-comun.openapi.yaml#/components/schemas/Problema' }
         '422':
-          description: PAGO_RECHAZADO (la pasarela rechaza el cobro; la reserva queda caducada y el pago fallido).
+          description: >
+            PAGO_RECHAZADO (la pasarela rechaza el cobro; la reserva queda caducada y el pago fallido) o
+            FRANJA_YA_EMPEZADA (la reserva sigue vigente pero su franja ya ha empezado, RF-009a: queda
+            caducada y el pago fallido, sin cobro; el siguiente intento da TRANSICION_NO_PERMITIDA).
           content:
             application/problem+json:
               schema: { $ref: '../../000-core/contracts/api-comun.openapi.yaml#/components/schemas/Problema' }
