@@ -38,8 +38,26 @@ personal, pista, días y horas que no usa ninguna otra prueba** (research.md V11
 | Titular          | `ciudadana2.empadronada@si18.test` (Carla Vecina)                                     |
 | Personal         | `personal.este@si18.test`; para «otro centro», `personal.oeste@si18.test`              |
 | Pista            | «Pista de pádel 2» de Polideportivo Este                                              |
-| Fechas y horas   | martes 19/01/2027 y jueves 21/01/2027, de 10:00 a 13:00 de Madrid; 25/10/2026 y 28/03/2027 a las 10:00 (cambios de hora) |
-| Prueba HTTP en ventana | la hora en punto actual de `fabrica.Reloj` (21/12/2026, hacia las 18:00 de Madrid), en esa misma pista |
+| Fechas y horas   | 16–31/01/2027 a las 10:00 de Madrid, **una fecha por reserva** (ver T008 y T014); 25/10/2026 y 28/03/2027 a las 10:00 (cambios de hora) |
+| Reserva HTTP compartida | **una sola** confirmada de Carla en esa pista, en la hora en punto actual de `fabrica.Reloj` (21/12/2026 a las 18:00 de Madrid), creada de forma idempotente por `ValidarAccesoTests` (T007; análisis C1) |
+
+Asignación de fechas (cada reserva, su fecha, para no chocar con `ux_reservas_activa` ni depender del
+orden de ejecución; análisis C1 y C2):
+
+| Fecha (10:00–11:00) | Para |
+| ------------------- | ---- |
+| 18/01/2027 (lunes)  | T008, secuencia primera → segunda → tercera validación |
+| 20/01/2027 (miércoles; la franja fija rechazada de esa pista es de 19 a 21) | T008, un rechazo previo no cuenta |
+| 21/01/2027 (jueves) | T014, reserva compartida de solo lectura para los límites |
+| 22/01/2027 (viernes) | T008, validación aceptada anterior de otra persona |
+| 25/01/2027 (lunes)  | T018b (A2), fallo de `SaveChanges` |
+
+**Comprobación del 2026-11-26** (análisis C1): `git grep` de `Este, "Pista de pádel 2"` solo devuelve
+`ConsultaDisponibilidadTests.cs:83` (24/12/2026, cierre y franja fija) y `RevisarFranjasFijasTests.cs:113`
+(solicitud de los miércoles 19–21 que se rechaza); ninguna prueba usa fechas del 16–31/01/2027 ni a Carla
+o `personal.este`; las dos pruebas que miran «hoy» (21/12/2026) buscan Pádel en Polideportivo **Norte**
+(`BuscarFranjasTests.cs:141`, `BuscarSinResultadosTests.cs:77`), así que la reserva compartida de las
+18:00 en Este no les afecta.
 
 Reglas (E13 de spec-002):
 
@@ -48,8 +66,11 @@ Reglas (E13 de spec-002):
 - los límites y los días de cambio de hora se prueban con `DatosValidaciones.ConServicio(ahoraUtc, …)`
   (T006), con un reloj propio;
 - ninguna prueba cuenta filas globales de `validaciones_acceso`: se comprueba por `validacionId` o por
-  `reserva_id`, y «no se ha registrado nada» se comprueba con el máximo `id` antes y después de la
-  petición, filtrando por `personal_id` de la sesión usada.
+  `reserva_id`, y «no se ha registrado nada» se comprueba de una de estas dos formas (análisis F1):
+  - si la petición es del personal, con el máximo `id` antes y después, filtrando por su `personal_id`
+    (`DatosValidaciones.UltimoId`);
+  - si no lo es (sin sesión u otro rol, que no tienen `personal_id`), buscando un `codigo_leido` único
+    de la prueba (un `Guid` nuevo), que no debe aparecer.
 
 ---
 
@@ -101,7 +122,8 @@ Reglas (E13 de spec-002):
 - [ ] T004 Crear `src/SI18.Api/Modulos/Reservas/EndpointsValidacionesAcceso.cs` con
   `MapValidacionesAcceso(this WebApplication app)` y llamarlo desde `MapReservas()` en
   `RegistroReservas.cs` (`Program.cs` no cambia; research.md V1, V7):
-  - grupo `/api/validaciones-acceso` con `.RequireAuthorization(Politicas.EsPersonal)`;
+  - grupo `/api/validaciones-acceso` con **exactamente** `.RequireAuthorization(Politicas.EsPersonal)`
+    (sin sesión → 401 `NO_AUTENTICADO`, otro rol → 403 `ROL_NO_PERMITIDO`; lo prueba T020; análisis A1);
   - `POST /`: lee `PeticionValidacionAcceso`; `codigo = peticion.Codigo?.Trim()`; si es nulo o vacío →
     `ManejadorErrores.CrearValidacion(httpContext, { ["codigo"] = ["Escribe el código de acceso."] })`
     (400, **sin llamar al servicio**: no se registra, RF-004);
@@ -112,9 +134,8 @@ Reglas (E13 de spec-002):
     (research.md V2).
 
   Depende de T003.
-- [ ] T005 [P] Comprobar que el grupo devuelve 401 `NO_AUTENTICADO` sin sesión y 403 `ROL_NO_PERMITIDO`
-  con otro rol con el `RequireAuthorization` de 000-core (ya probado en `Comun/PoliticasTests.cs`); si
-  `PoliticasTests` no cubre `EsPersonal`, no se cambia: lo cubre T021 (US4).
+- ~~T005~~ **Retirada** (análisis A1): no tenía entregable propio. La política va en T004 y la prueba en
+  T020. Se conserva el número para no renumerar.
 - [ ] T006 Crear `tests/SI18.Api.Tests/Reservas/DatosValidaciones.cs` (se apoya en `DatosReservas` sin
   cambiarlo):
   - constantes de la tabla «Datos de las pruebas de integración» (`Carla`, `PersonalEste`,
@@ -122,10 +143,17 @@ Reglas (E13 de spec-002):
   - `Task<HttpResponseMessage> Validar(HttpClient cliente, string? codigo)`: `POST /api/validaciones-acceso`;
   - `Task<T> ConServicio<T>(DateTime ahoraUtc, string correoPersonal, Func<ServicioValidarAcceso, Task<T>> accion)`:
     un ámbito y un `Si18DbContext` propios y un `FakeTimeProvider` fijado en `ahoraUtc`, como
-    `DatosReservas.ConServicio`;
+    `DatosReservas.ConServicio`; y una sobrecarga que recibe directamente un `IUsuarioActual` de prueba en
+    lugar del correo (la usa T018b);
   - `Task<List<ValidacionAcceso>> DeLaReserva(long reservaId)` y `Task<ValidacionAcceso> Leer(long validacionId)`;
   - `Task<long> UltimoId(string correoPersonal)`: el mayor `id` de `validaciones_acceso` de esa persona
-    (para comprobar que una petición no registra nada).
+    (para comprobar que una petición no registra nada);
+  - `Task<bool> HayValidacionConCodigo(string codigoLeido)` (análisis F1);
+  - `Task<long> ConfirmadaCompartida()`: la reserva confirmada de Carla en Este «Pista de pádel 2» a la
+    hora en punto actual de `fabrica.Reloj` (21/12/2026 a las 18:00 de Madrid), **idempotente**: si ya
+    existe una confirmada de Carla en esa pista e inicio (por ejemplo, porque la base de pruebas se
+    reutiliza con `SI18_TEST_CONNECTION`), devuelve su `id`; si no, la inserta con
+    `DatosReservas.Confirmada` (análisis C1).
 
   Depende de T002 y T003.
 
@@ -144,24 +172,32 @@ franja; si ya se había aceptado, con el aviso de la hora anterior.
 ### Pruebas de US1 (antes de la implementación)
 
 - [ ] T007 [P] [US1] Crear `tests/SI18.Api.Tests/Reservas/ValidarAccesoTests.cs` (HTTP, sesión de
-  `personal.este`) con los casos aceptados:
-  - reserva confirmada de Carla en Este «Pista de pádel 2» en la hora en punto actual de
-    `fabrica.Reloj` (insertada con `DatosReservas.Confirmada`) → 201 con `titular = "Carla Vecina"`,
+  `personal.este`), que implementa `IAsyncLifetime` y en `InitializeAsync` obtiene **una sola vez** la
+  reserva compartida con `DatosValidaciones.ConfirmadaCompartida()` (idempotente; análisis C1). Todas
+  las pruebas de la clase que necesitan una confirmada en su ventana usan esa reserva y **ninguna
+  inserta otra confirmada** en esa pista e inicio. Antes de escribirla, repetir el `git grep` de T002
+  para la pista y el 21/12/2026. Casos aceptados:
+  - la reserva compartida → 201 con `titular = "Carla Vecina"`,
     `instalacion`, `centro = "Polideportivo Este"`, `fecha` y horas de Madrid, `validacionAnteriorHora`
-    nulo; y su fila con `aceptada = true`, `motivo_rechazo` nulo, `reserva_id`, `personal_id` y
-    `fecha_utc = ahora` (HU1 esc. 1; HU3 esc. 1);
+    nulo **o con la hora de una validación anterior de la misma reserva** (la reserva es compartida y
+    otras pruebas de la clase pueden haberla validado antes; el aviso lo prueba T008); y su fila con
+    `aceptada = true`, `motivo_rechazo` nulo, `reserva_id`, `personal_id` y `fecha_utc = ahora` (HU1
+    esc. 1; HU3 esc. 1);
   - el mismo código con espacios delante y detrás → 201 (RF-004).
 
   Depende de T006.
 - [ ] T008 [P] [US1] Crear `tests/SI18.Api.Tests/Reservas/AvisoValidacionAnteriorTests.cs` con
-  `DatosValidaciones.ConServicio` (reserva de Carla el 19/01/2027 de 10:00 a 11:00; RF-006a, CE-007):
-  - primera aceptada a las 09:50 → sin aviso;
-  - segunda a las 10:20 → `ValidacionAnteriorHora = "09:50"`;
-  - tercera a las 10:40 → `"10:20"` (la más reciente);
-  - un rechazo previo (09:40, fuera de ventana) no cuenta: la primera aceptada no lleva aviso (HU1 esc. 7);
-  - una aceptada por otra persona del personal del mismo centro sí cuenta: insertar directamente una
-    `ValidacionAcceso` aceptada de `personal.este` y validar con el servicio de otra sesión del mismo
-    centro (si la siembra no tiene otra, con `personal.este` en un segundo ámbito).
+  `DatosValidaciones.ConServicio` (RF-006a, CE-007). **Cada caso tiene su propia reserva de Carla en Este
+  «Pista de pádel 2», de 10:00 a 11:00, en su propia fecha** (tabla «Asignación de fechas»; análisis C2):
+  - **18/01/2027**, un único `[Fact]` con la secuencia: primera aceptada a las 09:50 → sin aviso;
+    segunda a las 10:20 → `ValidacionAnteriorHora = "09:50"`; tercera a las 10:40 → `"10:20"` (la más
+    reciente; HU1 esc. 6);
+  - **20/01/2027**: un rechazo previo a las 09:40 (fuera de ventana) no cuenta: la primera aceptada, a
+    las 09:50, no lleva aviso (HU1 esc. 7);
+  - **22/01/2027**: una aceptada por **otra** persona del personal sí cuenta (análisis U1): insertar
+    directamente una `ValidacionAcceso` aceptada a las 09:48 con `personal_id` de `personal.oeste` (la
+    siembra solo tiene una persona del personal por centro, y la consulta del aviso no filtra por persona
+    ni por centro) y validar a las 09:55 con `personal.este` → `ValidacionAnteriorHora = "09:48"`.
 
   Depende de T006.
 
@@ -223,9 +259,10 @@ centro, con la instalación y la franja (nunca el titular).
 - [ ] T013 [P] [US2] Añadir a `tests/SI18.Api.Tests/Reservas/ValidarAccesoTests.cs` los rechazos por HTTP:
   - `"noexiste"` → 422 `QR_DESCONOCIDO`, con `validacionId` y **sin** extensión `reserva`; fila con
     `reserva_id` nulo (HU2 esc. 4; HU3 esc. 3);
-  - reserva de Carla en Este con la sesión de `personal.oeste` → 403 `QR_OTRO_CENTRO`, sin extensión
+  - la reserva compartida (T007) con la sesión de `personal.oeste` → 403 `QR_OTRO_CENTRO`, sin extensión
     `reserva`; fila con su `reserva_id` y `aceptada = false` (HU2 esc. 5);
-  - reserva cancelada de Carla (`DatosReservas.Cancelada`) en la ventana → 422
+  - reserva cancelada de Carla (`DatosReservas.Cancelada`) en la misma pista e inicio que la compartida
+    (una cancelada no es activa y no choca con `ux_reservas_activa`), también idempotente → 422
     `QR_RESERVA_NO_CONFIRMADA` con la extensión `reserva` (instalación, centro, fecha y horas) y sin
     ningún campo de titular (HU2 esc. 3; CE-003);
   - un código de 100 caracteres → 422 `QR_DESCONOCIDO`, registrado recortado a 64.
@@ -234,7 +271,9 @@ centro, con la instalación y la franja (nunca el titular).
 - [ ] T014 [P] [US2] Crear `tests/SI18.Api.Tests/Reservas/LimitesValidacionTests.cs` con
   **`[Trait("Categoria", "Limites")]`** y `DatosValidaciones.ConServicio` (reloj propio; research.md V11;
   CE-002):
-  - reserva de Carla el 21/01/2027 de 10:00 a 11:00: 09:45:00 aceptada; 09:46 aceptada; 09:44:59
+  - **una** reserva de Carla el 21/01/2027 de 10:00 a 11:00, compartida de solo lectura por todos los
+    casos de la clase (creada de forma idempotente en `IAsyncLifetime`; los resultados de estos casos
+    no dependen del historial de validaciones; análisis C2): 09:45:00 aceptada; 09:46 aceptada; 09:44:59
     `QR_FUERA_DE_VENTANA` con `Reserva` informada; 11:00:00 aceptada; 11:00:01 y 11:01
     `QR_FUERA_DE_VENTANA` (HU1 esc. 2; HU2 esc. 1 y 2);
   - cambios de hora: reserva a las 10:00 de Madrid del 25/10/2026 y del 28/03/2027: aceptada a las
@@ -255,7 +294,10 @@ centro, con la instalación y la franja (nunca el titular).
   `type`, `title`, `status`, `detail`, `instance`, `codigo`, `traceId` ni `errors`). Aditivo: ninguna
   pantalla existente cambia. Prueba en `tests/SI18.Api.Tests/Comun/ClienteApiExtensionesTests.cs` (la API
   referencia `SI18.Cliente`) con un `HttpMessageHandler` falso que devuelve un 422 con `validacionId` y
-  `reserva`: `ErrorApi.Extensiones` los contiene y `Codigo`, `Detalle` y `Errores` no cambian.
+  `reserva`: `ErrorApi.Extensiones` los contiene y `Codigo`, `Detalle` y `Errores` no cambian. El
+  constructor de `ClienteApi` necesita un `NavigationManager`: usar en la prueba una subclase mínima
+  (`NavegacionDePrueba : NavigationManager`, que llama a `Initialize("http://localhost/", "http://localhost/")`
+  y no navega; análisis U3).
   Anotar en el PR que es un cambio en código común (research.md V2; plan.md C2).
 - [ ] T017 [US2] Completar `ValidarAcceso.razor` con el resultado rechazado: `<h2>` «Acceso denegado» con
   un icono distinto del de «permitido», el `Detalle` del catálogo y, si
@@ -278,9 +320,22 @@ Q1, Q6, Q7 y Q10 y §4 pasos 5 y 6.
   `PETICION_INVALIDA` con `errors.codigo` y **ningún** registro nuevo de `personal.este`
   (`DatosValidaciones.UltimoId` igual antes y después; RF-004, CE-004); y que una validación aceptada no
   cambia la reserva (`estado`, `codigo_acceso` y `cancelada_en_utc` iguales; RF-010). Depende de T006.
-- [ ] T019 [US3] Revisar que `ServicioValidarAcceso` hace un único `SaveChanges` y que no hay ningún otro
-  camino que devuelva un resultado sin haberlo guardado (RF-009): si el `SaveChanges` lanza, la
-  excepción llega al manejador global (500 `ERROR_INTERNO`). Depende de T009, T018.
+- [ ] T018b [US3] Añadir a `tests/SI18.Api.Tests/Reservas/ValidarAccesoTests.cs` la prueba de RF-009
+  (análisis A2), **con el fallo provocado dentro de la propia prueba y sin dejar filas a medias en la
+  base compartida**:
+  - reserva confirmada de Carla el **25/01/2027** de 10:00 a 11:00 (idempotente);
+  - `DatosValidaciones.ConServicio` con un `IUsuarioActual` de prueba de rol personal de centro, centro
+    Este e `Id` que no existe en `usuarios` (por ejemplo, `int.MaxValue`), a las 09:50: el `INSERT` viola
+    la FK `personal_id → usuarios`, así que `SaveChanges` lanza;
+  - comprobar que `Validar` **lanza** (no devuelve ningún `ResultadoValidacion` aceptado ni rechazado)
+    y que, después, no hay **ninguna** fila de `validaciones_acceso` de esa reserva (el `INSERT` fallido
+    no deja nada: un solo `SaveChanges`, en su propia transacción implícita);
+  - que la excepción llega al manejador global como 500 `ERROR_INTERNO` sin trazas ya lo prueba
+    `Comun/ErroresTests.cs` de 000-core; no se duplica.
+
+  Depende de T006.
+- [ ] T019 [US3] Comprobar que `ServicioValidarAcceso` hace un único `SaveChanges` y que T018b pasa
+  (RF-009). Depende de T009, T018, T018b.
 
 **Punto de control**: CE-004 cubierto por las pruebas de T007, T013 y T018.
 
@@ -295,11 +350,11 @@ ve el personal.
 
 - [ ] T020 [P] [US4] Añadir a `ValidarAccesoTests.cs`: sin sesión → 401 `NO_AUTENTICADO`; con
   `ciudadana2.empadronada`, `representante.padel` y `tecnico` → 403 `ROL_NO_PERMITIDO`; en ninguno se
-  registra nada (el máximo `id` de `validaciones_acceso` no cambia: se comprueba con una consulta por
-  `codigo_leido` único de la prueba, porque esas peticiones no tienen `personal_id`) (HU4 esc. 1 y 2;
-  CE-004). Depende de T006.
-- [ ] T021 [US4] Si T020 no pasa con T004, corregir la política del grupo en
-  `EndpointsValidacionesAcceso.cs` (debe ser exactamente `Politicas.EsPersonal`). Depende de T020.
+  registra nada: cada petición envía un `codigo_leido` único (un `Guid` nuevo) y
+  `DatosValidaciones.HayValidacionConCodigo` devuelve `false` (esas peticiones no tienen `personal_id`;
+  análisis F1) (HU4 esc. 1 y 2; CE-004). Depende de T006.
+- ~~T021~~ **Retirada** (análisis A1): era condicional («si T020 no pasa»). La política se fija en T004 y
+  T020 la prueba. Se conserva el número para no renumerar.
 - [ ] T022 [P] [US4] Comprobar en `ValidarAcceso.razor` el acceso por URL (T012): sin sesión →
   `/iniciar-sesion`; con un ciudadano → `AvisoSinPermisoValidar` y ningún formulario. Depende de T012.
 - [ ] T023 [US4] (sin código) Confirmar con @ara139-ua el texto «Validar acceso» y su posición en el hueco
@@ -346,6 +401,8 @@ ve el personal.
   - NVDA: etiqueta, ayuda y error del campo; cada resultado (permitido, permitido con aviso, denegado
     con y sin datos de la reserva) anunciado **una sola vez** con el texto completo;
   - «Acceso permitido» y «Acceso denegado» escritos y con iconos distintos, no solo por el color;
+  - **menú de los demás roles** (análisis E1; HU-4 esc. 3, RF-016): con `ciudadana2.empadronada@si18.test`
+    y con `tecnico@si18.test`, el menú **no** muestra «Validar acceso»;
   - Lighthouse ≥ 95 y axe sin infracciones graves ni críticas con el formulario vacío, con un resultado
     aceptado con aviso y con uno rechazado.
 
@@ -363,8 +420,8 @@ ve el personal.
 - [ ] T028 Ejecutar quickstart.md §2–§5 de principio a fin: `dotnet test SI18.slnx` en verde (también
   con `--filter-trait "Categoria=Limites"`), los escenarios Q1–Q10 contra la API y los pasos de la
   pantalla. Medir y anotar en el PR:
-  - el tiempo desde pulsar «Validar» hasta que se ve y se anuncia el resultado, 10 veces: < 1 s en al
-    menos 9 de 10 (CE-001);
+  - el tiempo desde pulsar «Validar» hasta que se ve y se anuncia el resultado, **20 veces**: < 1 s en
+    al menos **19 de 20** (CE-001, 95 %; análisis U2);
   - con un cronómetro, el tiempo de validar un código escrito a mano desde que se tiene delante:
     < 15 s (CE-005);
   - 20 llamadas a `POST /api/validaciones-acceso` con la API local (aceptadas y rechazadas): p95
@@ -377,9 +434,13 @@ ve el personal.
     el menú del personal.
 
   Anotarlo en la descripción del PR.
-- [ ] T030 Abrir los PR hacia `develop`, con la lista de los principios I–IX revisados, como en spec-002:
-  - **PR de API**: T001–T010, T013–T015, T018–T021 y T027. Sin código común; se puede fusionar antes
-    (el endpoint se prueba con quickstart.md §3);
+- [ ] T030 Abrir los PR hacia `develop`, con la lista de los principios I–IX revisados, como en spec-002.
+  **Antes de abrir cada PR, revisar los secretos** (constitución, «Flujo de trabajo», principio V;
+  análisis D1): `git grep -nE "Password=|SI18_CLAVE_DEMO=.+[^>]$" -- ":!*.example"` (quickstart §7 de
+  000-core; solo deben salir las coincidencias ya justificadas en T075 de 000-core) y
+  `git ls-files fuentes/.env` (sin resultados), con el resultado en la descripción del PR.
+  - **PR de API**: T001–T004, T006–T010, T013–T015, T018, T018b, T019, T020 y T027 (T005 y T021,
+    retiradas). Sin código común; se puede fusionar antes (el endpoint se prueba con quickstart.md §3);
   - **PR de pantallas**: T011, T012, T016, T017, T022–T026, con la comprobación de accesibilidad de
     T026; **revisa @ara139-ua** el código común de T016 (C2) y T024 (C1).
 
@@ -394,11 +455,11 @@ ve el personal.
 
 ```text
 Fase 1 Setup (T001 ∥ T002)
-   └─► Fase 2 Fundacional (T003 → T004; T005; T006 tras T002 y T003)
+   └─► Fase 2 Fundacional (T003 → T004; T006 tras T002 y T003)          *T005 retirada
           ├─► US1 (T007 ∥ T008 → T009 → T010; cliente: T011 → T012)
           │      ├─► US2 (T013 ∥ T014 → T015; T016 → T017 tras T012)
-          │      ├─► US3 (T018 → T019)
-          │      └─► US4 (T020 → T021; T022 tras T012; T023 → T024)
+          │      ├─► US3 (T018 ∥ T018b → T019)
+          │      └─► US4 (T020; T022 tras T012; T023 → T024)          *T021 retirada
           │             └─► US5 (T025 → T026)          *tras US1, US2 y US4 en el cliente
           └─► Fase 8 Pulido (T027–T031)
 ```
@@ -413,16 +474,17 @@ Fase 1 Setup (T001 ∥ T002)
 ### Paralelismo dentro de cada fase
 
 - **Fase 1**: T001 y T002 en paralelo.
-- **Fase 2**: T005 en paralelo con T003–T004.
 - **US1**: T007 y T008 en paralelo; en el cliente, T011 en paralelo con toda la API.
 - **US2**: T013 y T014 en paralelo; T016 en paralelo con toda la API.
-- **US3 y US4**: T018, T020 y T022 en paralelo.
+- **US3 y US4**: T018, T018b, T020 y T022 en paralelo.
+- **Datos**: cada clase de prueba usa sus propias fechas (tabla «Asignación de fechas»), así que las
+  clases se pueden escribir y ejecutar en paralelo sin chocar.
 
 ### Ejemplo de reparto en el tiempo (una persona)
 
 ```text
-Día 1:  T001 ∥ T002 → T003 → T004 ∥ T005 → T006 → T007 ∥ T008 → T009 → T010     (MVP de API)
-Día 2:  T013 ∥ T014 → T015 → T018 → T019 → T020 → T021 → T027                   (PR de API)
+Día 1:  T001 ∥ T002 → T003 → T004 → T006 → T007 ∥ T008 → T009 → T010            (MVP de API)
+Día 2:  T013 ∥ T014 → T015 → T018 ∥ T018b → T019 → T020 → T027                  (PR de API)
 Día 3:  T016 → T011 → T012 → T017 → T022 → T023 → T024 → T025 → T026            (PR de pantallas)
 Día 4:  T028 → T029 → T030 → T031
 ```

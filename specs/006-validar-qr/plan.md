@@ -107,11 +107,13 @@ fuentes/
 │           ├── AccesoReservas.cs                      # + ComprobarPersonal (V10)
 │           ├── ValidarAcceso.razor                    # /validar-acceso (nuevo; V10)
 │           └── ValidarAcceso.razor.css                # estilos propios, sin tocar app.css (nuevo)
-└── tests/SI18.Api.Tests/Reservas/                     # V11 (nuevos)
-    ├── DatosValidaciones.cs                           # titular, personal, pista y fechas propios; ConServicio con reloj propio
-    ├── ValidarAccesoTests.cs                          # HTTP: roles, 400, cada motivo, extensiones y filas registradas
-    ├── LimitesValidacionTests.cs                      # [Trait("Categoria","Limites")]: ventana y cambios de hora
-    └── AvisoValidacionAnteriorTests.cs                # RF-006a
+└── tests/SI18.Api.Tests/
+    ├── Reservas/                                      # V11 (nuevos)
+    │   ├── DatosValidaciones.cs                       # titular, personal, pista y fechas propios; ConServicio con reloj propio
+    │   ├── ValidarAccesoTests.cs                      # HTTP: roles, 400, cada motivo, extensiones, filas registradas y RF-009
+    │   ├── LimitesValidacionTests.cs                  # [Trait("Categoria","Limites")]: ventana y cambios de hora
+    │   └── AvisoValidacionAnteriorTests.cs            # RF-006a
+    └── Comun/ClienteApiExtensionesTests.cs            # C2: ErrorApi.Extensiones (nuevo; análisis F2)
 ```
 
 **Decisión de estructura**: la de 000-core, sin proyectos nuevos. El código nuevo va en las carpetas
@@ -161,7 +163,7 @@ El PR de API se puede fusionar antes: el endpoint se prueba con quickstart §3 s
 | Dependencia o riesgo | Mitigación |
 | -------------------- | ---------- |
 | Las pruebas pisan datos de otras specs (lo del #37) | Titular, personal, pista y fechas que no usa ninguna otra prueba (research.md V11); se repite el `git grep` antes de escribirlas; ninguna prueba adelanta `fabrica.Reloj` ni cuenta filas globales |
-| El reloj compartido de `FabricaApi` deja una reserva fuera de su ventana | Los límites usan el servicio con reloj propio; la única prueba HTTP con reserva en ventana la inserta en la hora en punto actual de la fábrica |
+| El reloj compartido de `FabricaApi` deja una reserva fuera de su ventana | Los límites usan el servicio con reloj propio; las pruebas HTTP con reserva en ventana comparten una sola reserva, creada de forma idempotente en la hora en punto actual de la fábrica (analyze-1, C1) |
 | C2 (código común) se retrasa | El PR de API no depende de C2; la pantalla puede mostrar solo el `detail` hasta que se fusione, y se completa después |
 | Se muestra el titular en un rechazo por error | `ReservaValidadaDto` no tiene campo de titular; prueba de que `QR_OTRO_CENTRO` y `QR_DESCONOCIDO` no llevan la extensión `reserva` (CE-003) |
 | Zona horaria escrita a mano | Fechas y horas con `HorarioMadrid` en la API; `git grep "Europe/Madrid"` en quickstart §2 |

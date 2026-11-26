@@ -222,12 +222,15 @@ HU-06, por tanto, compone lo que hay en un servicio, un endpoint y una pantalla.
     `personal.oeste@si18.test` (sus validaciones no chocan con nada);
   - pista: «Pista de pádel 2» de **Polideportivo Este** (solo la usan una prueba del 24/12/2026 con
     cierre y franja fija, y una solicitud de franja fija de los miércoles 19–21 que se **rechaza**);
-  - fechas: martes **19/01/2027** y jueves **21/01/2027**, de 10:00 a 13:00 (ninguna prueba usa enero
-    entre el 16 y el 31, y no son miércoles a las 19–21); los cambios de hora, **25/10/2026** y
-    **28/03/2027** a las **10:00** (las demás pruebas de esos días usan otras pistas);
-  - la única prueba HTTP que necesita una reserva dentro de su ventana con el reloj compartido la
-    inserta en la hora en punto actual de la fábrica (21/12/2026, hacia las 18:00 de Madrid) en esa
-    misma pista, que nadie usa ese día.
+  - fechas: del **16 al 31/01/2027** a las 10:00, **una fecha por reserva** para no chocar con
+    `ux_reservas_activa` ni depender del orden de ejecución (18, 20, 21, 22 y 25/01/2027; la asignación
+    está en tasks.md, «Datos de las pruebas de integración»; ninguna prueba usa enero entre el 16 y el
+    31, y la franja fija de los miércoles de esa pista es de 19 a 21); los cambios de hora,
+    **25/10/2026** y **28/03/2027** a las **10:00** (las demás pruebas de esos días usan otras pistas);
+  - las pruebas HTTP que necesitan una reserva dentro de su ventana con el reloj compartido usan **una
+    sola** reserva confirmada, creada de forma idempotente en la hora en punto actual de la fábrica
+    (21/12/2026 a las 18:00 de Madrid) en esa misma pista, que nadie usa ese día (ajuste de
+    analyze-1, C1).
 
   Antes de escribir las pruebas, la tarea correspondiente repite el `git grep` y anota en tasks.md si
   algo ha cambiado. Ninguna prueba de esta spec adelanta `fabrica.Reloj` (E13 de spec-002) ni cuenta
