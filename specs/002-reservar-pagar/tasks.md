@@ -618,7 +618,7 @@ efectivo y el QR solo en las confirmadas.
   dentro de un `Log…`; y una prueba en `PagarReservaTests` que, con un `ILoggerProvider` de prueba,
   paga con `4000000000000001` y comprueba que ningún mensaje registrado contiene «4000000000000001» ni
   «0001». Depende de T034.
-- [ ] T049 Ejecutar quickstart.md §2–§4 de principio a fin: `dotnet test SI18.slnx` en verde (también
+- [X] T049 Ejecutar quickstart.md §2–§4 de principio a fin: `dotnet test SI18.slnx` en verde (también
   con `--filter-trait "Categoria=Limites"`), los escenarios R1–R18 contra la API y los pasos de la
   pantalla. Cronometrar los pasos 2–4 de §4 (de pulsar «Reservar» a ver el QR) y anotar el tiempo:
   debe ser < 2 min (CE-001). Medir con la API local 10 veces `POST /api/reservas` y `POST /api/reservas/{id}/pago` y
