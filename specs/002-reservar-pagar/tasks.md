@@ -345,12 +345,15 @@ caducidad al reservar y al pagar, y la misma respuesta antes y después del barr
 
   Depende de T026.
 - [X] T029 [US2] Crear `tests/SI18.Api.Tests/Reservas/ReservaConcurrenteTests.cs`
-  (`[Collection(ColeccionApi.Nombre)]`, Polideportivo Oeste, «Pista de pádel 1», 22/12/2026 a las
+  (`[Collection(ColeccionApi.Nombre)]`, Polideportivo Oeste, «Pista de pádel 1», 23/12/2026 a las
   19:00; CE-002, HU2 esc. 2, RF-007): **20 peticiones `POST /api/reservas` simultáneas** sobre la misma
   franja (`Task.WhenAll`), repartidas entre las sesiones de `ciudadana.empadronada`,
   `ciudadano.noempadronado` y `representante.padel` (la siembra solo tiene esas personas que puedan
   reservar fuera de `MisReservasTests`) → exactamente una 201 y diecinueve 409 `FRANJA_OCUPADA`; en la
   base, una sola reserva activa y un solo pago. Depende de T026.
+
+  > **Nota (#37)**: la fecha era el 22/12/2026; pasó al 23/12 porque `ConflictosFranjasFijasTests`
+  > (spec-005) deja una reserva en esa misma franja de la base compartida.
 - [X] T030 [US2] Ampliar `tests/SI18.Api.Tests/Reservas/PagarReservaTests.cs` con los límites de los
   10 minutos (`[Trait("Categoria","Limites")]`; casos límite de la spec):
   - **9:59**: pendiente creada hace 9 min 59 s → se cobra y queda confirmada;
@@ -484,7 +487,7 @@ efectivo y el QR solo en las confirmadas.
 - [X] T039 [US5] Crear `tests/SI18.Api.Tests/Reservas/MisReservasTests.cs`
   (`[Collection(ColeccionApi.Nombre)]`, Polideportivo Oeste, «Pista de tenis 1» y «Pista de tenis 2»;
   **solo** con `representante.norte@si18.test`):
-  - **HU5 esc. 6**: reservas confirmadas el 26/12 y el 27/12/2026 y otra del 20/11/2026 → orden 26/12,
+  - **HU5 esc. 6**: reservas confirmadas el 25/12 y el 27/12/2026 y otra del 20/11/2026 → orden 25/12,
     27/12, 20/11; una reserva que está en curso (`inicio ≤ ahora < fin`) va primera;
   - **HU5 esc. 1–3**: confirmada con `codigoAcceso`; caducada y cancelada sin código; pendiente vigente
     con `limitePagoUtc` y `horaLimitePago` (en Madrid, truncada al minuto);
@@ -494,6 +497,9 @@ efectivo y el QR solo en las confirmadas.
   - `personal.oeste@si18.test` → 403 `ROL_NO_PERMITIDO`.
 
   Depende de T038 y T011.
+
+  > **Nota (#37)**: la confirmada del 26/12/2026 (Oeste «Pista de tenis 1», 10:00) pasó al 25/12 porque
+  > `ConflictosFranjasFijasTests` (spec-005) ya tiene una confirmada en esa franja de la base compartida.
 - [X] T040 [US5] Crear `src/SI18.Cliente/Reservas/MisReservas.razor` (ruta `/mis-reservas`; research.md E11):
   - mismo control de acceso que T024;
   - `<PageTitle>Mis reservas · SI-18</PageTitle>` y `<h1>` «Mis reservas»;
@@ -718,4 +724,4 @@ puede adelantar) → Pulido. Si las pantallas se retrasan, el PR de API se abre 
 ## Phase 11: Convergence
 
 - [X] T053 Añadir a `tests/SI18.Api.Tests/Reservas/MotivosRechazoTests.cs` el caso de cambio de hora del 25/10/2026 (`[Trait("Categoria","Limites")]`, con `DatosReservas.ConServicio` y un reloj propio anterior a ese día): las 14 franjas de 08:00 a 21:00 de Madrid se pueden resumir, la de 08:00 es `2026-10-25T07:00:00Z`, y reservar y pagar la de 08:00 da `finUtc − inicioUtc = 1 h`. Usar una pista y una franja que no pise ninguna otra prueba de la base compartida per Casos límite «Cambio de hora», Constitution II (partial)
-- [ ] T054 Actualizar en este `tasks.md` las fechas de T029 (23/12/2026 a las 19:00) y T039 (25/12 en vez de 26/12), con una nota de que cambiaron en el #37 porque pisaban las de `ConflictosFranjasFijasTests` (spec-005) per tasks.md T029 y T039 (partial)
+- [X] T054 Actualizar en este `tasks.md` las fechas de T029 (23/12/2026 a las 19:00) y T039 (25/12 en vez de 26/12), con una nota de que cambiaron en el #37 porque pisaban las de `ConflictosFranjasFijasTests` (spec-005) per tasks.md T029 y T039 (partial)
