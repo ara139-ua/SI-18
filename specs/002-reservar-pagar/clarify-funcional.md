@@ -47,7 +47,22 @@ Por eso la evidencia del fallo previo es la prueba automática de T056, escrita 
 
 Resumen de la ejecución: `total: 6 · error: 3 · correcto: 3`. Los tres fallos dicen `Assert.Throws() Failure: No exception was thrown` (se esperaba `ErrorNegocio`): es exactamente el defecto de la pregunta 1.
 
-La salida en verde, después de implementar T056, se añadirá aquí con el commit de la corrección.
+### Resultado después de la corrección: en verde
+
+Corrección en el commit `51dd22c` (spec-002 T056: `Reserva.YaEmpezada`, comprobación en `Confirmar` y rama nueva en `ServicioReservar.Pagar`), después de llevar la regla a 000-core en `7cd5517` (T055). Mismo comando, mismas pruebas y mismos datos, el 26/11/2026:
+
+| Prueba | Observado después de la corrección |
+|--------|-------------------------------------|
+| `ReservaTests.Confirmar_en_el_inicio_de_la_franja_lanza_FRANJA_YA_EMPEZADA_y_no_cambia_nada` | ✅ Lanza `FRANJA_YA_EMPEZADA`; sigue pendiente, pago pendiente y sin código |
+| `PagarReservaTests.RF009a_pagar_en_el_inicio_dentro_de_los_10_minutos_caduca_sin_cobrar_con_FRANJA_YA_EMPEZADA` | ✅ `FRANJA_YA_EMPEZADA`; caducada, pago fallido, sin código y 0 cobros |
+| `PagarReservaTests.RF009a_despues_de_FRANJA_YA_EMPEZADA_un_segundo_intento_es_TRANSICION_NO_PERMITIDA_sin_cobro` | ✅ `FRANJA_YA_EMPEZADA` y después `TRANSICION_NO_PERMITIDA`; 0 cobros |
+| `ReservaTests.Confirmar_1_s_antes_del_inicio_confirma` | ✅ |
+| `PagarReservaTests.RF009a_pagar_1_s_antes_del_inicio_cobra_y_confirma` | ✅ |
+| `PagarReservaTests.RF009a_con_10_minutos_y_la_franja_empezada_responde_RESERVA_CADUCADA_porque_RF009_va_primero` | ✅ |
+
+Resumen de la ejecución: `total: 6 · error: 0 · correcto: 6`. Suite completa después de T055–T060: `dotnet test SI18.slnx` 405/405 y `--filter-trait "Categoria=Limites"` 167/167, con `dotnet build` sin advertencias.
+
+La otra mitad de la respuesta 1 (hora límite = la más temprana entre creación + 10 min e inicio) se corrigió en `01127dd` (T057) con su propia prueba de los dos casos (`CrearReservaTests.RF008a_…`): 1 de 2 en rojo antes (límite a las 10:05 en vez de a las 10:00) y 2 de 2 después.
 
 ## 3. Preguntas, respuestas y justificación
 

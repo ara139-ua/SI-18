@@ -31,9 +31,9 @@ versión funcional ([clarify-funcional.md](./clarify-funcional.md)).
 
 | ID | Historia / criterio | Gravedad | Evidencia (analyze final) | Decisión | Responsable | Revisor | Estado | Dónde se resuelve |
 |----|---------------------|----------|---------------------------|----------|-------------|---------|--------|-------------------|
-| D1 | RF-009a; 000-core RF-016 y `Confirmar` | CRITICAL | La aclaración 1 añade una causa de caducidad que 000-core no tiene (principio VII) | Proponer primero el cambio en 000-core, por PR revisado por Artur | Saul | Artur | Abierto: tarea T055, pendiente de aprobación | tasks.md T055 (converge-2026-11-26-2.md F1) |
-| C1 | RF-009a, RF-008a, RF-011, RF-017, HU-2 esc. 6, HU-5 esc. 3 | HIGH | Criterios nuevos sin tarea ni prueba; research.md E4 sin el paso nuevo | Convertirlo en tareas con `/speckit-converge` y documentar el paso | Saul | Artur | Abierto: T056–T058 y T060, pendientes de aprobación | converge-2026-11-26-2.md F2–F4, F6 |
-| C2 | HU-4 esc. 3 (representante del club dueño) | MEDIUM | La prueba existente usa una ciudadana | Añadir la prueba (el código ya lo cumple) | Saul | Artur | Abierto: T059, pendiente de aprobación | converge-2026-11-26-2.md F5 |
+| D1 | RF-009a; 000-core RF-016 y `Confirmar` | CRITICAL | La aclaración 1 añade una causa de caducidad que 000-core no tiene (principio VII) | Proponer primero el cambio en 000-core, por PR revisado por Artur | Saul | Artur (revisión pedida en el PR) | Resuelto: T055 (`7cd5517`) | 000-core spec.md RF-016 y data-model.md § Reserva |
+| C1 | RF-009a, RF-008a, RF-011, RF-017, HU-2 esc. 6, HU-5 esc. 3 | HIGH | Criterios nuevos sin tarea ni prueba; research.md E4 sin el paso nuevo | Convertirlo en tareas con `/speckit-converge` y documentar el paso | Saul | Artur (revisión pedida en el PR) | Resuelto: T056 (`51dd22c`), T057 (`01127dd`), T058 (`b7b8a14`; comprobación manual de accesibilidad pendiente) y T060 | converge-2026-11-26-2.md F2–F4, F6 |
+| C2 | HU-4 esc. 3 (representante del club dueño) | MEDIUM | La prueba existente usa una ciudadana | Añadir la prueba (el código ya lo cumple) | Saul | Artur (revisión pedida en el PR) | Resuelto: T059 (`84a67ee`) | converge-2026-11-26-2.md F5 |
 | C3 | RF-013 (reservas de tarifa club) | LOW | Sin prueba con dos representantes del mismo club | Aceptado: exigiría añadir usuarios a la siembra (principio VIII); la propiedad por usuario ya está probada | Saul | — | Aceptado (justificado) | — |
 | I1 | RF-009a, RF-020 | LOW | El texto de `FRANJA_YA_EMPEZADA` dice «no se puede reservar» | Aceptado: no se crea un código ni un texto nuevo (principio VII) | Saul | — | Aceptado (justificado) | — |
 
@@ -46,8 +46,8 @@ versión funcional ([clarify-funcional.md](./clarify-funcional.md)).
 ## Matriz de trazabilidad de HU-02
 
 Decisiones del plan: research.md E1–E14. Las pruebas son de `fuentes/tests/SI18.Api.Tests` salvo que se
-diga otra cosa. Las filas marcadas con ⏳ son criterios de la aclaración del 26/11/2026 cuyas tareas
-(converge, fase 12) están pendientes de aprobación.
+diga otra cosa. Los criterios de la aclaración del 26/11/2026 se cubren con la fase 12 de tasks.md
+(T055–T060).
 
 | Criterio | Qué exige (resumen) | Decisión del plan | Tareas | Prueba |
 |----------|---------------------|-------------------|--------|--------|
@@ -59,9 +59,9 @@ diga otra cosa. Las filas marcadas con ⏳ son criterios de la aclaración del 2
 | RF-006 | Caducar la pendiente no vigente al reservar | E3 | T026, T028 | `CrearReservaTests.HU2_esc4_una_pendiente_ajena_de_10_minutos_exactos_se_caduca_al_reservar` y `…_9_minutos_59_segundos_sigue_bloqueando` |
 | RF-007 | Dos peticiones simultáneas: una sola activa | E3, E5 | T026, T029 | `ReservaConcurrenteTests.De_20_peticiones_simultaneas_…`; `CrearReservaTests.Doble_envio_de_la_misma_reserva_crea_una_sola` |
 | RF-008 | Pagar sin guardar la tarjeta | E4 | T015, T048 | `PagarReservaTests.El_numero_de_tarjeta_no_aparece_en_ningun_registro` |
-| RF-008a | Hora límite fija (la más temprana entre creación + 10 min e inicio) | E4, E11 | T025, ⏳ T057 | `CrearReservaTests.HU1_esc2_…` (creación + 10 min); ⏳ caso «creada 5 min antes del inicio» (T057) |
+| RF-008a | Hora límite fija (la más temprana entre creación + 10 min e inicio) | E4, E11 | T025, T057 | `CrearReservaTests.RF008a_creada_5_min_antes_del_inicio_la_hora_limite_es_la_del_inicio` y `RF008a_creada_con_mas_antelacion_la_hora_limite_es_la_creacion_mas_10_minutos` |
 | RF-009 | Caducada por tiempo → `RESERVA_CADUCADA` sin cobro | E4 | T027, T030 | `PagarReservaTests.HU2_esc3_a_los_10_minutos_exactos_caduca_sin_cobrar`, `A_los_9_59_se_cobra_y_queda_confirmada`, `Caducada_por_el_barrido_…` |
-| RF-009a ⏳ | Pagar con la franja empezada → `FRANJA_YA_EMPEZADA`, caducada, sin cobro | E4 (⏳ T060) | ⏳ T055, T056 | ⏳ `PagarReservaTests` (1 s antes, en el inicio, segundo intento y RF-009 primero) y `ReservaTests` (T056) |
+| RF-009a | Pagar con la franja empezada → `FRANJA_YA_EMPEZADA`, caducada, sin cobro | E4 paso 4b | T055, T056, T060 | `PagarReservaTests.RF009a_…` (4 casos) y `ReservaTests.Confirmar_en_el_inicio_de_la_franja_…`, `Confirmar_1_s_antes_del_inicio_confirma` (rojo antes y verde después: clarify-funcional.md §2) |
 | RF-010 | Confirmar con código | E4 | T015, T019 | `PagarReservaTests.HU1_esc3_…` |
 | RF-011 | Rechazo sin reintento | E4 | T033, T034 | `PagarReservaTests.HU3_esc1_…`, `HU3_esc2_…`, `Pagar_dos_veces_es_TRANSICION_NO_PERMITIDA_y_conserva_el_codigo` |
 | RF-012 | Tarjeta mal formada → 400 sin cambiar nada | E4 | T017, T034 | `PagarReservaTests.HU3_esc4_una_tarjeta_con_formato_no_valido_da_400_y_no_cambia_nada` |
@@ -70,7 +70,7 @@ diga otra cosa. Las filas marcadas con ⏳ son criterios de la aclaración del 2
 | RF-015 | Lista de todas las reservas con estado efectivo | E6 | T038, T039 | `MisReservasTests.HU5_esc5_…` |
 | RF-015a | Orden de «Mis reservas» | E6 | T038, T039 | `MisReservasTests.HU5_esc6_…` |
 | RF-016 | Código solo en confirmadas | E6, E11 | T023, T039 | `MisReservasTests.HU5_esc1_a_3_…` |
-| RF-017 | Ir a pagar mientras esté vigente y no haya empezado | E11 | T040, ⏳ T058 | Manual (quickstart §4 paso 7); ⏳ T058 |
+| RF-017 | Ir a pagar mientras esté vigente y no haya empezado | E11 | T040, T058 | Manual (quickstart §4 paso 7; comprobación de T058 pendiente) |
 | RF-018 | Consulta de reservas activas para HU-01 | E7 | T007, T008 | `ConsultaReservasTests` |
 | RF-019 | Retirar la provisional sin cambiar la búsqueda | E7 | T009, T010 | `git grep` sin resultados (T010); pruebas de HU-01 en verde |
 | RF-019a | Operaciones para HU-03 y HU-07 (base para trabajo futuro) | E8 | T044–T046 | `ServicioReservasTests` |
@@ -85,4 +85,4 @@ diga otra cosa. Las filas marcadas con ⏳ son criterios de la aclaración del 2
 | CE-006 | Rechazos explicados | E11 | T036, T037 | `MotivosRechazoTests`; manual |
 | CE-007 | Retirada de la provisional sin romper HU-01 | E7 | T008, T010 | `ConsultaReservasTests`; pruebas de HU-01 |
 | CE-008 | Teclado, Lighthouse ≥ 95 y axe | E11 | T042, T043 | Auditoría de 002 (Lighthouse 100) |
-| HU-4 esc. 3 (club propio) ⏳ | El representante del club dueño tampoco reserva su franja fija | — | ⏳ T059 | ⏳ `MotivosRechazoTests` (T059) |
+| HU-4 esc. 3 (club propio) | El representante del club dueño tampoco reserva su franja fija | — | T059 | `MotivosRechazoTests.HU4_esc3_el_representante_del_club_duenio_de_la_franja_fija_tampoco_puede_reservarla` |
