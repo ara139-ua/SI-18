@@ -83,7 +83,7 @@ throughput: ninguna spec los pide (principio VIII).
 | II. Lógica probada | Reglas puras en `SI18.Dominio` con `FakeTimeProvider` y pruebas a los dos lados de cada límite, incluido el cambio de hora (R15, quickstart §5). `DateTime.Now` está prohibido por analizador | ✅ | ✅ |
 | III. Reglas en el backend | Reglas en `SI18.Dominio`, que llama solo la API. Cifras en `ValoresNegocio` (R6). Concurrencia con el índice parcial `ux_reservas_activa` (R7) y `FOR UPDATE` en cursos (R19). El cliente solo muestra | ✅ | ✅ |
 | IV. Errores coherentes | `ErrorNegocio` → `IExceptionHandler` → Problem Details con `codigo` y texto en español. Catálogo en [contracts/errores.md](./contracts/errores.md) (R11) | ✅ | ✅ |
-| V. Sin secretos | Cadena de conexión y contraseña de demo en user-secrets o variables de entorno; `.env.example` con valores de relleno; `.env` ignorado; `git grep` antes de fusionar (R17) | ✅ | ✅ |
+| V. Sin secretos | Cadena de conexión y contraseña de demo solo en variables de entorno, cargadas desde `.env` (sin `dotnet user-secrets`: cambio surgido al ejecutar T074, ver R17); `.env.example` con valores de relleno; `.env` ignorado; `git grep` antes de fusionar (R17) | ✅ | ✅ |
 | VI. Datos ficticios | Siembra con nombres inventados y correos `@si18.test`; no se guardan datos de tarjeta (R9, R13) | ✅ | ✅ |
 | VII. Base común en 000-core | Este plan, [data-model.md](./data-model.md) y [contracts/](./contracts/README.md) son la base. La migración inicial crea todo el esquema compartido (R12) | ✅ | ✅ |
 | VIII. Cero alcance fantasma | Solo los proyectos pedidos; sin capa de infraestructura aparte, sin bus de eventos, sin E2E ni contenedor de la API. El barrido de caducidades se justifica por «la franja vuelve a estar libre» y por el informe (R8) | ✅ | ✅ |

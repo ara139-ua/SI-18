@@ -283,8 +283,12 @@ Cada apartado sigue el formato *Decisión / Motivo / Alternativas descartadas*. 
   - `fuentes/docker-compose.yml` levanta solo PostgreSQL (`postgres:17-alpine`, volumen nombrado,
     `healthcheck`). La API y el cliente se ejecutan con `dotnet run`.
   - `fuentes/.env.example` lleva valores de relleno; `.env` está en `.gitignore`.
-  - La API lee `ConnectionStrings__Si18`, `SI18_CLAVE_DEMO` y `SI18_SEMBRAR_DATOS` de variables de
-    entorno o de `dotnet user-secrets`.
+  - La API lee `ConnectionStrings__Si18`, `SI18_CLAVE_DEMO` y `SI18_SEMBRAR_DATOS` solo de variables
+    de entorno, que se cargan desde `.env` (quickstart §2).
+  - **Cambio (2026-11-26, T077)**: la primera versión decía «variables de entorno o `dotnet
+    user-secrets`». Al ejecutar T074 se vio que `SI18.Api.csproj` no declara `UserSecretsId` y que
+    `dotnet user-secrets set` falla; se deja solo la vía de las variables de entorno y no se añade
+    `UserSecretsId` (principio VIII: una sola forma basta).
 - **Motivo**: principio V y la petición del grupo. Contenerizar la API no lo pide ninguna spec
   (principio VIII).
 - **Alternativas descartadas**: cadenas de conexión en `appsettings.Development.json` (secreto en el
