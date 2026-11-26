@@ -139,7 +139,7 @@ fuentes/
 │   │   ├── Program.cs               # composición: autenticación, Problem Details, módulos, ficheros del cliente
 │   │   ├── Infraestructura/
 │   │   │   ├── Si18DbContext.cs
-│   │   │   ├── Migraciones/         # 0001_NucleoComun
+│   │   │   ├── Migraciones/         # 20261104144623_NucleoComun
 │   │   │   ├── InicializadorDatos.cs
 │   │   │   ├── ManejadorErrores.cs  # IExceptionHandler + tabla código → HTTP
 │   │   │   ├── PasarelaSimulada.cs
@@ -221,7 +221,7 @@ cada módulo se registra dentro de su `Registro<Modulo>.cs`, que solo toca su du
    - `ValoresNegocio`, `HorarioMadrid`, enumerados, `ErrorNegocio` y `CodigosError`;
    - las entidades del modelo con sus métodos de transición. `Reserva` y `Pago` incluyen la máquina de
      estados completa, porque la aplican HU-02, HU-03 y HU-07.
-3. **Persistencia**: `Si18DbContext`, configuraciones EF por módulo y la migración `0001_NucleoComun`
+3. **Persistencia**: `Si18DbContext`, configuraciones EF por módulo y la migración `20261104144623_NucleoComun`
    con todos los índices y `CHECK` de [data-model.md](./data-model.md).
 4. **Siembra**: `InicializadorDatos`, idempotente y con la contraseña tomada de `SI18_CLAVE_DEMO`.
 5. **Identificación**: `/api/sesion` (cookie), `IUsuarioActual`, políticas por rol y `PermisosCentro`.
@@ -258,7 +258,7 @@ secuencia que garantiza RF-013, RF-014 y RF-016.
 
 | Riesgo | Mitigación |
 | ------ | ---------- |
-| Conflictos en `ModelSnapshot` con cuatro ramas | El esquema completo va en `0001_NucleoComun`. Si una spec necesita una migración, la rebasa sobre `develop` y la regenera antes de fusionar (R12) |
+| Conflictos en `ModelSnapshot` con cuatro ramas | El esquema completo va en `20261104144623_NucleoComun`. Si una spec necesita una migración, la rebasa sobre `develop` y la regenera antes de fusionar (R12) |
 | Alguien no instala .NET 10 | `global.json` hace fallar la compilación con un mensaje claro; quickstart §1 |
 | Divergencia entre buscar y reservar | Las dos usan `IConsultaDisponibilidad`, con una prueba de integración que compara el precio mostrado con el cobrado (CE-005) |
 | Uso de `DateTime.Now` | `BannedApiAnalyzers` + `TreatWarningsAsErrors` |

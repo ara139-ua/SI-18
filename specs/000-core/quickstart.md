@@ -60,7 +60,7 @@ Las variables de `.env.example` son:
 ```powershell
 dotnet build SI18.slnx                                        # sin errores ni advertencias tratadas como error
 dotnet tool restore                                           # dotnet-ef fijado en .config/dotnet-tools.json
-dotnet ef database update --project src/SI18.Api --connection $env:ConnectionStrings__Si18   # aplica 0001_NucleoComun
+dotnet ef database update --project src/SI18.Api --connection $env:ConnectionStrings__Si18   # aplica 20261104144623_NucleoComun
 $env:SI18_SEMBRAR_DATOS = "true"; dotnet run --project src/SI18.Api
 ```
 
