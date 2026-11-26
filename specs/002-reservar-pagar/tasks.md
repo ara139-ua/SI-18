@@ -757,4 +757,5 @@ Tarea añadida por `/speckit-converge` el 2026-11-26, pasada final (informe en
 [converge-2026-11-26-final.md](./converge-2026-11-26-final.md)), después de implementar T055–T060 en el #54.
 Responsable: Saul. Revisor: Artur.
 
-- [ ] T061 [Saul · revisa Artur] En `contracts/api-reservas.openapi.yaml`, operación `/api/reservas/{id}/pago`: añadir 422 `FRANJA_YA_EMPEZADA` (vigente pero con la franja ya empezada: queda caducada y el pago fallido, sin cobro), incluir «o por una franja ya empezada» en `TRANSICION_NO_PERMITIDA` y en la descripción de la operación; solo documentación per RF-009a, T060 (partial)
+- [X] T061 [Saul · revisa Artur] En `contracts/api-reservas.openapi.yaml`, operación `/api/reservas/{id}/pago`: añadir 422 `FRANJA_YA_EMPEZADA` (vigente pero con la franja ya empezada: queda caducada y el pago fallido, sin cobro), incluir «o por una franja ya empezada» en `TRANSICION_NO_PERMITIDA` y en la descripción de la operación; solo documentación per RF-009a, T060 (partial)
+  **Hecho** (26/11/2026): `contracts/api-reservas.openapi.yaml`, operación `/pago`: 422 `FRANJA_YA_EMPEZADA`, `TRANSICION_NO_PERMITIDA` ampliada y la descripción de la operación. Solo documentación.

@@ -35,3 +35,8 @@ T061 (Phase 13: Convergence).
 **Pendiente que no es de código**: la comprobación manual de accesibilidad de T058 (quickstart §5) sigue sin hacerse; R19 no se ha ejecutado a mano. Ambas constan en `tasks.md`.
 
 **Hallazgos por tipo**: partial 1 · missing 0 · contradicts 0 · unrequested 0. **Por severidad**: LOW 1.
+
+## Resultado después de implementar (26/11/2026)
+
+- **T061**: el contrato de `/pago` recoge 422 `FRANJA_YA_EMPEZADA` y la ampliación de `TRANSICION_NO_PERMITIDA`. Solo documentación: no hay cambios de código ni de pruebas.
+- Con esto no quedan brechas de código ni de documentación en 002. No se ha ejecutado otra pasada.
