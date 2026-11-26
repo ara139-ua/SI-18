@@ -494,7 +494,7 @@ efectivo y el QR solo en las confirmadas.
   - `personal.oeste@si18.test` → 403 `ROL_NO_PERMITIDO`.
 
   Depende de T038 y T011.
-- [ ] T040 [US5] Crear `src/SI18.Cliente/Reservas/MisReservas.razor` (ruta `/mis-reservas`; research.md E11):
+- [X] T040 [US5] Crear `src/SI18.Cliente/Reservas/MisReservas.razor` (ruta `/mis-reservas`; research.md E11):
   - mismo control de acceso que T024;
   - `<PageTitle>Mis reservas · SI-18</PageTitle>` y `<h1>` «Mis reservas»;
   - sin reservas: «Todavía no tienes reservas.» en `MensajeAccesible` (`Severity.Info`);
