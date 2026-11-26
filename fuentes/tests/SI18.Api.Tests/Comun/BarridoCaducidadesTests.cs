@@ -73,4 +73,48 @@ public class BarridoCaducidadesTests(FabricaApi fabrica)
         Assert.NotNull(despues.Pago.ResueltoEnUtc);
         Assert.Equal(ahora, despues.Pago.ResueltoEnUtc.Value.ToUniversalTime(), TimeSpan.FromMilliseconds(1));
     }
+
+    [Fact]
+    public async Task El_barrido_salta_una_reserva_bloqueada_y_la_caduca_en_la_siguiente_vuelta()
+    {
+        // Las pendientes no vigentes que hayan dejado otras pruebas no cuentan en este caso.
+        await Barrido.EjecutarUnaVez(Ct);
+
+        // Sin adelantar el reloj (spec-002 T006): la pendiente se inserta ya creada hace 10 minutos.
+        var ahora = fabrica.Reloj.GetUtcNow().UtcDateTime;
+        long id;
+        using (var ambito = fabrica.Services.CreateScope())
+        {
+            var db = ambito.ServiceProvider.GetRequiredService<Si18DbContext>();
+            var instalacionId = await db.Instalaciones.Where(i => i.ReservablePorFranjas).OrderBy(i => i.Id).Select(i => i.Id).FirstAsync(Ct);
+            var usuarioId = await db.Usuarios.Where(u => u.Rol == Rol.Ciudadano).OrderBy(u => u.Id).Select(u => u.Id).FirstAsync(Ct);
+            var inicio = HorarioMadrid.AUtc(new DateOnly(2027, 2, 11), new TimeOnly(12, 0));
+            var reserva = new Reserva(usuarioId, instalacionId, inicio, TipoTarifa.Empadronado, 6.00m, ahora - ValoresNegocio.TiempoBloqueoPago);
+            db.Reservas.Add(reserva);
+            await db.SaveChangesAsync(Ct);
+            id = reserva.Id;
+        }
+
+        using (var bloqueo = fabrica.Services.CreateScope())
+        {
+            var db = bloqueo.ServiceProvider.GetRequiredService<Si18DbContext>();
+            await using var transaccion = await db.Database.BeginTransactionAsync(Ct);
+            await db.Reservas.FromSql($"SELECT * FROM reservas WHERE id = {id} FOR UPDATE").ToListAsync(Ct);
+
+            // Con la fila bloqueada, el barrido termina sin esperar y no caduca nada.
+            var caducadas = await Barrido.EjecutarUnaVez(Ct).WaitAsync(TimeSpan.FromSeconds(10), Ct);
+
+            Assert.Equal(0, caducadas);
+            Assert.Equal(EstadoReserva.PendientePago, (await Leer(id)).Estado);
+
+            await transaccion.RollbackAsync(Ct);
+        }
+
+        // Liberado el bloqueo, la siguiente vuelta la caduca.
+        Assert.True(await Barrido.EjecutarUnaVez(Ct) >= 1);
+
+        var despues = await Leer(id);
+        Assert.Equal(EstadoReserva.Caducada, despues.Estado);
+        Assert.Equal(EstadoPago.Fallido, despues.Pago!.Estado);
+    }
 }

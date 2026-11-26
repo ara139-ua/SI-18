@@ -1,7 +1,6 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using SI18.Api.Modulos.Cancelaciones;
 using SI18.Api.Modulos.Disponibilidad.Provisional;
-using SI18.Api.Modulos.Reservas;
 
 namespace SI18.Api.Modulos.Disponibilidad;
 
@@ -16,7 +15,6 @@ public static class RegistroDisponibilidad
         // Consultas provisionales de solo lectura (spec-001, RF-014a; research.md D5). Con TryAdd, si el dueño ya
         // registró la suya, la provisional no se añade; si la registra después, la suya gana (el contenedor resuelve
         // el último registro). Cada dueño borra la provisional en el PR que publica la definitiva.
-        services.TryAddScoped<IConsultaReservas, ConsultaReservasProvisional>();
         services.TryAddScoped<IConsultaCierres, ConsultaCierresProvisional>();
 
         services.AddScoped<ServicioDisponibilidad>();

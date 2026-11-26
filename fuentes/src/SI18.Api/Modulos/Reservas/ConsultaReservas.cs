@@ -1,16 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 using SI18.Api.Infraestructura;
-using SI18.Api.Modulos.Reservas;
 using SI18.Dominio.Comun;
 
-namespace SI18.Api.Modulos.Disponibilidad.Provisional;
+namespace SI18.Api.Modulos.Reservas;
 
 /// <summary>
-/// PROVISIONAL (spec-001, RF-014a): sustituir por la implementación de spec-002 (Saul) y borrar este fichero.
-/// Lectura de solo consulta de las reservas activas de una instalación (specs/001-buscar-pistas/research.md D5).
-/// Su comportamiento lo fija <c>ConsultasProvisionalesTests</c>.
+/// Implementación definitiva de <see cref="IConsultaReservas"/> (specs/002-reservar-pagar/research.md E7;
+/// contracts/modulos.md). Hace la misma consulta que la provisional de spec-001, a la que sustituye, y la fijan las
+/// mismas pruebas (<c>ConsultaReservasTests</c>). Solo lectura. Dueño: Saul.
 /// </summary>
-public sealed class ConsultaReservasProvisional(Si18DbContext db, TimeProvider reloj) : IConsultaReservas
+public sealed class ConsultaReservas(Si18DbContext db, TimeProvider reloj) : IConsultaReservas
 {
     public async Task<IReadOnlyList<ReservaActiva>> Activas(int instalacionId, DateTime desdeUtc, DateTime hastaUtc, CancellationToken ct)
     {

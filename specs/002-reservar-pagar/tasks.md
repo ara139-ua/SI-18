@@ -54,12 +54,12 @@ Tarjetas ficticias (R9 de 000-core): `4000000000000001` se acepta, `400000000000
 
 **Propósito**: que el módulo `Reservas` exista en la API con su registro y sus DTO.
 
-- [ ] T001 Crear `src/SI18.Api/Modulos/Reservas/RegistroReservas.cs` con
+- [X] T001 Crear `src/SI18.Api/Modulos/Reservas/RegistroReservas.cs` con
   `AddReservas(this IServiceCollection)` y `MapReservas(this WebApplication)`, de momento vacíos, y
   añadir en `src/SI18.Api/Program.cs` **solo dos líneas** (research.md E9; convención de 000-core):
   `builder.Services.AddReservas();` justo después de `AddDisponibilidad()` y `app.MapReservas();` justo
   después de `MapDisponibilidad()`.
-- [ ] T002 [P] Crear los DTO en `src/SI18.Contratos/Reservas/`, uno por fichero, según
+- [X] T002 [P] Crear los DTO en `src/SI18.Contratos/Reservas/`, uno por fichero, según
   [data-model.md § 3](./data-model.md) y [contracts/api-reservas.openapi.yaml](./contracts/api-reservas.openapi.yaml):
   - `EstadoReserva` (`PendientePago`, `Confirmada`, `Caducada`, `Cancelada`; JSON `pendiente_pago`,
     `confirmada`, `caducada`, `cancelada`), con los mismos nombres y orden que `SI18.Dominio.Comun.EstadoReserva`;
@@ -71,7 +71,7 @@ Tarjetas ficticias (R9 de 000-core): `4000000000000001` se acepta, `400000000000
   - `ResumenReservaDto(int InstalacionId, string Pista, string Centro, DateOnly Fecha, string HoraInicio, string HoraFin, DateTime InicioUtc, decimal Importe)`,
     con horas «`HH:mm`» de Madrid;
   - `ReservaDto(long Id, int InstalacionId, string Pista, string Centro, DateOnly Fecha, string HoraInicio, string HoraFin, DateTime InicioUtc, DateTime FinUtc, decimal Importe, EstadoReserva Estado, DateTime? LimitePagoUtc, string? HoraLimitePago, string? CodigoAcceso)`.
-- [ ] T003 [P] Crear `tests/SI18.Api.Tests/Reservas/EstadoReservaEspejoTests.cs` con el patrón de
+- [X] T003 [P] Crear `tests/SI18.Api.Tests/Reservas/EstadoReservaEspejoTests.cs` con el patrón de
   `Comun/EnumeracionesEspejoTests.cs`: mismos nombres y orden que el enumerado de dominio y mismo texto
   JSON con `OpcionesJson` (research.md E12). Depende de T002.
 
@@ -91,7 +91,7 @@ definitiva de reservas activas (y la retirada de la provisional) y los datos de 
 > en un PR y se retira la provisional en otro: durante ese intervalo habría dos implementaciones de la
 > misma regla registradas (research.md E7).
 
-- [ ] T004 Crear `src/SI18.Api/Modulos/Reservas/CargaReservas.cs` (clase `internal static`) con
+- [X] T004 Crear `src/SI18.Api/Modulos/Reservas/CargaReservas.cs` (clase `internal static`) con
   `Task<Reserva?> CargarParaModificar(Si18DbContext db, long reservaId, int? usuarioId, CancellationToken ct)`
   (research.md E5):
   - si `db.Database.CurrentTransaction` es nulo, lanza `InvalidOperationException` («Hay que abrir la
@@ -101,7 +101,7 @@ definitiva de reservas activas (y la retirada de la provisional) y los datos de 
     `UsuarioId == usuarioId` si se pasa;
   - `AplicarCierre` (T045) y la caducidad al reservar (T026) cargan varias reservas: escriben su
     propia consulta `FOR UPDATE` con el mismo patrón y la misma comprobación de transacción.
-- [ ] T005 Cambiar `src/SI18.Api/Infraestructura/BarridoCaducidades.cs` (dueño: Saul, T068 de 000-core)
+- [X] T005 Cambiar `src/SI18.Api/Infraestructura/BarridoCaducidades.cs` (dueño: Saul, T068 de 000-core)
   a **`FOR UPDATE SKIP LOCKED`** (research.md E5; data-model.md § 2.3):
   - `EjecutarUnaVez` abre una transacción (`BeginTransactionAsync`) y carga las pendientes no vigentes
     con `FromSql($"SELECT * FROM reservas WHERE estado = 'pendiente_pago' AND creada_en_utc <= {limite} FOR UPDATE SKIP LOCKED")`
@@ -111,13 +111,13 @@ definitiva de reservas activas (y la retirada de la provisional) y los datos de 
     `SKIP LOCKED`: no espera a un pago en curso; lo que se salta lo coge en la siguiente vuelta.
 
   `Comun/BarridoCaducidadesTests.cs` debe seguir en verde sin cambios.
-- [ ] T006 Añadir a `tests/SI18.Api.Tests/Comun/BarridoCaducidadesTests.cs` el caso
+- [X] T006 Añadir a `tests/SI18.Api.Tests/Comun/BarridoCaducidadesTests.cs` el caso
   `El_barrido_salta_una_reserva_bloqueada_y_la_caduca_en_la_siguiente_vuelta`
   (`[Trait("Categoria","Limites")]`): con una pendiente creada hace 10 min (instante insertado, sin
   adelantar el reloj) y bloqueada por otra transacción abierta con `FOR UPDATE`, `EjecutarUnaVez`
   termina sin esperar y devuelve 0; tras liberar el bloqueo (`Rollback`), la siguiente vuelta la caduca.
   Usa el 11/02/2027 a las 12:00. Depende de T005.
-- [ ] T007 [P] Crear `src/SI18.Api/Modulos/Reservas/ConsultaReservas.cs`, que implementa
+- [X] T007 [P] Crear `src/SI18.Api/Modulos/Reservas/ConsultaReservas.cs`, que implementa
   `IConsultaReservas` con **la misma consulta** que la provisional (research.md E7; contracts/modulos.md):
   - `Activas(instalacionId, desdeUtc, hastaUtc, ct)` devuelve, con `AsNoTracking` y ordenadas por
     `InicioUtc`, las reservas de la instalación con `desdeUtc ≤ InicioUtc < hastaUtc` y
@@ -126,13 +126,13 @@ definitiva de reservas activas (y la retirada de la provisional) y los datos de 
 
   Registrarla con `services.AddScoped<IConsultaReservas, ConsultaReservas>()` en `AddReservas()`.
   Depende de T001.
-- [ ] T008 Crear `tests/SI18.Api.Tests/Reservas/ConsultaReservasTests.cs` **moviendo sin cambiar sus
+- [X] T008 Crear `tests/SI18.Api.Tests/Reservas/ConsultaReservasTests.cs` **moviendo sin cambiar sus
   casos** `Una_pendiente_bloquea_hasta_los_10_minutos_y_no_despues` y
   `Solo_cuentan_confirmadas_y_pendientes_vigentes_dentro_del_rango` desde
   `tests/SI18.Api.Tests/Disponibilidad/ConsultasProvisionalesTests.cs` (mismos datos: Polideportivo
   Oeste, enero de 2027; mismo `[Trait("Categoria","Limites")]`), con la `IConsultaReservas` resuelta de
   `fabrica.Services` y un caso más que comprueba que es `ConsultaReservas` (RF-019; CE-007). Depende de T007.
-- [ ] T009 **[código de Artur, revisión de Artur, mismo PR que T007–T008]** Retirar la provisional
+- [X] T009 **[código de Artur, revisión de Artur, mismo PR que T007–T008]** Retirar la provisional
   (research.md E7; contracts/modulos.md, «Lo que retira»):
   - borrar `src/SI18.Api/Modulos/Disponibilidad/Provisional/ConsultaReservasProvisional.cs`;
   - en `src/SI18.Api/Modulos/Disponibilidad/RegistroDisponibilidad.cs`, borrar **solo** la línea
@@ -145,12 +145,12 @@ definitiva de reservas activas (y la retirada de la provisional) y los datos de 
     línea más su `using`). **No lo recoge plan.md ni contracts/modulos.md**: avisar a Artur en el PR.
 
   Depende de T007 y T008.
-- [ ] T010 Comprobar la retirada (quickstart.md §2): `git grep -n "ConsultaReservasProvisional" -- fuentes`
+- [X] T010 Comprobar la retirada (quickstart.md §2): `git grep -n "ConsultaReservasProvisional" -- fuentes`
   sin resultados y `dotnet test SI18.slnx` en verde con `tests/SI18.Api.Tests/Disponibilidad/` **sin más
   cambios** que los de T009 (`BuscarFranjasTests`, `BuscarSinResultadosTests`,
   `ConsultaDisponibilidadTests` y `PrecioPorTarifaTests` intactos; RF-019, CE-007). Anotarlo en el PR
   para la revisión de Artur. Depende de T009.
-- [ ] T011 [P] Crear `tests/SI18.Api.Tests/Reservas/DatosReservas.cs` (sobre `DatosDisponibilidad`, sin
+- [X] T011 [P] Crear `tests/SI18.Api.Tests/Reservas/DatosReservas.cs` (sobre `DatosDisponibilidad`, sin
   cambiarlo) con:
   - `Task<long> Pendiente(string correo, int pistaId, DateTime inicioUtc, DateTime creadaEnUtc)`;
   - `Task<long> Confirmada(…)`, `Task<long> CaducadaPorTiempo(…)` (pago resuelto en
@@ -179,7 +179,7 @@ una tarjeta aceptada y ver la reserva confirmada con su QR.
 
 **Prueba independiente**: quickstart.md R1, R2, R5, R14 y los pasos 1–5 de §4.
 
-- [ ] T012 [P] [US1] Crear `src/SI18.Api/Modulos/Reservas/ServicioReservar.cs` (clase `sealed`,
+- [X] T012 [P] [US1] Crear `src/SI18.Api/Modulos/Reservas/ServicioReservar.cs` (clase `sealed`,
   scoped; dependencias: `Si18DbContext`, `TimeProvider`, `IConsultaDisponibilidad`, `IPasarelaPago`,
   `IUsuarioActual`) con un método privado `ReservaDto ADto(Reserva r, Instalacion i, Centro c, DateTime ahora)`
   (data-model.md § 3):
@@ -190,7 +190,7 @@ una tarjeta aceptada y ver la reserva confirmada con su QR.
   - `CodigoAcceso` solo si es `Confirmada` (RF-016).
 
   Registrarlo con `AddScoped<ServicioReservar>()` en `AddReservas()`. Depende de T002.
-- [ ] T013 [US1] Añadir a `ServicioReservar`
+- [X] T013 [US1] Añadir a `ServicioReservar`
   `Task<ResumenReservaDto> Resumen(int instalacionId, DateTime inicioUtc, CancellationToken ct)` (research.md E2):
   - `MotivoNoDisponible(instalacionId, inicioUtc)`: sus excepciones (`PETICION_INVALIDA`,
     `NO_ENCONTRADO`) se dejan pasar; si devuelve un motivo, `throw CodigosError.Error(motivo)`;
@@ -198,7 +198,7 @@ una tarjeta aceptada y ver la reserva confirmada con su QR.
   - `Importe = IConsultaDisponibilidad.Precio(instalacionId, IUsuarioActual.TipoTarifa)`.
 
   No escribe nada. Depende de T012.
-- [ ] T014 [US1] Añadir a `ServicioReservar`
+- [X] T014 [US1] Añadir a `ServicioReservar`
   `Task<ReservaDto> Crear(PeticionReserva peticion, CancellationToken ct)`, pasos 1–3 y 5 de research.md E3:
   - `ahora` se lee **una sola vez** al principio;
   - mismas comprobaciones que `Resumen` y, si `Precio ≠ ImporteMostrado`, `PRECIO_CAMBIADO`;
@@ -206,7 +206,7 @@ una tarjeta aceptada y ver la reserva confirmada con su QR.
     (crea su pago pendiente), `SaveChanges` y `Commit`.
 
   La caducidad al reservar y el `23505` los añade T015 (US2). Depende de T013.
-- [ ] T015 [US1] Añadir a `ServicioReservar` `Task<ReservaDto> Pagar(long id, string numeroTarjeta, CancellationToken ct)`
+- [X] T015 [US1] Añadir a `ServicioReservar` `Task<ReservaDto> Pagar(long id, string numeroTarjeta, CancellationToken ct)`
   con el camino feliz de research.md E4 (pasos 2 y 5 con `true`):
   - transacción; `CargaReservas.CargarParaModificar(db, id, IUsuarioActual.Id)`; si es nula →
     `NO_ENCONTRADO` (RF-013);
@@ -216,10 +216,10 @@ una tarjeta aceptada y ver la reserva confirmada con su QR.
 
   El número de tarjeta no se pasa a ningún `ILogger` ni se guarda (R9). Los demás estados los añaden
   T027 (US2) y T033 (US3). Depende de T004 y T012.
-- [ ] T016 [US1] Añadir a `ServicioReservar` `Task<ReservaDto> Ver(long id, CancellationToken ct)`:
+- [X] T016 [US1] Añadir a `ServicioReservar` `Task<ReservaDto> Ver(long id, CancellationToken ct)`:
   la reserva **del usuario de la sesión** (`AsNoTracking`, con instalación y centro), o `NO_ENCONTRADO`
   (RF-013). Depende de T012.
-- [ ] T017 [US1] Crear `src/SI18.Api/Modulos/Reservas/EndpointsReservas.cs` con el grupo
+- [X] T017 [US1] Crear `src/SI18.Api/Modulos/Reservas/EndpointsReservas.cs` con el grupo
   `/api/reservas` (`.RequireAuthorization(Politicas.EsCiudadanoORepresentante)`) y mapearlo en
   `MapReservas()` (contracts/api-reservas.openapi.yaml):
   - `GET /resumen?instalacionId&inicioUtc`: si falta alguno o `inicioUtc` no es un instante UTC ISO
@@ -233,7 +233,7 @@ una tarjeta aceptada y ver la reserva confirmada con su QR.
   - `GET /{id}`: `Ver`.
 
   Ningún endpoint registra el cuerpo de la petición. Depende de T013–T016.
-- [ ] T018 [US1] Crear `tests/SI18.Api.Tests/Reservas/CrearReservaTests.cs`
+- [X] T018 [US1] Crear `tests/SI18.Api.Tests/Reservas/CrearReservaTests.cs`
   (`[Collection(ColeccionApi.Nombre)]`, Polideportivo Sur, «Pista de pádel 1» y «Pista de pádel 2»,
   22–28/12/2026):
   - **HU1 esc. 1**: el resumen de una franja libre, con `ciudadana.empadronada@si18.test`, trae pista,
@@ -248,13 +248,13 @@ una tarjeta aceptada y ver la reserva confirmada con su QR.
     `instalacionId = 999999` → 404 `NO_ENCONTRADO`; las 10:30 de Madrid → 400 `PETICION_INVALIDA`.
 
   Depende de T017 y T011.
-- [ ] T019 [P] [US1] Crear `tests/SI18.Api.Tests/Reservas/PagarReservaTests.cs`
+- [X] T019 [P] [US1] Crear `tests/SI18.Api.Tests/Reservas/PagarReservaTests.cs`
   (`[Collection(ColeccionApi.Nombre)]`, Polideportivo Este, «Pista de tenis 1» y «Pista de tenis 2»,
   22–28/12/2026) con el camino feliz (**HU1 esc. 3**): una pendiente creada hace 1 min, pagada con
   `4000 0000 0000 0001` (con espacios) → 200, `estado = confirmada`, `codigoAcceso` de 22 caracteres;
   en la base, reserva confirmada con ese código y pago `completado` con `resuelto_en_utc`; `GET /{id}`
   devuelve el mismo código. Esta clase crece en T030, T031, T034, T047 y T048. Depende de T017 y T011.
-- [ ] T020 [P] [US1] Crear `tests/SI18.Api.Tests/Reservas/ReservarComoEnLaBusquedaTests.cs`
+- [X] T020 [P] [US1] Crear `tests/SI18.Api.Tests/Reservas/ReservarComoEnLaBusquedaTests.cs`
   (`[Collection(ColeccionApi.Nombre)]`, Polideportivo Norte, «Tenis», 26 y 27/12/2026; CE-005,
   HU1 esc. 5): para tres franjas de la búsqueda y con las tres tarifas (`ciudadana.empadronada`,
   `ciudadano.noempadronado`, `representante.padel`), `precio` de `GET /api/disponibilidad/franjas`
@@ -316,14 +316,14 @@ caducidad al reservar y al pagar, y la misma respuesta antes y después del barr
 
 **Prueba independiente**: quickstart.md R3, R4 y R9.
 
-- [ ] T026 [US2] Completar `ServicioReservar.Crear` (research.md E3 paso 4; data-model.md § 2.1):
+- [X] T026 [US2] Completar `ServicioReservar.Crear` (research.md E3 paso 4; data-model.md § 2.1):
   - dentro de la transacción y antes del `INSERT`, cargar con
     `FromSql(… WHERE instalacion_id = {…} AND inicio_utc = {…} AND estado = 'pendiente_pago' AND creada_en_utc <= {ahora − TiempoBloqueoPago} FOR UPDATE)`
     las pendientes **no vigentes** de esa franja y `Caducar(ahora)` cada una (R8.2; RF-006);
   - capturar `DbUpdateException` cuya `InnerException` sea `PostgresException` con `SqlState == "23505"`
     y `ConstraintName == "ux_reservas_activa"` → `CodigosError.Error(FranjaOcupada)` (R7; RF-007). La
     traducción vive aquí, no en `ManejadorErrores` (research.md E3).
-- [ ] T027 [US2] Completar `ServicioReservar.Pagar` con la caducidad (research.md E4 pasos 3 y 4;
+- [X] T027 [US2] Completar `ServicioReservar.Pagar` con la caducidad (research.md E4 pasos 3 y 4;
   aclaración del plan del 2026-11-25):
   - `PendientePago` y `!EstaVigente(ahora)` → `Caducar(ahora)`, `SaveChanges`, `Commit` y **después**
     `throw CodigosError.Error(ReservaCaducada)`, sin llamar a la pasarela (RF-009; R8.3);
@@ -333,7 +333,7 @@ caducidad al reservar y al pagar, y la misma respuesta antes y después del barr
     simultáneos encuentra la reserva ya confirmada).
 
   Una caducada por rechazo o por cierre y una cancelada **no** entran aquí (T033). Depende de T015.
-- [ ] T028 [US2] Ampliar `tests/SI18.Api.Tests/Reservas/CrearReservaTests.cs` (Polideportivo Sur,
+- [X] T028 [US2] Ampliar `tests/SI18.Api.Tests/Reservas/CrearReservaTests.cs` (Polideportivo Sur,
   «Pista de pádel 2»):
   - **HU2 esc. 1**: con una pendiente vigente de `ciudadana.empadronada`, `ciudadano.noempadronado`
     recibe 409 `FRANJA_OCUPADA` con el texto del catálogo;
@@ -344,14 +344,14 @@ caducidad al reservar y al pagar, y la misma respuesta antes y después del barr
     `resuelto_en_utc = ahora`; con una creada hace 9 min 59 s → 409 `FRANJA_OCUPADA`.
 
   Depende de T026.
-- [ ] T029 [US2] Crear `tests/SI18.Api.Tests/Reservas/ReservaConcurrenteTests.cs`
+- [X] T029 [US2] Crear `tests/SI18.Api.Tests/Reservas/ReservaConcurrenteTests.cs`
   (`[Collection(ColeccionApi.Nombre)]`, Polideportivo Oeste, «Pista de pádel 1», 22/12/2026 a las
   19:00; CE-002, HU2 esc. 2, RF-007): **20 peticiones `POST /api/reservas` simultáneas** sobre la misma
   franja (`Task.WhenAll`), repartidas entre las sesiones de `ciudadana.empadronada`,
   `ciudadano.noempadronado` y `representante.padel` (la siembra solo tiene esas personas que puedan
   reservar fuera de `MisReservasTests`) → exactamente una 201 y diecinueve 409 `FRANJA_OCUPADA`; en la
   base, una sola reserva activa y un solo pago. Depende de T026.
-- [ ] T030 [US2] Ampliar `tests/SI18.Api.Tests/Reservas/PagarReservaTests.cs` con los límites de los
+- [X] T030 [US2] Ampliar `tests/SI18.Api.Tests/Reservas/PagarReservaTests.cs` con los límites de los
   10 minutos (`[Trait("Categoria","Limites")]`; casos límite de la spec):
   - **9:59**: pendiente creada hace 9 min 59 s → se cobra y queda confirmada;
   - **10:00** (HU2 esc. 3): creada hace 10 min exactos → 409 `RESERVA_CADUCADA`; en la base,
@@ -366,7 +366,7 @@ caducidad al reservar y al pagar, y la misma respuesta antes y después del barr
     `creada + 10:00` exactos) → `RESERVA_CADUCADA`.
 
   Depende de T027.
-- [ ] T031 [US2] Añadir a `PagarReservaTests` **dos pagos simultáneos de la misma reserva** (E5): con
+- [X] T031 [US2] Añadir a `PagarReservaTests` **dos pagos simultáneos de la misma reserva** (E5): con
   `DatosReservas.ConServicio` y una `PasarelaContadora`, dos llamadas a `Pagar` en paralelo (cada una
   con su ámbito y su `Si18DbContext`) → una confirma y la otra recibe `TRANSICION_NO_PERMITIDA`; la
   pasarela se llama **una sola vez**. Depende de T027.
@@ -387,7 +387,7 @@ sin cambios.
 
 **Prueba independiente**: quickstart.md R7, R8 y R9b.
 
-- [ ] T033 [US3] Completar `ServicioReservar.Pagar` (research.md E4 pasos 3 y 5; data-model.md § 2.2):
+- [X] T033 [US3] Completar `ServicioReservar.Pagar` (research.md E4 pasos 3 y 5; data-model.md § 2.2):
   - `Cobrar` devuelve `false` → `Caducar(ahora)`, `SaveChanges`, `Commit` y **después**
     `throw CodigosError.Error(PagoRechazado)` (RF-011);
   - `Cancelada` o `Caducada` **no** por tiempo (`Pago.ResueltoEnUtc < CreadaEnUtc + TiempoBloqueoPago`:
@@ -396,7 +396,7 @@ sin cambios.
   El orden queda: no es suya → 404; caducada por tiempo → `RESERVA_CADUCADA`; otro estado no
   pendiente → `TRANSICION_NO_PERMITIDA`; pendiente no vigente → caducar y `RESERVA_CADUCADA`; cobro.
   Depende de T027.
-- [ ] T034 [US3] Ampliar `tests/SI18.Api.Tests/Reservas/PagarReservaTests.cs`:
+- [X] T034 [US3] Ampliar `tests/SI18.Api.Tests/Reservas/PagarReservaTests.cs`:
   - **HU3 esc. 1**: `4000 0000 0000 0002` → 422 `PAGO_RECHAZADO`; `caducada`, pago `fallido`, sin código;
   - **E4/E13 · caducada por pago rechazado → `TRANSICION_NO_PERMITIDA`** (HU3 esc. 2;
     `[Trait("Categoria","Limites")]`): volver a pagar esa reserva con `…0001` → 409
@@ -434,7 +434,7 @@ sin cambios.
 
 **Prueba independiente**: quickstart.md R10–R13.
 
-- [ ] T036 [P] [US4] Crear `tests/SI18.Api.Tests/Reservas/MotivosRechazoTests.cs`
+- [X] T036 [P] [US4] Crear `tests/SI18.Api.Tests/Reservas/MotivosRechazoTests.cs`
   (`[Collection(ColeccionApi.Nombre)]`, Polideportivo Sur, «Pista de tenis 1» y «Pista de tenis 2»,
   22–28/12/2026); en todos, además del código, **no se crea ninguna reserva** (HU4 esc. 6: `detail` en
   español y sin detalles técnicos):
@@ -472,7 +472,7 @@ efectivo y el QR solo en las confirmadas.
 
 **Prueba independiente**: quickstart.md R15, R16 y los pasos 5–7 de §4.
 
-- [ ] T038 [US5] Añadir a `ServicioReservar` `Task<IReadOnlyList<ReservaDto>> Mias(CancellationToken ct)`
+- [X] T038 [US5] Añadir a `ServicioReservar` `Task<IReadOnlyList<ReservaDto>> Mias(CancellationToken ct)`
   y `GET /api/reservas` en `EndpointsReservas.cs` (research.md E6; data-model.md, «Orden de "Mis
   reservas"»):
   - todas las reservas de `IUsuarioActual.Id`, `AsNoTracking`, unidas a `instalaciones` y `centros`;
@@ -481,7 +481,7 @@ efectivo y el QR solo en las confirmadas.
   - cada elemento con `ADto` (estado efectivo; RF-015). No escribe nada.
 
   Depende de T016.
-- [ ] T039 [US5] Crear `tests/SI18.Api.Tests/Reservas/MisReservasTests.cs`
+- [X] T039 [US5] Crear `tests/SI18.Api.Tests/Reservas/MisReservasTests.cs`
   (`[Collection(ColeccionApi.Nombre)]`, Polideportivo Oeste, «Pista de tenis 1» y «Pista de tenis 2»;
   **solo** con `representante.norte@si18.test`):
   - **HU5 esc. 6**: reservas confirmadas el 26/12 y el 27/12/2026 y otra del 20/11/2026 → orden 26/12,
@@ -567,7 +567,7 @@ efectivo y el QR solo en las confirmadas.
 **Propósito**: que C pueda cancelar por el usuario y aplicar un cierre sin escribir en `reservas` ni
 `pagos`, dentro de su propia transacción (aclaración 1; research.md E8).
 
-- [ ] T044 Crear `src/SI18.Api/Modulos/Reservas/ServicioReservas.cs`, que implementa
+- [X] T044 Crear `src/SI18.Api/Modulos/Reservas/ServicioReservas.cs`, que implementa
   `IServicioReservas` **sin cambiar su firma** (contracts/modulos.md), con
   `CancelarPorUsuario(reservaId, usuarioId, ct)`:
   - `CargaReservas.CargarParaModificar(db, reservaId, usuarioId)` (que exige la transacción abierta:
@@ -578,7 +578,7 @@ efectivo y el QR solo en las confirmadas.
   - **no** llama a `SaveChanges` ni abre o confirma transacciones.
 
   Registrarlo con `AddScoped<IServicioReservas, ServicioReservas>()` en `AddReservas()`. Depende de T004.
-- [ ] T045 Añadir a `ServicioReservas` `AplicarCierre(instalacionId, inicioUtc, finUtc, ct)`
+- [X] T045 Añadir a `ServicioReservas` `AplicarCierre(instalacionId, inicioUtc, finUtc, ct)`
   (data-model.md § 2.5):
   - exige la transacción abierta (si no, `InvalidOperationException`);
   - carga con `FOR UPDATE` las reservas de la instalación con estado guardado `confirmada` o
@@ -586,7 +586,7 @@ efectivo y el QR solo en las confirmadas.
   - confirmadas → `Cancelar(MotivoCancelacion.CierreMantenimiento, ahora)` → `Canceladas`;
     pendientes, vigentes o no → `Caducar(ahora)` → `Caducadas`;
   - las dos listas ordenadas por `InicioUtc`; sin `SaveChanges`. Depende de T044.
-- [ ] T046 Crear `tests/SI18.Api.Tests/Reservas/ServicioReservasTests.cs`
+- [X] T046 Crear `tests/SI18.Api.Tests/Reservas/ServicioReservasTests.cs`
   (`[Collection(ColeccionApi.Nombre)]`, Polideportivo Norte, «Pista de tenis 1» y «Pista de tenis 2»,
   enero de 2027), con un llamador de prueba que abre la transacción, llama, hace `SaveChanges` y
   `Commit`, como harán HU-03 y HU-07:
@@ -602,7 +602,7 @@ efectivo y el QR solo en las confirmadas.
     de `Commit`, no cambia nada en la base.
 
   Depende de T045.
-- [ ] T047 Añadir a `tests/SI18.Api.Tests/Reservas/PagarReservaTests.cs` el caso límite «cierre
+- [X] T047 Añadir a `tests/SI18.Api.Tests/Reservas/PagarReservaTests.cs` el caso límite «cierre
   posterior» (spec, «Casos límite»): una pendiente **vigente** caducada por `AplicarCierre` →
   el pago responde 409 `TRANSICION_NO_PERMITIDA` (no `RESERVA_CADUCADA`: se caducó antes del límite),
   sin cobro. Depende de T045 y T033.
@@ -613,7 +613,7 @@ efectivo y el QR solo en las confirmadas.
 
 ## Fase 10: Pulido y cierre
 
-- [ ] T048 Revisar que el número de tarjeta no aparece en ningún registro (R9; research.md E4):
+- [X] T048 Revisar que el número de tarjeta no aparece en ningún registro (R9; research.md E4):
   `git grep -n -i "numeroTarjeta" -- fuentes/src` solo en el DTO, el endpoint y el servicio, ninguno
   dentro de un `Log…`; y una prueba en `PagarReservaTests` que, con un `ILoggerProvider` de prueba,
   paga con `4000000000000001` y comprueba que ningún mensaje registrado contiene «4000000000000001» ni
