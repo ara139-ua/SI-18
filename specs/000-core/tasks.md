@@ -714,9 +714,16 @@ responsable.
   infracciones en los cuatro. Manual: teclado, NVDA (el error se lee una sola vez, con icono, y el foco vuelve al
   correo) y 320 px, todo correcto. Resultados en https://github.com/ara139-ua/SI-18/pull/41#issuecomment-7195036538.
   @ara139-ua puede revisarla después de la fusión.
-- [ ] T074 [Ambos] Ejecutar quickstart.md §2–§5 de principio a fin en las dos máquinas, con .NET 10:
+- [X] T074 [Ambos] Ejecutar quickstart.md §2–§5 de principio a fin en las dos máquinas, con .NET 10:
   docker compose, `dotnet ef database update`, siembra, V1–V10 manuales y `dotnet test SI18.slnx`
   en verde.
+
+  **Hecho (2026-11-26, Saul)**: quickstart §2–§5 ejecutado de principio a fin en la máquina de Saul (SDK
+  10.0.404), sobre una base nueva y vacía `si18_t074`. V1–V10 en verde, siembra idempotente («sembrados»
+  la primera vez y «ya existen» la segunda), `dotnet test SI18.slnx` 362/362 y `Categoria=Limites` 151/151.
+  Detalle en https://github.com/ara139-ua/SI-18/pull/41. No se ejecutó en la máquina de Artur por falta de
+  tiempo antes de la entrega. Las correcciones de §2 (variables de `.env` en lugar de `dotnet user-secrets`)
+  y §3 (`dotnet ef database update --connection`) del quickstart salieron de esta ejecución.
 - [X] T075 [Ambos] Revisar los secretos según quickstart.md §7 (`git grep` sin resultados) y comprobar
   con `git ls-files fuentes/.env` que `.env` no está versionado.
 
@@ -729,8 +736,13 @@ responsable.
   reales de `.env` no están en ningún fichero versionado. Tras «000-core T074: correcciones del
   quickstart» quedan 5: desaparece `quickstart.md:29` (ya no se usa `user-secrets`) y la orden de §7
   pasa a `quickstart.md:134`.
-- [ ] T076 [Ambos] Abrir el PR final de `develop` → `main`, con la lista de los principios I–IX
+- [X] T076 [Ambos] Abrir el PR final de `develop` → `main`, con la lista de los principios I–IX
   revisados (constitución, «Flujo de trabajo»). Después, ejecutar `/speckit-converge` para 000-core.
+
+  **Hecho (2026-11-26, Saul)**: PR `develop` → `main` abierto en https://github.com/ara139-ua/SI-18/pull/43,
+  con los principios I–IX revisados. Se fusiona cuando estén todas las specs (falta la 006). `/speckit-converge`
+  ejecutado para 000-core: 3 hallazgos LOW, añadidos como Fase 8 (T077–T079) y resueltos; informe en
+  [converge-2026-11-26.md](./converge-2026-11-26.md).
 
 ---
 
@@ -810,3 +822,12 @@ final de cada una.
   es el del módulo.
 - Ninguna tarea implementa la lógica de las historias HU-01…HU-08: solo las piezas comunes y sus
   interfaces (principio VIII).
+
+## Fase 8: Convergencia
+
+Tareas añadidas por `/speckit-converge` el 2026-11-26 (informe en
+[converge-2026-11-26.md](./converge-2026-11-26.md)).
+
+- [X] T077 [Saul] Alinear `plan.md` (fila «V. Sin secretos» de la comprobación de la constitución) y `research.md` R17 con la decisión real: la cadena de conexión y la contraseña de demo llegan solo por variables de entorno (`.env`), sin `dotnet user-secrets` y sin añadir `UserSecretsId`; anotar que el cambio sale de la ejecución de T074 per plan: principio V, R17 (partial)
+- [X] T078 [Saul] Crear en `fuentes/tests/SI18.Api.Tests/Comun/` una prueba que compruebe que `FormatoEs` usa la misma zona horaria que `ValoresNegocio.ZonaHoraria` per Constitution III, plan R6 (partial)
+- [X] T079 [Saul] Cambiar `0001_NucleoComun` por `20261104144623_NucleoComun` en `plan.md` y `quickstart.md` per plan: estructura y piezas transversales 3, quickstart §3 (partial)

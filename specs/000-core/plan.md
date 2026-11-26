@@ -83,7 +83,7 @@ throughput: ninguna spec los pide (principio VIII).
 | II. Lógica probada | Reglas puras en `SI18.Dominio` con `FakeTimeProvider` y pruebas a los dos lados de cada límite, incluido el cambio de hora (R15, quickstart §5). `DateTime.Now` está prohibido por analizador | ✅ | ✅ |
 | III. Reglas en el backend | Reglas en `SI18.Dominio`, que llama solo la API. Cifras en `ValoresNegocio` (R6). Concurrencia con el índice parcial `ux_reservas_activa` (R7) y `FOR UPDATE` en cursos (R19). El cliente solo muestra | ✅ | ✅ |
 | IV. Errores coherentes | `ErrorNegocio` → `IExceptionHandler` → Problem Details con `codigo` y texto en español. Catálogo en [contracts/errores.md](./contracts/errores.md) (R11) | ✅ | ✅ |
-| V. Sin secretos | Cadena de conexión y contraseña de demo en user-secrets o variables de entorno; `.env.example` con valores de relleno; `.env` ignorado; `git grep` antes de fusionar (R17) | ✅ | ✅ |
+| V. Sin secretos | Cadena de conexión y contraseña de demo solo en variables de entorno, cargadas desde `.env` (sin `dotnet user-secrets`: cambio surgido al ejecutar T074, ver R17); `.env.example` con valores de relleno; `.env` ignorado; `git grep` antes de fusionar (R17) | ✅ | ✅ |
 | VI. Datos ficticios | Siembra con nombres inventados y correos `@si18.test`; no se guardan datos de tarjeta (R9, R13) | ✅ | ✅ |
 | VII. Base común en 000-core | Este plan, [data-model.md](./data-model.md) y [contracts/](./contracts/README.md) son la base. La migración inicial crea todo el esquema compartido (R12) | ✅ | ✅ |
 | VIII. Cero alcance fantasma | Solo los proyectos pedidos; sin capa de infraestructura aparte, sin bus de eventos, sin E2E ni contenedor de la API. El barrido de caducidades se justifica por «la franja vuelve a estar libre» y por el informe (R8) | ✅ | ✅ |
@@ -139,7 +139,7 @@ fuentes/
 │   │   ├── Program.cs               # composición: autenticación, Problem Details, módulos, ficheros del cliente
 │   │   ├── Infraestructura/
 │   │   │   ├── Si18DbContext.cs
-│   │   │   ├── Migraciones/         # 0001_NucleoComun
+│   │   │   ├── Migraciones/         # 20261104144623_NucleoComun
 │   │   │   ├── InicializadorDatos.cs
 │   │   │   ├── ManejadorErrores.cs  # IExceptionHandler + tabla código → HTTP
 │   │   │   ├── PasarelaSimulada.cs
@@ -221,7 +221,7 @@ cada módulo se registra dentro de su `Registro<Modulo>.cs`, que solo toca su du
    - `ValoresNegocio`, `HorarioMadrid`, enumerados, `ErrorNegocio` y `CodigosError`;
    - las entidades del modelo con sus métodos de transición. `Reserva` y `Pago` incluyen la máquina de
      estados completa, porque la aplican HU-02, HU-03 y HU-07.
-3. **Persistencia**: `Si18DbContext`, configuraciones EF por módulo y la migración `0001_NucleoComun`
+3. **Persistencia**: `Si18DbContext`, configuraciones EF por módulo y la migración `20261104144623_NucleoComun`
    con todos los índices y `CHECK` de [data-model.md](./data-model.md).
 4. **Siembra**: `InicializadorDatos`, idempotente y con la contraseña tomada de `SI18_CLAVE_DEMO`.
 5. **Identificación**: `/api/sesion` (cookie), `IUsuarioActual`, políticas por rol y `PermisosCentro`.
@@ -258,7 +258,7 @@ secuencia que garantiza RF-013, RF-014 y RF-016.
 
 | Riesgo | Mitigación |
 | ------ | ---------- |
-| Conflictos en `ModelSnapshot` con cuatro ramas | El esquema completo va en `0001_NucleoComun`. Si una spec necesita una migración, la rebasa sobre `develop` y la regenera antes de fusionar (R12) |
+| Conflictos en `ModelSnapshot` con cuatro ramas | El esquema completo va en `20261104144623_NucleoComun`. Si una spec necesita una migración, la rebasa sobre `develop` y la regenera antes de fusionar (R12) |
 | Alguien no instala .NET 10 | `global.json` hace fallar la compilación con un mensaje claro; quickstart §1 |
 | Divergencia entre buscar y reservar | Las dos usan `IConsultaDisponibilidad`, con una prueba de integración que compara el precio mostrado con el cobrado (CE-005) |
 | Uso de `DateTime.Now` | `BannedApiAnalyzers` + `TreatWarningsAsErrors` |
