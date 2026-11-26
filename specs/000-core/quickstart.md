@@ -26,20 +26,30 @@ Copy-Item .env.example .env          # rellena los valores; .env está en .gitig
 docker compose up -d                 # PostgreSQL 17 con healthcheck
 docker compose ps                    # el servicio «postgres» debe estar «healthy»
 
-dotnet user-secrets --project src/SI18.Api set "ConnectionStrings:Si18" "Host=localhost;Port=5432;Database=si18;Username=si18;Password=<la de .env>"
-dotnet user-secrets --project src/SI18.Api set "SI18_CLAVE_DEMO" "<contraseña de demo de .env>"
+# Carga las variables de .env en la sesión de PowerShell (la API no lee .env por sí sola).
+# Repítelo en cada terminal nueva antes de §3 y §5.
+Get-Content .env | Where-Object { $_ -match '^\s*[^#\s][^=]*=' } | ForEach-Object {
+    $nombre, $valor = $_ -split '=', 2
+    Set-Item -Path "Env:$($nombre.Trim())" -Value $valor.Trim()
+}
 ```
+
+> **No uses `dotnet user-secrets`**: `SI18.Api.csproj` no declara `UserSecretsId`, así que
+> `dotnet user-secrets set` falla con «Could not find the global property 'UserSecretsId'». La API
+> toma `ConnectionStrings__Si18`, `SI18_CLAVE_DEMO` y `SI18_SEMBRAR_DATOS` de las variables de
+> entorno que carga el bloque anterior.
 
 > **Puerto ocupado**: si ya tienes un PostgreSQL instalado en Windows escuchando en el 5432 (por
 > ejemplo, el servicio `postgresql-x64-*`), Docker publica el puerto sin avisar y las conexiones a
 > `localhost:5432` llegan a ese servidor, no al contenedor. Compruébalo con
 > `Get-NetTCPConnection -LocalPort 5432 -State Listen`. Si está ocupado, pon `POSTGRES_PORT=5433` en
-> `.env` y usa `Port=5433` en la cadena de conexión (también en `user-secrets`).
+> `.env` y usa `Port=5433` también en `ConnectionStrings__Si18` del mismo `.env`.
 
 Las variables de `.env.example` son:
 
 - `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` y `POSTGRES_PORT`: para docker-compose.
-- `ConnectionStrings__Si18`: para la API, como alternativa a user-secrets.
+- `ConnectionStrings__Si18`: para la API y para `dotnet ef database update`. Su contraseña y su
+  puerto tienen que coincidir con `POSTGRES_PASSWORD` y `POSTGRES_PORT`.
 - `SI18_CLAVE_DEMO`: contraseña común de los usuarios de demo.
 - `SI18_SEMBRAR_DATOS=true`: siembra los datos de demo.
 - `SI18_TEST_CONNECTION`: opcional; hace que las pruebas usen esta base de datos en lugar de
@@ -50,9 +60,14 @@ Las variables de `.env.example` son:
 ```powershell
 dotnet build SI18.slnx                                        # sin errores ni advertencias tratadas como error
 dotnet tool restore                                           # dotnet-ef fijado en .config/dotnet-tools.json
-dotnet ef database update --project src/SI18.Api              # aplica 0001_NucleoComun
+dotnet ef database update --project src/SI18.Api --connection $env:ConnectionStrings__Si18   # aplica 0001_NucleoComun
 $env:SI18_SEMBRAR_DATOS = "true"; dotnet run --project src/SI18.Api
 ```
+
+> **`--connection` es obligatorio**: sin él, `dotnet ef` usa `Si18DbContextDiseno`, que solo sirve
+> para `dotnet ef migrations add` (apunta a `Host=localhost;Database=si18_diseno` sin contraseña) y
+> falla con «No password has been provided but the backend requires one». Si prefieres no usar
+> `dotnet ef`, la API aplica las migraciones al arrancar con `SI18_SEMBRAR_DATOS=true`.
 
 **Resultado esperado**:
 - el registro muestra «Datos de demostración sembrados» la primera vez y «ya existen» las siguientes
