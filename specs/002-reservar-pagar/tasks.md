@@ -279,7 +279,7 @@ una tarjeta aceptada y ver la reserva confirmada con su QR.
   parámetros `Codigo` y `Descripcion`; dibuja el QR en SVG con QRCoder (`SvgQRCode`, ya referenciado
   en el cliente, R14) dentro de un `<figure role="img" aria-label="Código de acceso de {Descripcion}">`,
   con el SVG en `max-width: 100%` y, en un `<figcaption>`, el código en texto seleccionable.
-- [ ] T024 [US1] Crear `src/SI18.Cliente/Reservas/NuevaReserva.razor` (ruta `/reservas/nueva`; research.md E11):
+- [X] T024 [US1] Crear `src/SI18.Cliente/Reservas/NuevaReserva.razor` (ruta `/reservas/nueva`; research.md E11):
   - **acceso**, como `/buscar-pistas` (D7 de spec-001): sin sesión → `/iniciar-sesion`; con otro rol,
     aviso «Reservar pistas es para ciudadanos y representantes de club.» en `MensajeAccesible`
     (`Severity.Warning`), sin pedir nada a la API;

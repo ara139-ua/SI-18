@@ -1,0 +1,32 @@
+/* Término y valor en la misma fila mientras quepan; a 320 px, uno encima del otro (tasks.md T042). */
+.resumen-reserva {
+    margin: 0 0 1.5rem;
+    max-width: 40rem;
+}
+
+.resumen-reserva > div {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 1rem;
+    padding: 0.375rem 0;
+    border-bottom: 1px solid #E0E0E0;
+}
+
+.resumen-reserva dt {
+    flex: 0 0 7rem;
+    font-weight: 600;
+}
+
+.resumen-reserva dd {
+    flex: 1 1 12rem;
+    margin: 0;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 30rem) {
+    .resumen-reserva dt,
+    .resumen-reserva dd {
+        flex-basis: 100%;
+    }
+}
