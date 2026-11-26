@@ -1,0 +1,144 @@
+@page "/reservas/{Id:long}/pago"
+@using SI18.Contratos.Reservas
+@inject ClienteApi Api
+@inject EstadoSesion Sesion
+@inject NavigationManager Navegacion
+
+@* Pago de una reserva pendiente (specs/002-reservar-pagar/research.md E11; tasks.md T025). El resultado se
+   muestra en la misma página: el formulario desaparece y el foco pasa al encabezado del resultado. *@
+
+<PageTitle>Pagar la reserva · SI-18</PageTitle>
+
+<MudText Typo="Typo.h4" HtmlTag="h1" GutterBottom="true">Pagar la reserva</MudText>
+
+<MensajeAccesible @ref="_mensaje" />
+
+@if (_reserva is not null)
+{
+    <ResumenReserva Pista="@_reserva.Pista" Centro="@_reserva.Centro" Fecha="_reserva.Fecha"
+                    HoraInicio="@_reserva.HoraInicio" HoraFin="@_reserva.HoraFin" Importe="_reserva.Importe" />
+
+    @if (_resultado == Resultado.Pendiente)
+    {
+        <p>Paga antes de las @_reserva.HoraLimitePago; después la reserva caduca.</p>
+
+        <form @onsubmit="Pagar" novalidate class="formulario-pago">
+            <MudTextField T="string" @bind-Value="_numeroTarjeta" Label="Número de tarjeta" Variant="Variant.Outlined"
+                          InputMode="InputMode.numeric" UserAttributes="_atributosTarjeta"
+                          HelperText="16 dígitos; es una tarjeta ficticia"
+                          Error="_errorTarjeta is not null" ErrorText="@_errorTarjeta" />
+
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Disabled="_enviando">
+                Pagar @FormatoEs.Importe(_reserva.Importe)
+            </MudButton>
+        </form>
+    }
+    else if (_resultado == Resultado.Confirmada)
+    {
+        <section aria-labelledby="encabezado-resultado">
+            <h2 id="encabezado-resultado" tabindex="-1" @ref="_encabezado" class="mud-typography mud-typography-h5 encabezado-resultado">
+                Reserva confirmada
+            </h2>
+            <CodigoAcceso Codigo="@(_reserva.CodigoAcceso ?? string.Empty)" Descripcion="@TextosReservas.Descripcion(_reserva)" />
+            <MudButton Href="/mis-reservas" Variant="Variant.Text" Color="Color.Primary">Ver mis reservas</MudButton>
+        </section>
+    }
+}
+
+@code {
+    [Parameter] public long Id { get; set; }
+
+    private enum Resultado { Pendiente, Confirmada }
+
+    private static readonly Dictionary<string, object> _atributosTarjeta = new() { ["autocomplete"] = "cc-number" };
+
+    private MensajeAccesible _mensaje = null!;
+    private ElementReference _encabezado;
+    private ReservaDto? _reserva;
+    private Resultado _resultado;
+    private string? _numeroTarjeta;
+    private string? _errorTarjeta;
+    private bool _enviando;
+    private bool _enfocarResultado;
+    private (string Texto, Severity Tipo)? _mensajePendiente;
+
+    protected override async Task OnInitializedAsync()
+    {
+        switch (await AccesoReservas.Comprobar(Sesion))
+        {
+            case Acceso.SinSesion:
+                Navegacion.NavigateTo(ClienteApi.RutaInicioSesion);
+                return;
+            case Acceso.SinPermiso:
+                _mensajePendiente = (AccesoReservas.AvisoSinPermiso, Severity.Warning);
+                return;
+        }
+
+        try
+        {
+            _reserva = await Api.GetAsync<ReservaDto>($"/api/reservas/{Id}");
+            _resultado = _reserva.Estado == EstadoReserva.Confirmada ? Resultado.Confirmada : Resultado.Pendiente;
+        }
+        catch (ErrorApi error)
+        {
+            _mensajePendiente = (error.Detalle, Severity.Error);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // MensajeAccesible solo existe después del primer renderizado.
+        if (_mensajePendiente is { } pendiente)
+        {
+            _mensajePendiente = null;
+            _mensaje.Mostrar(pendiente.Texto, pendiente.Tipo);
+        }
+
+        // El formulario ha desaparecido: el foco va al encabezado del resultado para no perderse en <body>.
+        if (_enfocarResultado)
+        {
+            _enfocarResultado = false;
+            await _encabezado.FocusAsync();
+        }
+    }
+
+    private async Task Pagar()
+    {
+        if (_enviando || _reserva is null)
+        {
+            return;
+        }
+
+        _enviando = true;
+        _errorTarjeta = null;
+        _mensaje.Limpiar();
+
+        try
+        {
+            _reserva = await Api.PostAsync<PeticionPago, ReservaDto>(
+                $"/api/reservas/{Id}/pago", new PeticionPago(_numeroTarjeta ?? string.Empty));
+            _numeroTarjeta = null;
+            MostrarResultado(Resultado.Confirmada, "Reserva confirmada.", Severity.Success);
+        }
+        catch (ErrorApi error) when (error.Errores.TryGetValue("numeroTarjeta", out var errores))
+        {
+            // Formato de la tarjeta: el error va en el propio campo; el formulario se queda.
+            _errorTarjeta = string.Join(' ', errores);
+        }
+        catch (ErrorApi error)
+        {
+            _mensaje.Mostrar(error.Detalle, Severity.Error);
+        }
+        finally
+        {
+            _enviando = false;
+        }
+    }
+
+    private void MostrarResultado(Resultado resultado, string texto, Severity tipo)
+    {
+        _resultado = resultado;
+        _enfocarResultado = true;
+        _mensaje.Mostrar(texto, tipo);
+    }
+}

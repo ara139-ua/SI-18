@@ -291,7 +291,7 @@ una tarjeta aceptada y ver la reserva confirmada con su QR.
     envía: `POST /api/reservas` con el importe del resumen y, con 201, navega a `/reservas/{id}/pago`.
 
   Los rechazos los completa T036 (US4). Depende de T017.
-- [ ] T025 [US1] Crear `src/SI18.Cliente/Reservas/PagarReserva.razor` (ruta `/reservas/{Id:long}/pago`;
+- [X] T025 [US1] Crear `src/SI18.Cliente/Reservas/PagarReserva.razor` (ruta `/reservas/{Id:long}/pago`;
   research.md E11):
   - mismo control de acceso que T024;
   - `GET /api/reservas/{id}`; muestra el resumen y el texto fijo «Paga antes de las {HoraLimitePago};

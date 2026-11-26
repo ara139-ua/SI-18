@@ -1,0 +1,22 @@
+/* Pago de una reserva (tasks.md T025, T042). */
+.formulario-pago {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    max-width: 28rem;
+}
+
+.formulario-pago ::deep .mud-input-control {
+    width: 100%;
+}
+
+/* El encabezado del resultado recibe el foco desde código; no es un control, así que no lleva recuadro
+   (misma excepción que h1:focus en app.css, sin tocar app.css). */
+.encabezado-resultado {
+    margin: 1rem 0 0.5rem;
+}
+
+.encabezado-resultado:focus {
+    outline: none;
+}
