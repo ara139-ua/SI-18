@@ -114,14 +114,23 @@ que hay en un servicio, unos endpoints y unas pantallas.
        `TRANSICION_NO_PERMITIDA` (RF-011: sin reintento);
   4. `pendiente_pago` y `!EstaVigente(ahora)` → `Caducar(ahora)`, `SaveChanges`, `COMMIT` y 409
      `RESERVA_CADUCADA`, sin llamar a la pasarela (RF-009; R8.3);
+  4b. `pendiente_pago`, vigente y `ahora ≥ inicio` (la franja ya ha empezado) → `Caducar(ahora)`,
+     `SaveChanges`, `COMMIT` y 422 `FRANJA_YA_EMPEZADA`, sin llamar a la pasarela (RF-009a; 000-core
+     RF-016; aclaración 2026-11-26, T056). Va después del paso 4: si además han pasado los 10 minutos, la
+     respuesta es `RESERVA_CADUCADA`. Como la reserva se caduca antes del límite de 10 minutos, no es una
+     caducidad «por tiempo» y un segundo intento da `TRANSICION_NO_PERMITIDA` (paso 3);
   5. `IPasarelaPago.Cobrar(reserva.Importe, numeroTarjeta)`:
      - `true` → `Confirmar(GeneradorCodigoAcceso.Nuevo(), ahora)`, `SaveChanges`, `COMMIT` y 200 con
        la reserva confirmada y su `codigoAcceso` (RF-010);
      - `false` → `Caducar(ahora)`, `SaveChanges`, `COMMIT` y 422 `PAGO_RECHAZADO` (RF-011).
 
-  En los pasos 4 y 5 (rechazo) el cambio de estado **se guarda antes de lanzar** el `ErrorNegocio`: el
+  En los pasos 4, 4b y 5 (rechazo) el cambio de estado **se guarda antes de lanzar** el `ErrorNegocio`: el
   error explica lo que ya ha pasado. `ahora` se lee una vez al principio, así que una reserva vigente en
   el paso 4 no puede caducar entre el cobro y `Confirmar`.
+- **Hora límite** (aclaración 2026-11-26, T057): `limitePagoUtc` y `horaLimitePago` son el instante más
+  temprano entre `creada_en_utc + TiempoBloqueoPago` y el inicio de la franja (RF-008a); después de ese
+  instante el pago ya no se acepta (paso 4 o 4b). «Mis reservas» no ofrece «Pagar» pasado el límite
+  (T058).
 - **Datos de la tarjeta**: el número solo vive en la petición. No se guarda, no se registra (ni el
   cuerpo de la petición ni el número en ningún `ILogger`), no se devuelve y la clase de la petición
   redefine `ToString()` para no imprimirlo (R9; RF-008).
