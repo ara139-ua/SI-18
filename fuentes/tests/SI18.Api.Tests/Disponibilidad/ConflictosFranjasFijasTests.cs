@@ -121,6 +121,23 @@ public class ConflictosFranjasFijasTests(FabricaApi fabrica)
     }
 
     [Fact]
+    public async Task Una_solicitud_identica_a_otra_pendiente_del_club_se_acepta_y_solo_puede_aprobarse_una()
+    {
+        // Clarify funcional del 26/11/2026 («Representante con varias solicitudes»).
+        var pabellon = await _datos.Pista(Oeste, "Pabellón");
+        var primera = await _api.Crear(pabellon, [3], 15, 17);
+        var duplicada = await _api.Crear(pabellon, [3], 15, 17);
+        Assert.NotEqual(primera.Id, duplicada.Id);
+        Assert.Equal(EstadoSolicitud.Pendiente, duplicada.Estado);
+
+        Assert.Equal(HttpStatusCode.OK, (await _api.Aprobar(primera.Id)).StatusCode);
+
+        var respuesta = await _api.Aprobar(duplicada.Id);
+        Assert.Equal(HttpStatusCode.Conflict, respuesta.StatusCode);
+        Assert.Equal("FRANJA_FIJA_SOLAPADA", await Codigo(respuesta));
+    }
+
+    [Fact]
     public async Task Con_reservas_y_solapes_a_la_vez_el_error_es_el_de_las_reservas()
     {
         var pista = await _datos.Pista(Oeste, "Pista de tenis 1");

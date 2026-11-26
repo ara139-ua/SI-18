@@ -51,6 +51,15 @@ de club (spec-005) y los cierres por mantenimiento (spec-007). HU-01 solo **lee*
 - Q: ¿El centro es obligatorio al buscar, o se puede buscar en todos los centros a la vez? → A:
   Obligatorio; no existe la opción «Todos los centros».
 
+### Session 2026-11-26 (sobre la versión funcional, enunciado 5.1)
+
+- Q: Si se pide por la API un deporte que existe pero no se reserva por franjas (natación, yoga…), ¿qué
+  responde la búsqueda? → A: Un resultado vacío con `totalPistas = 0`, que la pantalla muestra con el
+  mensaje «el centro no tiene pistas del deporte» de RF-011; no es una petición inválida.
+- Q: Al buscar para hoy cuando ya no queda ninguna franja por empezar (después de las 21:00), ¿qué se
+  muestra? → A: El mensaje general de RF-011 («No hay pistas libres… Prueba otra fecha u otro centro»);
+  no hay un mensaje propio para «hoy» y la fecha propuesta sigue siendo hoy.
+
 ## Escenarios de usuario y pruebas *(obligatorio)*
 
 ### Historia de usuario 1 - Ver las franjas libres de un deporte en un centro y una fecha (Prioridad: P1)
@@ -171,6 +180,9 @@ ven en la búsqueda:
   el día 2 aunque en UTC aún sea el día 1).
 - **Franja empezando**: a las 18:00:00 en punto la franja de las 18:00 ya no aparece; a las 17:59:59
   sí.
+- **Hoy sin franjas por empezar**: a partir de las 21:00:00 de Madrid, buscar la fecha de hoy no da
+  ninguna franja y se muestra el mensaje general de RF-011, que sugiere otra fecha u otro centro. La
+  fecha propuesta por defecto sigue siendo hoy (RF-005).
 - **Cambio de hora**: los días 25/10/2026 y 28/03/2027 la búsqueda muestra igualmente 14 franjas de
   08:00 a 21:00 en hora de Madrid, cada una de una hora real.
 - **Reserva pendiente que caduca**: una reserva pendiente de pago creada hace exactamente 10 minutos
@@ -182,7 +194,9 @@ ven en la búsqueda:
 - **Franja fija suspendida por un cierre**: durante el cierre la franja aparece como cerrada (no
   libre), no como bloqueada por el club; el resultado para quien busca es el mismo: no aparece.
 - **Deporte sin pistas reservables**: baloncesto, fútbol sala, natación, yoga y pilates no tienen
-  pistas reservables por franjas (RF-012 de `000-core`), así que no se ofrecen como filtro.
+  pistas reservables por franjas (RF-012 de `000-core`), así que no se ofrecen como filtro. Si se piden
+  igualmente (por ejemplo, escribiendo la petición a mano), el resultado es vacío con `totalPistas = 0`
+  y se muestra el mensaje de RF-011 «el centro no tiene pistas del deporte», no un error.
 - **Instalación no reservable**: pabellones, salas y piscinas no aparecen nunca en el resultado,
   aunque admitan el deporte elegido.
 - **Dos personas a la vez**: la búsqueda muestra la situación en el momento de buscar; si otra
@@ -227,8 +241,9 @@ ven en la búsqueda:
   inicio.
 - **RF-010**: Si una instalación no tiene ninguna franja libre, NO DEBE aparecer en el resultado.
 - **RF-011**: Si no hay ninguna franja libre en total, DEBE mostrarse un mensaje que lo diga y sugiera
-  cambiar la fecha o el centro; si el centro no tiene ninguna pista del deporte elegido, el mensaje
-  DEBE decirlo así.
+  cambiar la fecha o el centro; si el centro no tiene ninguna pista reservable por franjas del deporte
+  elegido (también cuando el deporte no se reserva por franjas), el mensaje DEBE decirlo así. Para
+  distinguir los dos casos, el resultado DEBE indicar cuántas pistas del deporte tiene el centro.
 
 **Precio y coherencia con la reserva**
 

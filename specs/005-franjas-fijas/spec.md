@@ -56,6 +56,15 @@ ya enviada o aprobada, cobrar las franjas fijas (no se cobran, D9 de 000-core) y
   como conflicto que impide aprobar? → A: Sí. Cualquier reserva confirmada o pendiente de pago vigente
   es un conflicto, sea de quien sea.
 
+### Session 2026-11-26 (sobre la versión funcional, enunciado 5.1)
+
+- Q: ¿Un club puede pedir franjas fijas en una instalación de cualquier centro, o solo de uno «suyo»?
+  → A: De cualquier centro. Un club no pertenece a ningún centro (en `000-core` solo tiene nombre), así
+  que la solicitud no se limita por centro.
+- Q: Si un club envía una solicitud idéntica (misma instalación, días, horario y temporada) a otra suya
+  que sigue pendiente, ¿se acepta? → A: Sí, queda pendiente como cualquier otra. El técnico rechaza la
+  que sobre; si aprueba una, la otra ya no puede aprobarse porque se solapa (`FRANJA_FIJA_SOLAPADA`).
+
 ## Escenarios de usuario y pruebas *(obligatorio)*
 
 ### Historia de usuario 1 - Solicitar franjas fijas para mi club (Prioridad: P1)
@@ -243,7 +252,11 @@ pantalla, y se pasa la comprobación de quickstart.md §6 de `000-core`.
 - **Mismo horario, otro día**: martes 19:00–21:00 y miércoles 19:00–21:00 no se solapan.
 - **Otra instalación u otra temporada**: no hay solape.
 - **Representante con varias solicitudes**: un club puede tener varias solicitudes pendientes o
-  aprobadas a la vez, siempre que las aprobadas no se solapen entre sí.
+  aprobadas a la vez, siempre que las aprobadas no se solapen entre sí. Esto incluye una solicitud
+  idéntica a otra suya pendiente: se acepta, y en cuanto una se aprueba, la otra se rechaza al intentar
+  aprobarla con `FRANJA_FIJA_SOLAPADA`.
+- **Instalación de otro centro**: un club no pertenece a ningún centro; su representante puede pedir
+  una pista o un pabellón de cualquier centro.
 - **Dos representantes del mismo club**: ven las mismas solicitudes (son del club) y los dos reciben
   los avisos.
 - **Reserva del propio club**: si un representante del club tiene una reserva suelta en una de esas
@@ -264,7 +277,7 @@ pantalla, y se pasa la comprobación de quickstart.md §6 de `000-core`.
 **Solicitar (representante de club)**
 
 - **RF-001**: Solo un representante de club DEBE poder enviar solicitudes, siempre a nombre de su
-  propio club (el de su sesión, no uno elegido).
+  propio club (el de su sesión, no uno elegido), y para una instalación de cualquier centro.
 - **RF-002**: La solicitud DEBE indicar instalación, días de la semana, hora de inicio, hora de fin y
   temporada, con las reglas de `000-core` (data-model.md § SolicitudFranjasFijas): instalación pista o
   pabellón (D2); al menos un día, sin repetir, de lunes a domingo; horas en punto, inicio ≥ 08:00, fin ≤

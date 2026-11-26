@@ -35,10 +35,14 @@ public class BuscarSinResultadosTests(FabricaApi fabrica)
 
     private DateOnly Hoy => HorarioMadrid.Hoy(_datos.Ahora);
 
-    [Fact]
-    public async Task Un_deporte_sin_pistas_reservables_da_200_con_total_cero()
+    // Baloncesto solo está en el pabellón y natación solo en la piscina: ninguno se reserva por franjas
+    // (clarify funcional del 26/11/2026: resultado vacío, no petición inválida).
+    [Theory]
+    [InlineData("Baloncesto")]
+    [InlineData("Natación")]
+    public async Task Un_deporte_sin_pistas_reservables_da_200_con_total_cero(string deporte)
     {
-        var respuesta = await Buscar("Baloncesto", Hoy.AddDays(1));
+        var respuesta = await Buscar(deporte, Hoy.AddDays(1));
 
         Assert.Equal(HttpStatusCode.OK, respuesta.StatusCode);
         var resultado = await respuesta.Content.ReadFromJsonAsync<ResultadoBusquedaDto>(OpcionesJson.Predeterminadas, Ct);
