@@ -523,3 +523,22 @@ C2), el PR de API se abre antes (T030).
 - Fuera de `*/Reservas` solo se tocan, con revisión de @ara139-ua: `ErrorApi.cs` y `ClienteApi.cs`
   (T016, C2) y `MainLayout.razor` (T024, C1). `Program.cs` no cambia.
 - Ninguna fecha ni hora se convierte con `"Europe/Madrid"` escrito a mano (T027).
+
+---
+
+## Fase 9: Convergencia (converge 2026-11-26, [primer informe](./converge-2026-11-26.md))
+
+- [X] T032 [US1] (F3, RF-006a) El aviso de validación anterior dice «Este código ya se validó hoy a las HH:mm»
+  si la anterior es del mismo día de Madrid que ahora, y «Este código se validó por última vez el dd/MM/yyyy a
+  las HH:mm» si no. El formato está en `TextosReservas.AvisoValidacionAnterior` (`src/SI18.Cliente/Reservas/`),
+  que usa `FormatoEs.FechaHora` (misma zona que `HorarioMadrid`; `SI18.Cliente` no referencia `SI18.Dominio`).
+  Prueba `AvisoValidacionAnteriorTextoTests` con el mismo día, otro día (aunque sea el mismo día UTC) y
+  horario de verano.
+- [ ] T033 (F5) Corregir en `quickstart.md` §4 paso 1 la frase «Si el cambio de `MainLayout.razor` … aún no está
+  fusionado, abre `/validar-acceso` a mano» (C1 ya está fusionado) y en la matriz de `analyze-registro.md` la
+  de CE-006 «sin marcar hasta hacerla» (T026 está hecha).
+
+**Sin tarea** (informe de converge): F4 (pruebas del texto de `ValidarAcceso.razor`; la lectura de extensiones
+y ahora el texto del aviso tienen prueba, y la pantalla se comprobó a mano en T026) y F6 (mensaje de fallo de
+conexión, que sigue el patrón de `InicioSesion.razor`). F1 y F2 quedan abiertos hasta la revisión de
+@ara139-ua; el #46 se fusionó sin ella por la entrega, como el #31 y el #36.
