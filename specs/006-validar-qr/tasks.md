@@ -226,11 +226,11 @@ franja; si ya se había aceptado, con el aviso de la hora anterior.
 - [X] T010 [US1] Añadir a `Validar` el aviso de RF-006a (research.md V5): solo si se acepta y **antes**
   de insertar, `MAX(FechaUtc)` de `ValidacionesAcceso` con `ReservaId == reserva.Id && Aceptada`; si hay
   valor, `ValidacionAnteriorUtc` y `ValidacionAnteriorHora` («`HH:mm`» de Madrid). Depende de T008, T009.
-- [ ] T011 [P] [US1] Añadir `ComprobarPersonal(EstadoSesion sesion)` a
+- [X] T011 [P] [US1] Añadir `ComprobarPersonal(EstadoSesion sesion)` a
   `src/SI18.Cliente/Reservas/AccesoReservas.cs`, con el mismo patrón que `Comprobar`: sin sesión →
   `SinSesion`; rol `personal_centro` → `Permitido`; otro → `SinPermiso`; y la constante
   `AvisoSinPermisoValidar = "Validar códigos de acceso es para el personal de centro."`.
-- [ ] T012 [US1] Crear `src/SI18.Cliente/Reservas/ValidarAcceso.razor` (`@page "/validar-acceso"`) y
+- [X] T012 [US1] Crear `src/SI18.Cliente/Reservas/ValidarAcceso.razor` (`@page "/validar-acceso"`) y
   `ValidarAcceso.razor.css` (**sin tocar `app.css`**), con el resultado aceptado (research.md V10):
   - `<PageTitle>Validar acceso · SI-18</PageTitle>` y `<h1>` «Validar acceso»; acceso por URL con
     `ComprobarPersonal` (sin sesión → `/iniciar-sesion`; sin permiso → aviso sin formulario);
@@ -293,7 +293,7 @@ centro, con la instalación y la franja (nunca el titular).
   `QR_RESERVA_NO_CONFIRMADA` y `QR_FUERA_DE_VENTANA`, `Reserva = new ReservaValidadaDto(...)` con
   instalación, centro, fecha y horas de Madrid; con `QR_DESCONOCIDO` y `QR_OTRO_CENTRO`, `Reserva = null`
   (RF-007; research.md V2). Depende de T009, T013, T014.
-- [ ] T016 [US2] **[código común, revisión de @ara139-ua — C2]** Añadir a
+- [X] T016 [US2] **[código común, revisión de @ara139-ua — C2]** Añadir a
   `src/SI18.Cliente/Comun/ErrorApi.cs` la propiedad
   `IReadOnlyDictionary<string, JsonElement> Extensiones { get; init; }` (vacía por defecto) y rellenarla
   en `src/SI18.Cliente/Comun/ClienteApi.cs` al leer el Problem Details (todas las propiedades que no son
@@ -305,7 +305,7 @@ centro, con la instalación y la franja (nunca el titular).
   (`NavegacionDePrueba : NavigationManager`, que llama a `Initialize("http://localhost/", "http://localhost/")`
   y no navega; análisis U3).
   Anotar en el PR que es un cambio en código común (research.md V2; plan.md C2).
-- [ ] T017 [US2] Completar `ValidarAcceso.razor` con el resultado rechazado: `<h2>` «Acceso denegado» con
+- [X] T017 [US2] Completar `ValidarAcceso.razor` con el resultado rechazado: `<h2>` «Acceso denegado» con
   un icono distinto del de «permitido», el `Detalle` del catálogo y, si
   `ErrorApi.Extensiones["reserva"]` existe, instalación, centro, fecha y horas (nunca el titular); frase
   completa con `MensajeAccesible` y foco de vuelta al campo. Con `ROL_NO_PERMITIDO` (sesión cambiada),
@@ -361,11 +361,11 @@ ve el personal.
   análisis F1) (HU4 esc. 1 y 2; CE-004). Depende de T006.
 - ~~T021~~ **Retirada** (análisis A1): era condicional («si T020 no pasa»). La política se fija en T004 y
   T020 la prueba. Se conserva el número para no renumerar.
-- [ ] T022 [P] [US4] Comprobar en `ValidarAcceso.razor` el acceso por URL (T012): sin sesión →
+- [X] T022 [P] [US4] Comprobar en `ValidarAcceso.razor` el acceso por URL (T012): sin sesión →
   `/iniciar-sesion`; con un ciudadano → `AvisoSinPermisoValidar` y ningún formulario. Depende de T012.
 - [ ] T023 [US4] (sin código) Confirmar con @ara139-ua el texto «Validar acceso» y su posición en el hueco
   del personal, dejando sitio al enlace de cierres de spec-007 (plan.md C1).
-- [ ] T024 [US4] **[código común, revisión de @ara139-ua — C1]** En
+- [X] T024 [US4] **[código común, revisión de @ara139-ua — C1]** En
   `src/SI18.Cliente/Layout/MainLayout.razor`, dentro de
   `<AuthorizeView Roles="personal_centro" Context="personal">`, sustituir el comentario del hueco por
   `<MudButton Href="/validar-acceso" Color="Color.Inherit" Variant="Variant.Text">Validar acceso</MudButton>`
@@ -382,7 +382,7 @@ ve el personal.
 
 **Prueba independiente**: quickstart.md §5 (que aplica el §6 de `000-core/quickstart.md`).
 
-- [ ] T025 [US5] Completar la accesibilidad de `ValidarAcceso.razor` y `ValidarAcceso.razor.css`
+- [X] T025 [US5] Completar la accesibilidad de `ValidarAcceso.razor` y `ValidarAcceso.razor.css`
   (RF-013–RF-015; research.md V10):
   - orden de tabulación: campo → «Validar»; sin trampas de foco; tras cada resultado el foco vuelve al
     campo;
@@ -393,7 +393,7 @@ ve el personal.
     `ValidarAcceso.razor.css`.
 
   Depende de T012 y T017.
-- [ ] T026 [US5] Comprobar a mano quickstart.md §5 sobre `/validar-acceso`, **aplicando lo aprendido en
+- [X] T026 [US5] Comprobar a mano quickstart.md §5 sobre `/validar-acceso`, **aplicando lo aprendido en
   T073 de 000-core** (#41, #42):
   - **foco visible con MudBlazor**: Lighthouse y axe no lo detectan. Recorrer con el teclado y, en el
     `MudTextField` «Código de acceso», el `MudButton` «Validar» y el enlace «Validar acceso» del menú,
@@ -413,6 +413,9 @@ ve el personal.
     aceptado con aviso y con uno rechazado.
 
   Anotar el resultado en la descripción del PR (principio I). Depende de T024 y T025.
+  **Hecha**: parte automática (Lighthouse 100 y axe sin infracciones, 320 px, menús de los demás roles) anotada en el
+  PR #46; revisión manual (foco visible en el campo, «Validar» y el enlace del menú; barra y menú a 320 px y al 200 %
+  con `personal.este`; NVDA; iconos distintos) hecha por Saul el 26/11/2026, todo correcto.
 
 **Punto de control**: CE-006 cumplido, o sus fallos ajenos anotados y coordinados.
 
@@ -440,7 +443,7 @@ ve el personal.
     el menú del personal.
 
   Anotarlo en la descripción del PR.
-- [ ] T030 Abrir los PR hacia `develop`, con la lista de los principios I–IX revisados, como en spec-002.
+- [X] T030 Abrir los PR hacia `develop`, con la lista de los principios I–IX revisados, como en spec-002.
   **Antes de abrir cada PR, revisar los secretos** (constitución, «Flujo de trabajo», principio V;
   análisis D1): `git grep -nE "Password=|SI18_CLAVE_DEMO=.+[^>]$" -- ":!*.example"` (quickstart §7 de
   000-core; solo deben salir las coincidencias ya justificadas en T075 de 000-core) y

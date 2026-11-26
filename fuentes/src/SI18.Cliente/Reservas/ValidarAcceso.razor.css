@@ -1,0 +1,108 @@
+/* Validar acceso (specs/006-validar-qr, tasks.md T012, T025). Solo estilos de esta pantalla; no se toca app.css. */
+
+/* Una sola columna: el campo y el botón van uno debajo del otro. */
+.formulario-validar {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    max-width: 28rem;
+}
+
+.formulario-validar ::deep .mud-input-control {
+    width: 100%;
+}
+
+.formulario-validar ::deep .mud-button-root {
+    max-width: 100%;
+    white-space: normal;
+}
+
+/* Por debajo de 600 px, campo y botón ocupan todo el ancho (reflujo a 320 px). */
+@media (max-width: 599.98px) {
+    .formulario-validar {
+        max-width: none;
+        align-items: stretch;
+    }
+
+    .formulario-validar ::deep .mud-button-root {
+        width: 100%;
+    }
+}
+
+/* El resultado: el color solo refuerza; el texto y el icono ya bastan (RF-013). */
+.resultado {
+    margin-top: 1.5rem;
+    padding: 0.5rem 1rem 1rem;
+    max-width: 28rem;
+    border-inline-start: 0.375rem solid currentColor;
+    overflow-wrap: anywhere;
+}
+
+.resultado-permitido {
+    color: var(--mud-palette-success);
+    border-inline-start-color: var(--mud-palette-success);
+}
+
+.resultado-denegado {
+    color: var(--mud-palette-error);
+    border-inline-start-color: var(--mud-palette-error);
+}
+
+@media (max-width: 599.98px) {
+    .resultado {
+        max-width: none;
+    }
+}
+
+.encabezado-resultado {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0.5rem 0;
+}
+
+.resultado ::deep .icono-resultado {
+    flex: none;
+}
+
+/* El texto del resultado va en el color normal del tema; solo el encabezado lleva el color. */
+.resultado p,
+.resultado dl {
+    color: var(--mud-palette-text-primary);
+}
+
+/* Lista de definiciones apilada: etiqueta encima de su valor, a cualquier ancho. */
+.datos-resultado {
+    margin: 0.5rem 0 0;
+}
+
+.datos-resultado dt {
+    font-size: 0.875rem;
+    color: var(--mud-palette-text-secondary);
+}
+
+.datos-resultado dd {
+    margin: 0 0 0.5rem;
+    font-weight: 500;
+}
+
+.aviso-anterior {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin: 0.75rem 0 0;
+}
+
+/* Texto solo para lectores de pantalla: el error del campo ya se ve debajo de él. */
+.solo-lector {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}

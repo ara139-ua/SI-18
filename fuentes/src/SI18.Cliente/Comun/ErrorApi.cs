@@ -1,4 +1,5 @@
 using System.Net;
+using System.Text.Json;
 
 namespace SI18.Cliente.Comun;
 
@@ -14,4 +15,10 @@ public sealed class ErrorApi(string codigo, string detalle, HttpStatusCode estad
 
     /// <summary>Errores por campo de un 400 <c>PETICION_INVALIDA</c>.</summary>
     public IReadOnlyDictionary<string, string[]> Errores { get; init; } = new Dictionary<string, string[]>();
+
+    /// <summary>
+    /// Propiedades del Problem Details que el contrato no recoge en los campos de arriba (por ejemplo, <c>reserva</c>
+    /// y <c>validacionId</c> de spec-006). Vacía si no hay ninguna.
+    /// </summary>
+    public IReadOnlyDictionary<string, JsonElement> Extensiones { get; init; } = new Dictionary<string, JsonElement>();
 }

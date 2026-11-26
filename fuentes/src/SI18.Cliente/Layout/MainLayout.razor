@@ -33,7 +33,8 @@
                         <MudButton Href="/franjas-fijas" Color="Color.Inherit" Variant="Variant.Text">Franjas fijas</MudButton>
                     </AuthorizeView>
                     <AuthorizeView Roles="personal_centro" Context="personal">
-                        @* Hueco de Reservas y Cancelaciones (spec-006, 007): validar QR, cierres. *@
+                        <MudButton Href="/validar-acceso" Color="Color.Inherit" Variant="Variant.Text">Validar acceso</MudButton>
+                        @* Hueco de Cancelaciones (spec-007): cierres. *@
                     </AuthorizeView>
                     <AuthorizeView Roles="tecnico_concejalia" Context="tecnico">
                         <MudButton Href="/franjas-fijas/revision" Color="Color.Inherit" Variant="Variant.Text">Revisar franjas fijas</MudButton>
