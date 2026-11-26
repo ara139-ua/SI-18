@@ -1,0 +1,258 @@
+{
+  "fecha": "2026-11-26T11:17:59.396Z",
+  "manana": "2026-11-27",
+  "deporte": "Tenis",
+  "centro": "Polideportivo Norte",
+  "nombresReservar": [
+    {
+      "etiqueta": "Reservar Pista de tenis 2, viernes 27/11/2026, de 09:00 a 10:00",
+      "href": "/reservas/nueva?instalacionId=2&inicioUtc=2026-11-27T08%3A00%3A00.0000000Z"
+    },
+    {
+      "etiqueta": "Reservar Pista de tenis 2, viernes 27/11/2026, de 10:00 a 11:00",
+      "href": "/reservas/nueva?instalacionId=2&inicioUtc=2026-11-27T09%3A00%3A00.0000000Z"
+    }
+  ],
+  "errorCampo": {
+    "foco": "INPUT (en el formulario)",
+    "ayuda": "Escribe los 16 dígitos de la tarjeta.",
+    "describedby": null,
+    "invalid": "true",
+    "autocomplete": "cc-number",
+    "inputmode": "numeric"
+  },
+  "focoRechazo": "encabezado-resultado · El pago no se ha completado",
+  "focoConfirmada": "encabezado-resultado · Reserva confirmada",
+  "qr": {
+    "etiqueta": "Código de acceso de Pista de tenis 1, viernes 27/11/2026, de 21:00 a 22:00",
+    "texto": "Código de acceso: Nb80t2hEdv1MZK-mZXrnGQ"
+  },
+  "puntuaciones": [
+    {
+      "nombre": "/buscar-pistas (con resultados)",
+      "accesibilidad": 100,
+      "fallos": []
+    },
+    {
+      "nombre": "/reservas/nueva",
+      "accesibilidad": 100,
+      "fallos": []
+    },
+    {
+      "nombre": "/reservas/nueva (rechazo)",
+      "accesibilidad": 100,
+      "fallos": []
+    },
+    {
+      "nombre": "/reservas/{id}/pago (formulario)",
+      "accesibilidad": 100,
+      "fallos": []
+    },
+    {
+      "nombre": "/reservas/{id}/pago (error de formato)",
+      "accesibilidad": 100,
+      "fallos": []
+    },
+    {
+      "nombre": "/reservas/{id}/pago (rechazado)",
+      "accesibilidad": 100,
+      "fallos": []
+    },
+    {
+      "nombre": "/reservas/{id}/pago (confirmada)",
+      "accesibilidad": 100,
+      "fallos": []
+    },
+    {
+      "nombre": "/mis-reservas",
+      "accesibilidad": 100,
+      "fallos": []
+    }
+  ],
+  "resultados": [
+    {
+      "nombre": "/buscar-pistas (con resultados)",
+      "url": "/buscar-pistas",
+      "axe": [],
+      "anchos": {
+        "320": {
+          "scrollWidth": 320,
+          "fueraEnMain": [],
+          "fueraEnCabecera": [
+            "nav.menu-principal",
+            "a.mud-button-root.mud-button",
+            "span.mud-button-label",
+            "p.mud-typography.mud-typography-body2",
+            "button.mud-button-root.mud-button"
+          ]
+        },
+        "640": {
+          "scrollWidth": 640,
+          "fueraEnMain": [],
+          "fueraEnCabecera": []
+        }
+      }
+    },
+    {
+      "nombre": "/reservas/nueva",
+      "url": "/reservas/nueva?instalacionId=2&inicioUtc=2026-11-27T08%3A00%3A00Z",
+      "axe": [],
+      "anchos": {
+        "320": {
+          "scrollWidth": 320,
+          "fueraEnMain": [],
+          "fueraEnCabecera": [
+            "nav.menu-principal",
+            "a.mud-button-root.mud-button",
+            "span.mud-button-label",
+            "p.mud-typography.mud-typography-body2",
+            "button.mud-button-root.mud-button"
+          ]
+        },
+        "640": {
+          "scrollWidth": 640,
+          "fueraEnMain": [],
+          "fueraEnCabecera": []
+        }
+      }
+    },
+    {
+      "nombre": "/reservas/nueva (rechazo)",
+      "url": "/reservas/nueva?instalacionId=1&inicioUtc=2026-11-27T16%3A00%3A00Z",
+      "axe": [],
+      "anchos": {
+        "320": {
+          "scrollWidth": 320,
+          "fueraEnMain": [],
+          "fueraEnCabecera": [
+            "nav.menu-principal",
+            "a.mud-button-root.mud-button",
+            "span.mud-button-label",
+            "p.mud-typography.mud-typography-body2",
+            "button.mud-button-root.mud-button"
+          ]
+        },
+        "640": {
+          "scrollWidth": 640,
+          "fueraEnMain": [],
+          "fueraEnCabecera": []
+        }
+      }
+    },
+    {
+      "nombre": "/reservas/{id}/pago (formulario)",
+      "url": "/reservas/15/pago",
+      "axe": [],
+      "anchos": {
+        "320": {
+          "scrollWidth": 320,
+          "fueraEnMain": [],
+          "fueraEnCabecera": [
+            "nav.menu-principal",
+            "a.mud-button-root.mud-button",
+            "span.mud-button-label",
+            "p.mud-typography.mud-typography-body2",
+            "button.mud-button-root.mud-button"
+          ]
+        },
+        "640": {
+          "scrollWidth": 640,
+          "fueraEnMain": [],
+          "fueraEnCabecera": []
+        }
+      }
+    },
+    {
+      "nombre": "/reservas/{id}/pago (error de formato)",
+      "url": "/reservas/15/pago",
+      "axe": [],
+      "anchos": {
+        "320": {
+          "scrollWidth": 320,
+          "fueraEnMain": [],
+          "fueraEnCabecera": [
+            "nav.menu-principal",
+            "a.mud-button-root.mud-button",
+            "span.mud-button-label",
+            "p.mud-typography.mud-typography-body2",
+            "button.mud-button-root.mud-button"
+          ]
+        },
+        "640": {
+          "scrollWidth": 640,
+          "fueraEnMain": [],
+          "fueraEnCabecera": []
+        }
+      }
+    },
+    {
+      "nombre": "/reservas/{id}/pago (rechazado)",
+      "url": "/reservas/16/pago",
+      "axe": [],
+      "anchos": {
+        "320": {
+          "scrollWidth": 320,
+          "fueraEnMain": [],
+          "fueraEnCabecera": [
+            "nav.menu-principal",
+            "a.mud-button-root.mud-button",
+            "span.mud-button-label",
+            "p.mud-typography.mud-typography-body2",
+            "button.mud-button-root.mud-button"
+          ]
+        },
+        "640": {
+          "scrollWidth": 640,
+          "fueraEnMain": [],
+          "fueraEnCabecera": []
+        }
+      }
+    },
+    {
+      "nombre": "/reservas/{id}/pago (confirmada)",
+      "url": "/reservas/17/pago",
+      "axe": [],
+      "anchos": {
+        "320": {
+          "scrollWidth": 320,
+          "fueraEnMain": [],
+          "fueraEnCabecera": [
+            "nav.menu-principal",
+            "a.mud-button-root.mud-button",
+            "span.mud-button-label",
+            "p.mud-typography.mud-typography-body2",
+            "button.mud-button-root.mud-button"
+          ]
+        },
+        "640": {
+          "scrollWidth": 640,
+          "fueraEnMain": [],
+          "fueraEnCabecera": []
+        }
+      }
+    },
+    {
+      "nombre": "/mis-reservas",
+      "url": "/mis-reservas",
+      "axe": [],
+      "anchos": {
+        "320": {
+          "scrollWidth": 320,
+          "fueraEnMain": [],
+          "fueraEnCabecera": [
+            "nav.menu-principal",
+            "a.mud-button-root.mud-button",
+            "span.mud-button-label",
+            "p.mud-typography.mud-typography-body2",
+            "button.mud-button-root.mud-button"
+          ]
+        },
+        "640": {
+          "scrollWidth": 640,
+          "fueraEnMain": [],
+          "fueraEnCabecera": []
+        }
+      }
+    }
+  ]
+}
