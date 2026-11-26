@@ -452,7 +452,7 @@ sin cambios.
     `2027-03-28T06:00:00Z`, y reservar y pagar la de 08:00 da `finUtc − inicioUtc = 1 h`.
 
   Los estados y códigos HTTP son los del catálogo de 000-core (`contracts/errores.md`). Depende de T026.
-- [ ] T037 [US4] En `src/SI18.Cliente/Reservas/NuevaReserva.razor`, completar los rechazos (research.md E11):
+- [X] T037 [US4] En `src/SI18.Cliente/Reservas/NuevaReserva.razor`, completar los rechazos (research.md E11):
   - si el resumen o la creación responden un error, `MensajeAccesible` (`Severity.Error`) con su
     `Detalle`, sin resumen ni botón, y enlace «Volver a buscar pistas»;
   - con 409 `PRECIO_CAMBIADO`: se vuelve a pedir el resumen, se muestra el importe nuevo, se anuncia

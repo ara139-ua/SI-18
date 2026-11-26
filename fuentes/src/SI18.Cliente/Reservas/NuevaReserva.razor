@@ -9,7 +9,8 @@
 
 <PageTitle>Confirmar la reserva · SI-18</PageTitle>
 
-<MudText Typo="Typo.h4" HtmlTag="h1" GutterBottom="true">Confirmar la reserva</MudText>
+@* <h1> escrito a mano (con las clases de MudText) para poder devolverle el foco tras un rechazo. *@
+<h1 tabindex="-1" @ref="_titulo" class="mud-typography mud-typography-h4 mud-typography-gutterbottom">Confirmar la reserva</h1>
 
 <MensajeAccesible @ref="_mensaje" />
 
@@ -24,6 +25,10 @@
         </MudButton>
     </form>
 }
+else if (_rechazada)
+{
+    <MudButton Href="/buscar-pistas" Variant="Variant.Text" Color="Color.Primary">Volver a buscar pistas</MudButton>
+}
 
 @code {
     [SupplyParameterFromQuery(Name = "instalacionId")] public int? InstalacionId { get; set; }
@@ -32,6 +37,9 @@
     private MensajeAccesible _mensaje = null!;
     private ResumenReservaDto? _resumen;
     private bool _enviando;
+    private bool _rechazada;
+    private bool _enfocarTitulo;
+    private ElementReference _titulo;
     private (string Texto, Severity Tipo)? _mensajePendiente;
 
     protected override async Task OnInitializedAsync()
@@ -52,11 +60,12 @@
         }
         catch (ErrorApi error)
         {
+            _rechazada = true;
             _mensajePendiente = (error.Detalle, Severity.Error);
         }
     }
 
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         // MensajeAccesible solo existe después del primer renderizado.
         if (_mensajePendiente is { } pendiente)
@@ -64,6 +73,34 @@
             _mensajePendiente = null;
             _mensaje.Mostrar(pendiente.Texto, pendiente.Tipo);
         }
+
+        // El botón pulsado ha desaparecido o se ha desactivado: el foco vuelve al título para no perderse en <body>.
+        if (_enfocarTitulo)
+        {
+            _enfocarTitulo = false;
+            await _titulo.FocusAsync();
+        }
+    }
+
+    private async Task VolverAPedirResumen(string detalle)
+    {
+        try
+        {
+            _resumen = await PedirResumen();
+            _mensaje.Mostrar(detalle, Severity.Warning);
+        }
+        catch (ErrorApi error)
+        {
+            Rechazar(error.Detalle);
+        }
+    }
+
+    /// <summary>Sin resumen ni botón: solo el motivo y el enlace para volver a buscar (T037).</summary>
+    private void Rechazar(string detalle)
+    {
+        _resumen = null;
+        _rechazada = true;
+        _mensaje.Mostrar(detalle, Severity.Error);
     }
 
     // Un parámetro que falta en la URL no se envía vacío: la API responde 400 con el error de ese campo.
@@ -99,10 +136,16 @@
                 "/api/reservas", new PeticionReserva(_resumen.InstalacionId, _resumen.InicioUtc, _resumen.Importe));
             Navegacion.NavigateTo($"/reservas/{reserva.Id}/pago");
         }
+        catch (ErrorApi error) when (error.Codigo == "PRECIO_CAMBIADO")
+        {
+            // HU4 esc. 5: se vuelve a pedir el resumen y se puede confirmar con el importe nuevo.
+            await VolverAPedirResumen(error.Detalle);
+            _enfocarTitulo = true;
+        }
         catch (ErrorApi error)
         {
-            _resumen = null;
-            _mensaje.Mostrar(error.Detalle, Severity.Error);
+            Rechazar(error.Detalle);
+            _enfocarTitulo = true;
         }
         finally
         {
