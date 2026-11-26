@@ -98,6 +98,27 @@ public class ValidarAccesoTests(FabricaApi fabrica) : IAsyncLifetime
     }
 
     [Fact]
+    public async Task RF004_el_codigo_con_una_letra_en_otra_caja_es_desconocido_y_se_registra_sin_reserva()
+    {
+        // T034 (aclaración 2026-11-26): el código se compara distinguiendo mayúsculas y minúsculas.
+        var reserva = await _datos.Reservas.Leer(_compartida);
+        var codigo = reserva.CodigoAcceso!;
+        var posicion = codigo.IndexOf(codigo.First(char.IsLetter));
+        var otraCaja = codigo[..posicion] + (char.IsUpper(codigo[posicion]) ? char.ToLowerInvariant(codigo[posicion]) : char.ToUpperInvariant(codigo[posicion])) + codigo[(posicion + 1)..];
+        Assert.NotEqual(codigo, otraCaja);
+        using var cliente = await fabrica.CrearClienteConSesion(PersonalEste);
+
+        var respuesta = await Validar(cliente, otraCaja);
+
+        var problema = await LeerRechazo(respuesta, HttpStatusCode.UnprocessableEntity, CodigosError.QrDesconocido);
+        Assert.False(problema.TieneReserva);
+        var fila = await _datos.Leer(problema.ValidacionId);
+        Assert.False(fila.Aceptada);
+        Assert.Null(fila.ReservaId);
+        Assert.Equal(otraCaja, fila.CodigoLeido);
+    }
+
+    [Fact]
     public async Task HU2_esc5_el_codigo_de_otro_centro_se_rechaza_sin_datos_de_la_reserva_pero_se_registra_con_ella()
     {
         var reserva = await _datos.Reservas.Leer(_compartida);
