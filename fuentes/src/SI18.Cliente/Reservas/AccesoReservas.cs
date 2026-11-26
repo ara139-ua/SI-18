@@ -18,6 +18,7 @@ public enum Acceso
 public static class AccesoReservas
 {
     public const string AvisoSinPermiso = "Reservar pistas es para ciudadanos y representantes de club.";
+    public const string AvisoSinPermisoValidar = "Validar códigos de acceso es para el personal de centro.";
 
     public static async Task<Acceso> Comprobar(EstadoSesion sesion)
     {
@@ -30,5 +31,20 @@ public static class AccesoReservas
         return estado.User.IsInRole("ciudadano") || estado.User.IsInRole("representante_club")
             ? Acceso.Permitido
             : Acceso.SinPermiso;
+    }
+
+    /// <summary>
+    /// Igual que <see cref="Comprobar"/>, pero para validar códigos de acceso (spec-006, research.md V10): solo el
+    /// personal de centro. La regla de verdad la aplica la API (<c>ROL_NO_PERMITIDO</c>).
+    /// </summary>
+    public static async Task<Acceso> ComprobarPersonal(EstadoSesion sesion)
+    {
+        var estado = await sesion.GetAuthenticationStateAsync();
+        if (estado.User.Identity?.IsAuthenticated != true)
+        {
+            return Acceso.SinSesion;
+        }
+
+        return estado.User.IsInRole("personal_centro") ? Acceso.Permitido : Acceso.SinPermiso;
     }
 }

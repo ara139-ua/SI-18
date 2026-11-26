@@ -226,7 +226,7 @@ franja; si ya se había aceptado, con el aviso de la hora anterior.
 - [X] T010 [US1] Añadir a `Validar` el aviso de RF-006a (research.md V5): solo si se acepta y **antes**
   de insertar, `MAX(FechaUtc)` de `ValidacionesAcceso` con `ReservaId == reserva.Id && Aceptada`; si hay
   valor, `ValidacionAnteriorUtc` y `ValidacionAnteriorHora` («`HH:mm`» de Madrid). Depende de T008, T009.
-- [ ] T011 [P] [US1] Añadir `ComprobarPersonal(EstadoSesion sesion)` a
+- [X] T011 [P] [US1] Añadir `ComprobarPersonal(EstadoSesion sesion)` a
   `src/SI18.Cliente/Reservas/AccesoReservas.cs`, con el mismo patrón que `Comprobar`: sin sesión →
   `SinSesion`; rol `personal_centro` → `Permitido`; otro → `SinPermiso`; y la constante
   `AvisoSinPermisoValidar = "Validar códigos de acceso es para el personal de centro."`.
