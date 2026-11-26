@@ -714,9 +714,16 @@ responsable.
   infracciones en los cuatro. Manual: teclado, NVDA (el error se lee una sola vez, con icono, y el foco vuelve al
   correo) y 320 px, todo correcto. Resultados en https://github.com/ara139-ua/SI-18/pull/41#issuecomment-7195036538.
   @ara139-ua puede revisarla después de la fusión.
-- [ ] T074 [Ambos] Ejecutar quickstart.md §2–§5 de principio a fin en las dos máquinas, con .NET 10:
+- [X] T074 [Ambos] Ejecutar quickstart.md §2–§5 de principio a fin en las dos máquinas, con .NET 10:
   docker compose, `dotnet ef database update`, siembra, V1–V10 manuales y `dotnet test SI18.slnx`
   en verde.
+
+  **Hecho (2026-11-26, Saul)**: quickstart §2–§5 ejecutado de principio a fin en la máquina de Saul (SDK
+  10.0.404), sobre una base nueva y vacía `si18_t074`. V1–V10 en verde, siembra idempotente («sembrados»
+  la primera vez y «ya existen» la segunda), `dotnet test SI18.slnx` 362/362 y `Categoria=Limites` 151/151.
+  Detalle en https://github.com/ara139-ua/SI-18/pull/41. No se ejecutó en la máquina de Artur por falta de
+  tiempo antes de la entrega. Las correcciones de §2 (variables de `.env` en lugar de `dotnet user-secrets`)
+  y §3 (`dotnet ef database update --connection`) del quickstart salieron de esta ejecución.
 - [X] T075 [Ambos] Revisar los secretos según quickstart.md §7 (`git grep` sin resultados) y comprobar
   con `git ls-files fuentes/.env` que `.env` no está versionado.
 
