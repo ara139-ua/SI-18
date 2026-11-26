@@ -426,7 +426,7 @@ ve el personal.
 - [X] T027 [P] Comprobar que no se ha escrito la zona horaria a mano (research.md V8; lección de T078 de
   000-core): `git grep -n "Europe/Madrid" -- fuentes/src/SI18.Api/Modulos/Reservas fuentes/src/SI18.Cliente/Reservas fuentes/src/SI18.Contratos/Reservas`
   sin resultados.
-- [ ] T028 Ejecutar quickstart.md §2–§5 de principio a fin: `dotnet test SI18.slnx` en verde (también
+- [X] T028 Ejecutar quickstart.md §2–§5 de principio a fin: `dotnet test SI18.slnx` en verde (también
   con `--filter-trait "Categoria=Limites"`), los escenarios Q1–Q10 contra la API y los pasos de la
   pantalla. Medir y anotar en el PR:
   - el tiempo desde pulsar «Validar» hasta que se ve y se anuncia el resultado, **20 veces**: < 1 s en
@@ -435,7 +435,7 @@ ve el personal.
     < 15 s (CE-005);
   - 20 llamadas a `POST /api/validaciones-acceso` con la API local (aceptadas y rechazadas): p95
     < 300 ms (000-core; research.md V12).
-- [ ] T029 [P] Avisar al grupo (constitución, «Acuerdos de colaboración»; plan.md, «Puntos a coordinar»):
+- [X] T029 [P] Avisar al grupo (constitución, «Acuerdos de colaboración»; plan.md, «Puntos a coordinar»):
   - a **C** (C4): HU-03 y HU-07 **no tienen que hacer nada** para invalidar un código; una reserva
     cancelada por `IServicioReservas` se rechaza sola con `QR_RESERVA_NO_CONFIRMADA`; enlace a
     contracts/modulos.md;
@@ -443,6 +443,8 @@ ve el personal.
     el menú del personal.
 
   Anotarlo en la descripción del PR.
+  **Hecho** (26/11/2026): aviso a C en https://github.com/ara139-ua/SI-18/issues/40#issuecomment-7198377510 y a
+  @ara139-ua en https://github.com/ara139-ua/SI-18/pull/46#issuecomment-7198378318.
 - [X] T030 Abrir los PR hacia `develop`, con la lista de los principios I–IX revisados, como en spec-002.
   **Antes de abrir cada PR, revisar los secretos** (constitución, «Flujo de trabajo», principio V;
   análisis D1): `git grep -nE "Password=|SI18_CLAVE_DEMO=.+[^>]$" -- ":!*.example"` (quickstart §7 de
@@ -454,7 +456,10 @@ ve el personal.
     T026; **revisa @ara139-ua** el código común de T016 (C2) y T024 (C1).
 
   Los aprueba otra persona del grupo.
-- [ ] T031 Después de fusionar los dos PR, ejecutar `/speckit-converge` para la spec 006.
+- [X] T031 Después de fusionar los dos PR, ejecutar `/speckit-converge` para la spec 006.
+  **Hecho** (26/11/2026): dos informes, [converge-2026-11-26.md](./converge-2026-11-26.md) y
+  [converge-2026-11-26-2.md](./converge-2026-11-26-2.md); T032 y T033 resueltas. **F1 (revisión de C1 y C2) y F2 (T023)
+  siguen abiertos, pendientes de @ara139-ua** (el #46 se fusionó sin su revisión por la entrega, como el #31 y el #36).
 
 ---
 
@@ -521,3 +526,22 @@ C2), el PR de API se abre antes (T030).
 - Fuera de `*/Reservas` solo se tocan, con revisión de @ara139-ua: `ErrorApi.cs` y `ClienteApi.cs`
   (T016, C2) y `MainLayout.razor` (T024, C1). `Program.cs` no cambia.
 - Ninguna fecha ni hora se convierte con `"Europe/Madrid"` escrito a mano (T027).
+
+---
+
+## Fase 9: Convergencia (converge 2026-11-26, [primer informe](./converge-2026-11-26.md))
+
+- [X] T032 [US1] (F3, RF-006a) El aviso de validación anterior dice «Este código ya se validó hoy a las HH:mm»
+  si la anterior es del mismo día de Madrid que ahora, y «Este código se validó por última vez el dd/MM/yyyy a
+  las HH:mm» si no. El formato está en `TextosReservas.AvisoValidacionAnterior` (`src/SI18.Cliente/Reservas/`),
+  que usa `FormatoEs.FechaHora` (misma zona que `HorarioMadrid`; `SI18.Cliente` no referencia `SI18.Dominio`).
+  Prueba `AvisoValidacionAnteriorTextoTests` con el mismo día, otro día (aunque sea el mismo día UTC) y
+  horario de verano.
+- [X] T033 (F5) Corregir en `quickstart.md` §4 paso 1 la frase «Si el cambio de `MainLayout.razor` … aún no está
+  fusionado, abre `/validar-acceso` a mano» (C1 ya está fusionado) y en la matriz de `analyze-registro.md` la
+  de CE-006 «sin marcar hasta hacerla» (T026 está hecha).
+
+**Sin tarea** (informe de converge): F4 (pruebas del texto de `ValidarAcceso.razor`; la lectura de extensiones
+y ahora el texto del aviso tienen prueba, y la pantalla se comprobó a mano en T026) y F6 (mensaje de fallo de
+conexión, que sigue el patrón de `InicioSesion.razor`). F1 y F2 quedan abiertos hasta la revisión de
+@ara139-ua; el #46 se fusionó sin ella por la entrega, como el #31 y el #36.

@@ -5,6 +5,7 @@
 @inject ClienteApi Api
 @inject EstadoSesion Sesion
 @inject NavigationManager Navegacion
+@inject TimeProvider Reloj
 
 @* Validación del código de acceso por el personal de centro (specs/006-validar-qr/research.md V10; tasks.md T012,
    T017, T025). El resultado se muestra en la misma página, debajo del formulario. Se anuncia una sola vez con
@@ -54,11 +55,11 @@
                 <dt>Horario</dt>
                 <dd>@TextosReservas.Horas(_aceptada.HoraInicio, _aceptada.HoraFin)</dd>
             </dl>
-            @if (_aceptada.ValidacionAnteriorHora is not null)
+            @if (_avisoAnterior is not null)
             {
                 <p class="aviso-anterior">
                     <MudIcon Icon="@Icons.Material.Filled.History" Class="icono-resultado" />
-                    @AvisoAnterior(_aceptada.ValidacionAnteriorHora)
+                    @_avisoAnterior
                 </p>
             }
         </section>
@@ -107,6 +108,7 @@
     private string? _codigo;
     private string? _errorCodigo;
     private ValidacionAccesoDto? _aceptada;
+    private string? _avisoAnterior;
     private Rechazo? _rechazo;
     private (string Texto, Severity Tipo)? _mensajePendiente;
 
@@ -150,6 +152,7 @@
         }
 
         _aceptada = null;
+        _avisoAnterior = null;
         _rechazo = null;
         _errorCodigo = null;
         _mensaje.Limpiar();
@@ -168,7 +171,10 @@
             var resultado = await Api.PostAsync<PeticionValidacionAcceso, ValidacionAccesoDto>(
                 "/api/validaciones-acceso", new PeticionValidacionAcceso(_codigo));
             _aceptada = resultado;
-            _mensaje.Mostrar(FraseAceptada(resultado), Severity.Success);
+            _avisoAnterior = resultado.ValidacionAnteriorUtc is { } anterior
+                ? TextosReservas.AvisoValidacionAnterior(anterior.ToUniversalTime(), Reloj.GetUtcNow().UtcDateTime)
+                : null;
+            _mensaje.Mostrar(FraseAceptada(resultado, _avisoAnterior), Severity.Success);
             Reiniciar();
         }
         catch (ErrorApi error) when (error.Codigo == CodigoRolNoPermitido)
@@ -229,12 +235,10 @@
         }
     }
 
-    private static string AvisoAnterior(string hora) => $"Este código ya se validó hoy a las {hora}.";
-
-    private static string FraseAceptada(ValidacionAccesoDto r)
+    private static string FraseAceptada(ValidacionAccesoDto r, string? avisoAnterior)
     {
         var frase = $"Acceso permitido. {r.Titular}, {r.Instalacion}, {r.Centro}, {TextosReservas.Horas(r.HoraInicio, r.HoraFin)}.";
-        return r.ValidacionAnteriorHora is null ? frase : $"{frase} {AvisoAnterior(r.ValidacionAnteriorHora)}";
+        return avisoAnterior is null ? frase : $"{frase} {avisoAnterior}";
     }
 
     private static string FraseRechazada(Rechazo r)
