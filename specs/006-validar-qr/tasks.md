@@ -546,3 +546,11 @@ C2), el PR de API se abre antes (T030).
 y ahora el texto del aviso tienen prueba, y la pantalla se comprobó a mano en T026) y F6 (mensaje de fallo de
 conexión, que sigue el patrón de `InicioSesion.razor`). F1 y F2 quedan abiertos hasta la revisión de
 @ara139-ua; el #46 se fusionó sin ella por la entrega, como el #31 y el #36.
+
+## Fase 10: Convergencia (converge 2026-11-26, [tercer informe](./converge-2026-11-26-3.md))
+
+Después de la pasada de clarify sobre la versión funcional y de [analyze-3.md](./analyze-3.md).
+Responsable: Saul. Revisor: Artur.
+
+- [ ] T034 [Saul · revisa Artur] Añadir a `tests/SI18.Api.Tests/Reservas/ValidarAccesoTests.cs` la prueba del criterio de mayúsculas: el código de la reserva compartida con una sola letra cambiada de caja, validado por `personal.este@si18.test` → 422 `QR_DESCONOCIDO`, sin la extensión `reserva`, y registrado con `aceptada = false`, `reserva_id` nulo y el código leído tal cual per RF-004 (mayúsculas), Casos límite «Mayúsculas y minúsculas», Constitution II (partial)
+- [ ] T035 [Saul · revisa Artur] Recoger en research.md V10 el segundo texto del aviso de validación anterior («Este código se validó por última vez el dd/MM/yyyy a las HH:mm», cuando la anterior no es del mismo día de Madrid), como ya hace `TextosReservas.AvisoValidacionAnterior` (T032) per research.md V10, converge-2026-11-26-2 F7 (partial)
