@@ -631,7 +631,7 @@ efectivo y el QR solo en las confirmadas.
     no estaba en el plan.
 
   Anotarlo en la descripción del PR.
-- [ ] T051 Abrir los PR hacia `develop`, con la lista de los principios I–IX revisados, como en spec-001:
+- [X] T051 Abrir los PR hacia `develop`, con la lista de los principios I–IX revisados, como en spec-001:
   - **PR de API**: Fases 1–7 de la API y Fase 9 (T001–T020, T026–T031, T033–T034, T036, T038–T039,
     T044–T048). Incluye **en el mismo PR** `ConsultaReservas` (T007–T008) y la retirada de la provisional
     (T009–T010); **revisa Artur**;
