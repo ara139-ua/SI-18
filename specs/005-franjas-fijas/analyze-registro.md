@@ -1,38 +1,40 @@
 # Registro de `/speckit-analyze` y trazabilidad · 005-franjas-fijas
 
 **Responsable**: Artur (módulo `Disponibilidad`). **Informes**: analyze inicial (2026-11-25, antes de implementar;
-sus hallazgos están copiados en la tabla 1 porque el informe se dio en la sesión y no se guardó como fichero) y
+sus hallazgos están copiados en la tabla 1 del informe que se dio en la sesión de Claude Code, que no se guardó como fichero) y
 [analyze-final.md](./analyze-final.md) (2026-11-26, después de implementar y converger). Converge:
 [converge-2026-11-26.md](./converge-2026-11-26.md) (dos pasadas).
+
+> Este registro sustituye a la reconstrucción que hizo Saul el 26/11/2026 (#51) a partir de los commits de correcciones, porque el informe original sí se ha recuperado. Los identificadores y las decisiones coinciden con los de esa reconstrucción; aquí se añaden la gravedad, la evidencia de cada hallazgo, la decisión sobre C1 y el analyze final. Los PR de las correcciones (#33) los fusionó Artur sin revisión registrada en GitHub.
 
 ## 1. Registro de hallazgos del analyze inicial (2026-11-25)
 
 Estados: **Resuelto** (corregido en el commit indicado) · **Verificado** (el analyze final confirma que ya no
 aparece).
 
-| ID | Historia / criterio | Gravedad | Evidencia (analyze inicial) | Decisión | Responsable | Estado | Dónde se resuelve |
-|----|---------------------|----------|-----------------------------|----------|-------------|--------|-------------------|
-| T1 | T008 · `InicializadorDatosTests` (000-core) | ALTA | T008 insertaba una temporada terminada en la base compartida, y `InicializadorDatosTests` exige `Temporadas: 1` | No insertar nada: «temporada terminada» con el servicio y un reloj propio en julio de 2027 (`DatosDisponibilidad.ConServicioSolicitudes`) | Artur | Verificado (analyze final) | `13fc6dd` · tasks.md T006, T008 · `SolicitarFranjasFijasTests.Esc5_una_temporada_terminada_no_se_puede_elegir` |
-| T2 | T012 y T019 (`RevisarFranjasFijasTests`) | MEDIA | El rechazo de T019 usaba la misma pista y día que la aprobada de T012, que seguiría bloqueando | Rechazar en otra pista y otro día de Este, escrito en la tarea | Artur | Verificado (analyze final) | `13fc6dd` · tasks.md T019 · `RevisarFranjasFijasTests.Rechazar_deja_las_franjas_libres_y_avisa_al_club` |
-| U1 | «Casos límite» (solicitud de otro club) | MEDIA | El caso límite hablaba de `NO_ENCONTRADO` al ver una solicitud ajena, pero no hay endpoint de detalle | Caso límite reescrito: «un representante solo ve en su lista las de su club; no hay forma de consultarlas una a una» | Artur | Verificado (analyze final) | `13fc6dd` · spec.md «Casos límite» · `SolicitarFranjasFijasTests.Esc6_un_representante_no_ve_las_solicitudes_de_otro_club` |
-| U2 | RF-013, CE-004 («cada representante») | BAJA | La siembra tiene un representante por club y no se pueden añadir usuarios (`Usuarios: 10`) | Comprobar que hay tantos avisos nuevos como representantes del club, leídos de la base | Artur | Verificado (analyze final) | `13fc6dd` · tasks.md T012 · `RevisarFranjasFijasTests.Aprobar_sin_conflictos_bloquea_las_franjas_de_la_temporada_y_avisa_al_club` |
-| I1 | tasks.md «Datos de las pruebas» · T023 | BAJA | Las dos pruebas movidas de spec-001 usan Oeste, no Norte, contra la regla «un centro por clase» | Se conservan sus pistas de Oeste y la tarea explica por qué no chocan | Artur | Verificado (analyze final) | `13fc6dd` · tasks.md «Datos de las pruebas», T023 |
-| C1 | Constitución, «Acuerdos de colaboración» | BAJA | Mismo punto que C1 de la spec 001: ramas `feature/…` frente a `spec-NNN` | Parche 1.2.1 de la constitución con la práctica real. Decidido por Artur y Saul el 26/11/2026 | Artur (propuesta), Saul (aprobación) | Resuelto al fusionar `feature/constitucion-1.2.1` | `.specify/memory/constitution.md` 1.2.1 |
+| ID | Historia / criterio | Gravedad | Evidencia (analyze inicial) | Decisión | Responsable | Revisor | Estado | Dónde se resuelve |
+|----|---------------------|----------|-----------------------------|----------|-------------|---------|--------|-------------------|
+| T1 | T008 · `InicializadorDatosTests` (000-core) | ALTA | T008 insertaba una temporada terminada en la base compartida, y `InicializadorDatosTests` exige `Temporadas: 1` | No insertar nada: «temporada terminada» con el servicio y un reloj propio en julio de 2027 (`DatosDisponibilidad.ConServicioSolicitudes`) | Artur | Sin revisión registrada (#33) | Verificado (analyze final) | `13fc6dd` · tasks.md T006, T008 · `SolicitarFranjasFijasTests.Esc5_una_temporada_terminada_no_se_puede_elegir` |
+| T2 | T012 y T019 (`RevisarFranjasFijasTests`) | MEDIA | El rechazo de T019 usaba la misma pista y día que la aprobada de T012, que seguiría bloqueando | Rechazar en otra pista y otro día de Este, escrito en la tarea | Artur | Sin revisión registrada (#33) | Verificado (analyze final) | `13fc6dd` · tasks.md T019 · `RevisarFranjasFijasTests.Rechazar_deja_las_franjas_libres_y_avisa_al_club` |
+| U1 | «Casos límite» (solicitud de otro club) | MEDIA | El caso límite hablaba de `NO_ENCONTRADO` al ver una solicitud ajena, pero no hay endpoint de detalle | Caso límite reescrito: «un representante solo ve en su lista las de su club; no hay forma de consultarlas una a una» | Artur | Sin revisión registrada (#33) | Verificado (analyze final) | `13fc6dd` · spec.md «Casos límite» · `SolicitarFranjasFijasTests.Esc6_un_representante_no_ve_las_solicitudes_de_otro_club` |
+| U2 | RF-013, CE-004 («cada representante») | BAJA | La siembra tiene un representante por club y no se pueden añadir usuarios (`Usuarios: 10`) | Comprobar que hay tantos avisos nuevos como representantes del club, leídos de la base | Artur | Sin revisión registrada (#33) | Verificado (analyze final) | `13fc6dd` · tasks.md T012 · `RevisarFranjasFijasTests.Aprobar_sin_conflictos_bloquea_las_franjas_de_la_temporada_y_avisa_al_club` |
+| I1 | tasks.md «Datos de las pruebas» · T023 | BAJA | Las dos pruebas movidas de spec-001 usan Oeste, no Norte, contra la regla «un centro por clase» | Se conservan sus pistas de Oeste y la tarea explica por qué no chocan | Artur | Sin revisión registrada (#33) | Verificado (analyze final) | `13fc6dd` · tasks.md «Datos de las pruebas», T023 |
+| C1 | Constitución, «Acuerdos de colaboración» | BAJA | Mismo punto que C1 de la spec 001: ramas `feature/…` frente a `spec-NNN` | Parche 1.2.1 de la constitución con la práctica real. Decidido por Artur y Saul el 26/11/2026 | Artur (propuesta), Saul (aprobación) | Saul (aprueba el PR de la 1.2.1) | Resuelto al fusionar `feature/constitucion-1.2.1` | `.specify/memory/constitution.md` 1.2.1 |
 
 ### Hallazgos nuevos del analyze final (2026-11-26)
 
-| ID | Historia / criterio | Gravedad | Evidencia (analyze final) | Decisión | Responsable | Estado | Dónde se resuelve |
-|----|---------------------|----------|---------------------------|----------|-------------|--------|-------------------|
-| I1 | RF-016, RF-017 · contracts/modulos.md | MEDIA | `RepresentantesAfectados` no tiene consumidor y los cierres se leen con la provisional: HU-07 está fuera del alcance comprometido (constitución 1.2.0) | Nota de alcance: se conserva como base para trabajo futuro | Artur | Pendiente (documentación) | spec.md «Supuestos» · contracts/modulos.md |
-| E1 | CE-001 | BAJA | Sin tarea que mida «menos de 2 minutos» | Se da por cumplido con el recorrido de T025 (solicitud completa con teclado en menos de un minuto) | Artur | Aceptado | tasks.md T025 |
-| E2 | Historia 3, escenario 1 | BAJA | «Aprobar» desactivado no se comprobó en pantalla; la regla sí está probada en el servidor | Repetir la revisión con una solicitud con conflictos | Artur | Pendiente (comprobación manual) | tasks.md T025 |
-| U1 | Cabecera de spec.md | BAJA | «Estado: Borrador» | Cambiar a «Implementada» | Artur | Pendiente (documentación) | spec.md |
+| ID | Historia / criterio | Gravedad | Evidencia (analyze final) | Decisión | Responsable | Revisor | Estado | Dónde se resuelve |
+|----|---------------------|----------|---------------------------|----------|-------------|---------|--------|-------------------|
+| I1 | RF-016, RF-017 · contracts/modulos.md | MEDIA | `RepresentantesAfectados` no tiene consumidor y los cierres se leen con la provisional: HU-07 está fuera del alcance comprometido (constitución 1.2.0) | Nota de alcance: se conserva como base para trabajo futuro | Saul | Artur (revisa el cambio de Saul) | Resuelto (por Saul, #50) | contracts/modulos.md «Coordinación», nota de alcance |
+| E1 | CE-001 | BAJA | Sin tarea que mida «menos de 2 minutos» | Se da por cumplido con el recorrido de T025 (solicitud completa con teclado en menos de un minuto) | Artur | — | Aceptado | tasks.md T025 |
+| E2 | Historia 3, escenario 1 | BAJA | «Aprobar» desactivado no se comprobó en pantalla; la regla sí está probada en el servidor | Repetir la revisión con una solicitud con conflictos | Artur | — | Pendiente (comprobación manual) | tasks.md T025 |
+| U1 | Cabecera de spec.md | BAJA | «Estado: Borrador» | Cambiar a «Implementada» | Saul | Artur (revisa el cambio de Saul) | Resuelto (por Saul, #51) | spec.md «Estado: Implementada» |
 
 ### Hallazgo del converge
 
-| ID | Origen | Gravedad | Evidencia | Decisión | Responsable | Estado | Dónde se resuelve |
-|----|--------|----------|-----------|----------|-------------|--------|-------------------|
-| F1 | RF-008, CE-003 | MEDIA | Los conflictos empezaban en «ahora» aunque la temporada no hubiera empezado | Empezar en `max(ahora, inicio de la temporada)` | Artur | Verificado (converge, pasada 2) | T030 · PR #34 · `ConflictosFranjasFijasTests.Antes_de_empezar_la_temporada_solo_cuentan_las_reservas_de_dentro_de_ella` |
+| ID | Origen | Gravedad | Evidencia | Decisión | Responsable | Revisor | Estado | Dónde se resuelve |
+|----|--------|----------|-----------|----------|-------------|---------|--------|-------------------|
+| F1 | RF-008, CE-003 | MEDIA | Los conflictos empezaban en «ahora» aunque la temporada no hubiera empezado | Empezar en `max(ahora, inicio de la temporada)` | Artur | Sin revisión registrada (#34) | Verificado (converge, pasada 2) | T030 · PR #34 · `ConflictosFranjasFijasTests.Antes_de_empezar_la_temporada_solo_cuentan_las_reservas_de_dentro_de_ella` |
 
 ## 2. Matriz de trazabilidad de HU-05
 

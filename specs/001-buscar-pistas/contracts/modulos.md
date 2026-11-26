@@ -30,6 +30,10 @@ Solo lectura, registradas con `TryAddScoped`. Cada dueño las sustituye y borra 
 | `IConsultaCierres`      | `ConsultaCierresProvisional`                           | C · Cancelaciones (spec-007) | Se anota en spec-007 |
 | `IConsultaFranjasFijas` | `ConsultaFranjasFijasProvisional`                      | Artur · Disponibilidad (spec-005) | Se anota en spec-005 |
 
+> **Alcance (26/11/2026)**: HU-03 y HU-07 quedaron **fuera del alcance comprometido** por acuerdo con el
+> profesor (el grupo son dos personas; ver [docs/agrupamiento.md](../../../docs/agrupamiento.md)). La fila de `IConsultaCierres` (dueño «C», spec-007) ya no tiene destinatario: `ConsultaCierresProvisional` sigue siendo la implementación registrada. Se conserva
+> como base para trabajo futuro: no hay nadie asignado y no es trabajo pendiente.
+
 `IConsultaFranjasFijas.RepresentantesAfectados` no lo usa HU-01 y en la provisional lanza
 `NotImplementedException`; lo implementa spec-005 para HU-07.
 

@@ -189,6 +189,10 @@ HU-01 (Artur) ──► IConsultaReservas.Activas ──► ConsultaReservas (an
 
 ## Puntos a coordinar
 
+> **Alcance (26/11/2026)**: HU-03 y HU-07 quedaron **fuera del alcance comprometido** por acuerdo con el
+> profesor (el grupo son dos personas; ver [docs/agrupamiento.md](../../docs/agrupamiento.md)). Los puntos C3 y C4, dirigidos a «C», ya no tienen destinatario. Se conserva
+> como base para trabajo futuro: no hay nadie asignado y no es trabajo pendiente.
+
 | # | Con quién | Qué | Propuesta | Cuándo |
 | - | --------- | --- | --------- | ------ |
 | C1 | **Artur** (dueño de `/buscar-pistas`) | Botón «Reservar» en cada franja (aclaración de spec-001, RF-003) | Componente `EnlaceReservar` de Reservas; en `BuscarPistas.razor` solo `@using SI18.Cliente.Reservas` y `<EnlaceReservar Pista="pista" Franja="franja" Fecha="_resultado.Fecha" />` dentro del `<li>`. Sin cambios en DTO, endpoint ni pruebas de HU-01. Lo puede hacer Saul en el PR de implementación de 002 o Artur en el suyo; en los dos casos Artur revisa (E10) | Antes de implementar la pantalla de resumen |

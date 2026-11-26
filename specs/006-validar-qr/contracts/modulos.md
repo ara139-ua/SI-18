@@ -30,6 +30,10 @@ una reserva que pasa a `cancelada` por `IServicioReservas.CancelarPorUsuario` o 
 (spec-002, RF-019a) se rechaza con `QR_RESERVA_NO_CONFIRMADA` en la siguiente validación (RF-012). Se
 avisa a C de esta dependencia (constitución, «Acuerdos de colaboración»).
 
+> **Alcance (26/11/2026)**: HU-03 y HU-07 quedaron **fuera del alcance comprometido** por acuerdo con el
+> profesor (el grupo son dos personas; ver [docs/agrupamiento.md](../../../docs/agrupamiento.md)). El aviso a «C» del párrafo anterior ya no tiene destinatario. Se conserva
+> como base para trabajo futuro: no hay nadie asignado y no es trabajo pendiente.
+
 ## Cambios en código común (puntos a coordinar, revisión de @ara139-ua)
 
 | Fichero (común)                           | Cambio                                                          | Punto |
