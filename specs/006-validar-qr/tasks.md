@@ -366,6 +366,7 @@ ve el personal.
 - [X] T023 [US4] (sin código) Confirmar con @ara139-ua el texto «Validar acceso» y su posición en el hueco
   del personal, dejando sitio al enlace de cierres de spec-007 (plan.md C1).
   **Cerrada sin confirmación de @ara139-ua por la entrega.** Se le pidió en el comentario del #46; si propone cambiar el texto o la posición de "Validar acceso", se hará en un PR aparte.
+  **Confirmado** por @ara139-ua el 26/11/2026, sin cambios: [revision-c1-c2.md](./revision-c1-c2.md).
 - [X] T024 [US4] **[código común, revisión de @ara139-ua — C1]** En
   `src/SI18.Cliente/Layout/MainLayout.razor`, dentro de
   `<AuthorizeView Roles="personal_centro" Context="personal">`, sustituir el comentario del hueco por
@@ -461,6 +462,7 @@ ve el personal.
   **Hecho** (26/11/2026): dos informes, [converge-2026-11-26.md](./converge-2026-11-26.md) y
   [converge-2026-11-26-2.md](./converge-2026-11-26-2.md); T032 y T033 resueltas. **F1 (revisión de C1 y C2) y F2 (T023)
   siguen abiertos, pendientes de @ara139-ua** (el #46 se fusionó sin su revisión por la entrega, como el #31 y el #36).
+  **Cerrados** el 26/11/2026: @ara139-ua revisó C1 y C2 y confirmó T023, sin cambios ([revision-c1-c2.md](./revision-c1-c2.md)).
 
 ---
 
@@ -545,7 +547,8 @@ C2), el PR de API se abre antes (T030).
 **Sin tarea** (informe de converge): F4 (pruebas del texto de `ValidarAcceso.razor`; la lectura de extensiones
 y ahora el texto del aviso tienen prueba, y la pantalla se comprobó a mano en T026) y F6 (mensaje de fallo de
 conexión, que sigue el patrón de `InicioSesion.razor`). F1 y F2 quedan abiertos hasta la revisión de
-@ara139-ua; el #46 se fusionó sin ella por la entrega, como el #31 y el #36.
+@ara139-ua; el #46 se fusionó sin ella por la entrega, como el #31 y el #36. Revisión hecha el 26/11/2026, sin
+cambios: [revision-c1-c2.md](./revision-c1-c2.md).
 
 ## Fase 10: Convergencia (converge 2026-11-26, [tercer informe](./converge-2026-11-26-3.md))
 
